@@ -1,0 +1,54 @@
+#!/bin/bash
+
+########################################
+######## OneVizion Cron Launcher #######
+## Configuration environment variables:
+# SERVICE_OUT - path to standard output log file
+# JAVA_COMMAND - Java command to run
+# JAVA_OPTS - additional Java options
+# JAR_PATH - path to launch JAR file
+# JAR_OPTS - JAR options
+########################################
+
+function get_artifact_name() {
+    local SERVICE_NAME
+    SERVICE_NAME=$1
+
+    cut -d '_' -f2 <<<"$SERVICE_NAME"
+}
+
+ROOT_DIR="$(dirname "$0")"
+SERVICE_NAME="$(basename "$ROOT_DIR")"
+ARTIFACT_NAME="$(get_artifact_name "$SERVICE_NAME")"
+ENV_CONF_FILE="$ROOT_DIR/${ARTIFACT_NAME}.conf"
+
+if [ ! -f "$ENV_CONF_FILE" ]; then
+    echo "No environment configuration [$ENV_CONF_FILE] found"
+    exit 1
+fi
+
+# shellcheck disable=SC1090
+. "$ENV_CONF_FILE"
+
+if [ -z "$SERVICE_OUT" ]; then
+    echo "SERVICE_OUT is not set"
+    exit 1
+fi
+if [ -z "$JAVA_COMMAND" ]; then
+    echo "JAVA_COMMAND is not set"
+    exit 1
+fi
+if [ -z "$JAR_PATH" ]; then
+    echo "JAR_PATH is not set"
+    exit 1
+fi
+if [ -z "$JAR_OPTS" ]; then
+    echo "JAR_OPTS is not set"
+    exit 1
+fi
+
+touch "$SERVICE_OUT"
+cd "$ROOT_DIR" || exit 1
+
+# shellcheck disable=SC2086
+"$JAVA_COMMAND" $JAVA_OPTS -jar "$JAR_PATH" $JAR_OPTS >"$SERVICE_OUT" 2>&1

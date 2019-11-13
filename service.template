@@ -1,0 +1,15 @@
+[Unit]
+Description=${SERVICE_NAME} APP
+After=network.target
+
+[Service]
+Type=forking
+User=${SERVICE_UN}
+EnvironmentFile=${SERVICE_PATH}/${JAR_NAME}.conf
+ExecStart=${SERVICE_PATH}/app-launcher.sh
+StandardOutput=${SERVICE_PATH}/run.out
+PIDFile=${SERVICE_PATH}/run.pid
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

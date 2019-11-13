@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Server port="8005" shutdown="SHUTDOWN">
+    <Listener className="org.apache.catalina.startup.VersionLoggerListener"/>
+    <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on"/>
+    <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+    <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+    <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+
+    <Service name="Catalina">
+        <!-- CWE ID 526 fix: change server name to another and disable X-Powered-By header -->
+        <Connector port="8080" protocol="HTTP/1.1"
+                   connectionTimeout="20000"
+                   redirectPort="8443"
+                   xpoweredby="false"
+                   server="ov" />
+
+        <Engine name="Catalina" defaultHost="localhost">
+            <!-- Fix for redirects through unsecure HTTP (Sec-148589 Redirect to original url after login screen) -->
+            <Valve className="org.apache.catalina.valves.RemoteIpValve"
+                   internalProxies=".*"
+                   protocolHeader="X-Forwarded-Proto"
+                   httpsServerPort="443"/>
+
+            <Host name="localhost" appBase="webapps" unpackWARs="false" autoDeploy="false"/>
+            <Host name="sitename.onevizion.com" appBase="sitename.onevizion.com" unpackWARs="false" autoDeploy="false">
+                <!-- CWE ID 209 fix: don't show server information and stacktrace -->
+                <Valve className="org.apache.catalina.valves.ErrorReportValve"
+                       showReport="false"
+                       showServerInfo="false" />
+
+                <!-- Uncomment this to use custom images:
+                - login_background.jpg
+                - logo.svg
+                - favicon.png
+
+                (this will work only if you pass web.whiteLabeled=true parameter in Catalina/sitename.onevizion.com/ROOT.xml)
+                -->
+                <!-- <Context docBase="${catalina.base}/custom/img" path="/custom/img" /> -->
+            </Host>
+
+        </Engine>
+    </Service>
+</Server>
+

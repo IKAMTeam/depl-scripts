@@ -1,0 +1,19 @@
+######################################################
+######## OneVizion App/Cron Launcher configuration ########
+######################################################
+## Configuration environment variables:
+# SERVICE_PID - path to pid file (for App Launcher only)
+# SERVICE_OUT - path to standard output log file
+# JAVA_COMMAND - Java command to run
+# JAVA_OPTS - additional Java options
+# JAR_PATH - path to launch JAR file
+# JAR_OPTS - JAR options
+######################################################
+
+JAVA_COMMAND="java"
+JAVA_OPTS="-Djava.security.egd=file:///dev/urandom"
+JAR_PATH="${JAR_PATH}"
+JAR_OPTS="${JAR_OPTS}"
+
+SERVICE_PID="${SERVICE_PATH}/run.pid"
+SERVICE_OUT="${SERVICE_PATH}/run.out"
