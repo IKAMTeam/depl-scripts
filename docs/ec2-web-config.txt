@@ -1,0 +1,89 @@
+Instructions apply to the new instances of Amazon Linux 2 AMI 
+
+We use AWS Linux 2 Extras Library to install some components. 
+
+I. GENERAL WEB SERVER CONFIGURATION
+
+1. Set time zone: 
+sudo ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime 
+
+2. Install Tomcat (Tomcat in AWS extras comes with Corretto 11 dependency, which is AWS build of Java 11 compatible with Java SE):
+sudo amazon-linux-extras install tomcat8.5 
+
+Tomcat installed in /usr/share/tomcat directory 
+
+3. enable service to start at boot time: 
+sudo systemctl enable tomcat 
+
+4. Install OneVizion deployment and upgrade scripts from GitHub
+sudo yum install git 
+git clone https://github.com/IKAMTeam/depl-scripts 
+cd depl-scripts 
+chmod +x *.sh 
+cp credentials.conf.template credentials.conf 
+
+5. Open credentials.conf and set variables: 
+RELEASES_REPO_URL="https://ci.onevizion.com/archiva/repository/releases" 
+SNAPSHOT_REPO_URL= "https://ci.onevizion.com/archiva/repository/snapshots" 
+REPOSITORY_UN= "username for ci.onevizion.com access" 
+REPOSITORY_PWD="password for ci.onevizion.com access" 
+
+ 
+6. Test database connection: 
+java -jar setup/test-jdbc.jar <username> <password> <host>:<port>:<sid> 
+
+7. Setup Tomcat with OneVizion context configuration template, corrected logging settings to use with own deployment scripts, page for health check by Load Balancer.
+sudo cp -rf setup/tomcat/conf/* /usr/share/tomcat/conf 
+sudo chown -R tomcat:tomcat /usr/share/tomcat/conf/Catalina/sitename.onevizion.com
+sudo cp -rf setup/tomcat/webapps/* /usr/share/tomcat/webapps 
+sudo rm -f /usr/share/tomcat/conf/tomcat-users.xml 
+
+8. Setup timeout for Tomcat shutdown process before it will be killed: 
+sudo sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' /usr/share/tomcat/conf/tomcat.conf 
+
+
+II. INSTALLATION OF ONEVIZION WEB APP
+
+9. Open /usr/share/tomcat/conf/server.xml in a text editor and replace "sitename.onevizion.com" to the preferred hostname. Pay attention to the "Host" tag - it contains a sample config to use white-labeled images (background, logos, etc.). 
+
+10. Rename directory /usr/share/tomcat/conf/Catalina/sitename.onevizion.com to the preferred hostname. 
+
+11. In /usr/share/tomcat/conf/Catalina/<preferred hostname>/ROOT.xml
+Change docBase attribute to correct directory name (this directory will contain ps-web.war extracted content) - replace to ${catalina.home}/<preferred hostname>. 
+Change Parameter[name="app.serverUrl"] tag value to target website url e.g. https://<preferred hostname> 
+
+Replace next placeholders: 
+[placeholder for Oracle host] - Hostname for access Oracle database 
+[placeholder for Oracle port] - port for access Oracle database 
+[placeholder for Oracle SID] - Oracle SID 
+[placeholder username for OWNER schema] - Username for OWNER schema 
+[placeholder for OWNER schema password] - Password for OWNER schema 
+[placeholder username for USER schema] - Username for _USER schema 
+[placeholder for USER schema password] - Password for _USER schema 
+[placeholder username for PKG schema] - Username for _PKG schema 
+[placeholder for PKG schema password] - Password for _PKG schema 
+[placeholder for error reports email subject] - Usually equals to <username for OWNER schema>.<1st part of db URL>, for example prod01.trackor-prod 
+
+12. Install ps-web: 
+depl-scripts $ ./update-ps-web.sh <target version> /usr/share/tomcat <preferred hostname>
+
+(Tomcat will start automatically) 
+
+
+III. ENABLE SSL CONNECTION TO THE ORACLE DB (OPTIONAL)
+
+13. Make sure SSL is enabled in AWS RDS option group with following settings: port 2484, SSL_VERSION= 1.2, CIPHER_SUITE=SSL_RSA_WITH_AES_256_GCM_SHA384
+
+14. Use instructions from https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html to generate Java keystore file with AWS certificates:
+download certificate from https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem
+openssl x509 -outform der -in rds-ca-2019-root.pem -out rds-ca-2019-root.der
+
+15. Import AWS Certificate into Java trust store (located in $JAVA_HOME/jre/lib/security/cacerts, also Tomcat prints out JAVA_HOME into logs on startup):
+sudo keytool -import -trustcacerts -keystore cacerts -storepass changeit -alias Root -file rds-ca-2019-root.der
+
+16. Modify "web.dbSid" parameter in ROOT.xml to:
+'(DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))'
+
+Replace [placeholder for Oracle SID] and [placeholder for Oracle host] with correct values
+
+17. restart Tomcat
