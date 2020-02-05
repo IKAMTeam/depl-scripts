@@ -402,6 +402,9 @@ function wait_log() {
     OUT_PATH="$(mktemp --suffix="_out")"
     mkfifo "$FIFO_PATH" || return 1
 
+    delete_on_exit "$FIFO_PATH"
+    delete_on_exit "$OUT_PATH"
+
     set +m
     {
         if ! timeout "$TIMEOUT" grep -m 1 -e "$SUCCESS_STRING" -e "$FAILED_STRING" "$FIFO_PATH"; then
@@ -409,14 +412,15 @@ function wait_log() {
         fi
     } >"$OUT_PATH" &
 
-    delete_on_exit "$FIFO_PATH"
-    delete_on_exit "$OUT_PATH"
-
     # shellcheck disable=SC2024
     sudo tail -F -n 0 "$LOG_FILE_PATH" --pid $! 2>/dev/null >>"$FIFO_PATH"
 
     # Show grep output
     cat "$OUT_PATH"
+
+    # Match string again for generate return code
+    grep -m 1 -e "$SUCCESS_STRING" "$OUT_PATH" &>/dev/null
+    return $?
 }
 
 # Uses TOMCAT_UN, TOMCAT_GROUP variables

@@ -54,4 +54,7 @@ fi
 
 echo "Starting Tomcat..."
 sudo systemctl start "$TOMCAT_SERVICE" || exit 1
-wait_log "$TOMCAT_PATH/logs/$TOMCAT_WAIT_LOG" "Server startup in" "SEVERE:" 10m
+
+if ! wait_log "$TOMCAT_PATH/logs/$TOMCAT_WAIT_LOG" "Server startup in" "SEVERE" 10m; then
+    exit 1
+fi
