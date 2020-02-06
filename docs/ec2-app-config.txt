@@ -34,9 +34,9 @@ sudo cp setup/libsigar-amd64-linux.so /usr/lib
 integration-scheduler ALL=(ALL) NOPASSWD:ALL 
 
 8. Install OneVizion services:
-./install-daemon-service.sh <wbesite> <service: services|integration-scheduler|report-scheduler|rule-service|mail-service|trackor-mail> <version> <service parameters>
+./install-daemon-service.sh <website> <service: services|integration-scheduler|report-scheduler|rule-service|mail-service|trackor-mail> <version> <service parameters>
 
-- Use OneVizion install domain name for "wbesite", i.e. "test.onevizion.com"
+- Use OneVizion install domain name for "website", i.e. "test.onevizion.com"
 
 Supported services with list of arguments:
 - services <owner_schema> <user_schema> <rpt_schema> [services_to_run: mail_service,trackor_mail,report_scheduler,rule_service]
@@ -51,27 +51,27 @@ USER/PASSWORD@HOST:PORT:SID (Example: prod01/password@localhost:1521:xe)
 
 At a minimum, "services" and "integration-scheduler" should be installed. "services" includes report-scheduler, rule-service, mail-service, trackor-mail.
 
-Service will be installed as <wbesite>_<service> into /opt directory:
+Service will be installed as <website>_<service> into /opt directory:
 ./install-daemon-service.sh test.onevizion.com services 19.22.0 prod01/password@url:1521:a1 prod01_user/password@url:1521:a1 prod01_rpt/password@url:1521:a1
 ./install-daemon-service.sh test.onevizion.com integration-scheduler 19.22.0 prod01/password@url:1521:a1
 
 
 9. Start services:
-systemctl start <wbesite>_<service>
+systemctl start <website>_<service>
 
-Make sure that log file /opt/<wbesite>_<service>/run.out has no errors after service start. 
+Make sure that log file /opt/<website>_<service>/run.out has no errors after service start. 
 
 10. Install syncs3: 
-./install-cron-service.sh <wbesite> syncs3 <version> "<schedule>" <owner_schema> 
+./install-cron-service.sh <website> syncs3 <version> "<schedule>" <owner_schema> 
 
 Where: 
 <schedule> - cron format schedule, for example: 0 3 * * * 
 <owner_schema> - Credentials for OWNER schema: USER/PASSWORD@HOST:PORT:SID (Example: prod01/password@localhost:1521:xe) 
 
 12. Test syncs3 by execution command:
-sudo -u syncs3 /opt/<wbesite>_syncs3/cron-launcher.sh 
+sudo -u syncs3 /opt/<website>_syncs3/cron-launcher.sh 
 
-Make sure that logs file /opt/<wbesite>_syncs3/run.out contains no errors after complete the previous command. 
+Make sure that logs file /opt/<website>_syncs3/run.out contains no errors after complete the previous command. 
 
 
 
