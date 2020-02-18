@@ -419,8 +419,12 @@ function wait_log() {
     cat "$OUT_PATH"
 
     # Match string again for generate return code
-    grep -m 1 -e "$SUCCESS_STRING" "$OUT_PATH" &>/dev/null
-    return $?
+    if grep -m 1 -e "$SUCCESS_STRING" "$OUT_PATH" &>/dev/null; then
+        return 0
+    else
+        echo "(log file: $LOG_FILE_PATH)"
+        return 1
+    fi
 }
 
 # Uses TOMCAT_UN, TOMCAT_GROUP variables
