@@ -138,7 +138,6 @@ function extract_launcher_script() {
         sudo cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
     sudo chmod u+x,g+x "$OUTPUT_FILE" || return 1
 }
 
@@ -159,8 +158,7 @@ function extract_cron_launcher_script() {
         sudo cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
-    sudo chmod u+x,g+w "$OUTPUT_FILE" || return 1
+    sudo chmod u+x,g+x "$OUTPUT_FILE" || return 1
 
     export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
 }
@@ -315,12 +313,7 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-        sudo mkdir -m 771 -p "$SERVICES_PATH" || return 1
-        sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-        sudo chmod -R g+s "$SERVICE_PATH" || return 1
-        sudo setfacl -d -m u::rwx "$SERVICES_PATH" || return 1
-        sudo setfacl -d -m g::rwx "$SERVICES_PATH" || return 1
-        sudo setfacl -d -m o::--- "$SERVICES_PATH" || return 1
+        sudo mkdir -p "$SERVICES_PATH" || return 1
     fi
 
     export SERVICE_NAME
@@ -351,7 +344,13 @@ function config_service() {
         echo "[$SERVICE_UN] user added"
     fi
 
-    sudo mkdir -m 770 -p "$SERVICE_PATH/logs" || return 1
+    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+    sudo chmod -R g+s "$SERVICE_PATH" || return 1
+    sudo setfacl -d -m u::rwx "$SERVICES_PATH" || return 1
+    sudo setfacl -d -m g::rwx "$SERVICES_PATH" || return 1
+    sudo setfacl -d -m o::--- "$SERVICES_PATH" || return 1
+
+    sudo mkdir -p "$SERVICE_PATH/logs" || return 1
 
     export JAR_NAME
     JAR_NAME="$ARTIFACT"
