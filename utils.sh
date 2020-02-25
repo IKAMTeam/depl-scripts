@@ -316,6 +316,7 @@ function config_service() {
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
         sudo mkdir -m 771 -p "$SERVICES_PATH" || return 1
+        sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
         sudo chmod -R g+s "$SERVICE_PATH" || return 1
         sudo setfacl -d -m u::rwx "$SERVICES_PATH" || return 1
         sudo setfacl -d -m g::rwx "$SERVICES_PATH" || return 1
@@ -351,7 +352,6 @@ function config_service() {
     fi
 
     sudo mkdir -m 770 -p "$SERVICE_PATH/logs" || return 1
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
 
     export JAR_NAME
     JAR_NAME="$ARTIFACT"
