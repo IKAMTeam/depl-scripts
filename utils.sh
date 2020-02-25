@@ -243,6 +243,7 @@ function copy_service_jar() {
 
     rm -f "$SERVICE_JAR"
     cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
+    chmod 660 "$SERVICE_JAR" || return 1
     chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
 }
 
