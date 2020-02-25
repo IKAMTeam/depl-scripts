@@ -344,8 +344,6 @@ function config_service() {
         echo "[$SERVICE_GROUP] group added"
     fi
 
-    usermod -a -G "$SERVICE_GROUP" "$(whoami)"
-
     # Check user existence
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
