@@ -23,6 +23,9 @@ export CLEANUP_TMP_FILES=""
 # shellcheck source=credentials.conf
 . "$(dirname "$0")/credentials.conf"
 
+# Default permissions: rw-rw----
+umask 117
+
 function get_depl_env() {
     local VERSION DEPL_ENV
     VERSION=$1
@@ -315,7 +318,7 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-        sudo mkdir -p "$SERVICES_PATH" || return 1
+        sudo mkdir -m 770 -p "$SERVICES_PATH" || return 1
     fi
 
     export SERVICE_NAME
@@ -346,9 +349,8 @@ function config_service() {
         echo "[$SERVICE_UN] user added"
     fi
 
-    sudo mkdir -p "$SERVICE_PATH/logs" || return 1
+    sudo mkdir -m 770 -p "$SERVICE_PATH/logs" || return 1
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    sudo chmod -R 770 "$SERVICE_PATH" || return 1
     sudo chmod -R g+s "$SERVICE_PATH" || return 1
 
     export JAR_NAME
@@ -439,7 +441,7 @@ function unpack_ps_war() {
         sudo rm -rf "$WEBAPP_PATH" || return 1
     fi
 
-    sudo mkdir -p "$WEBAPP_PATH"
+    sudo mkdir -m 770 -p "$WEBAPP_PATH"
     sudo unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
     sudo chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
 }
