@@ -23,9 +23,6 @@ export CLEANUP_TMP_FILES=""
 # shellcheck source=credentials.conf
 . "$(dirname "$0")/credentials.conf"
 
-# Default permissions: rw-rw----
-umask 117
-
 function get_depl_env() {
     local VERSION DEPL_ENV
     VERSION=$1
