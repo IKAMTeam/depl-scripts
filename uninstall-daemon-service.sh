@@ -25,13 +25,13 @@ if ! is_daemon_installed "$SERVICE_NAME"; then
     fi
 fi
 
-sudo systemctl stop "$SERVICE_NAME"
+systemctl stop "$SERVICE_NAME"
 
 echo "Disabling service [$SERVICE_NAME]..."
-sudo systemctl disable "$SERVICE_NAME"
+systemctl disable "$SERVICE_NAME"
 
 # shellcheck disable=SC2153
 SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
 
 echo "Removing service data [$SERVICE_NAME]..."
-sudo rm -rf "/usr/lib/systemd/system/${SERVICE_NAME}.service" "$SERVICE_PATH"
+rm -rf "/usr/lib/systemd/system/${SERVICE_NAME}.service" "$SERVICE_PATH"

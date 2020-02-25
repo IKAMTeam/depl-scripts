@@ -122,7 +122,7 @@ function extract_artifact_version() {
     TMP_DIR="$(mktemp -d)"
     delete_on_exit "$TMP_DIR"
 
-    if ! sudo unzip -q -j "$ARTIFACT_JAR" "META-INF/MANIFEST.MF" -d "$TMP_DIR"; then
+    if ! unzip -q -j "$ARTIFACT_JAR" "META-INF/MANIFEST.MF" -d "$TMP_DIR"; then
         echo "Unable to extract [$ARTIFACT_JAR!/META-INF/MANIFEST.MF] to [$TMP_DIR]" 1>&2
         return 1
     fi
@@ -142,10 +142,10 @@ function extract_launcher_script() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$APP_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default app-launcher..."
-        sudo cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chmod u+x,g+x "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, CRON_LAUNCHER_IN_ARTIFACT_NAME, CRON_LAUNCHER_TEMPLATE_NAME variables
@@ -162,10 +162,10 @@ function extract_cron_launcher_script() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$CRON_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default cron-launcher..."
-        sudo cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chmod u+x,g+x "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
 
     export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
 }
@@ -181,7 +181,7 @@ function extract_environment_conf() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$ENV_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default environment configuration template..."
-        sudo cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 }
 
@@ -196,7 +196,7 @@ function extract_systemd_service() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$SYSTEMD_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default systemd service template..."
-        sudo cp "$(dirname "$0")/$SYSTEMD_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$SYSTEMD_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 }
 
@@ -212,18 +212,18 @@ function extract_jar_file() {
 
     TMP_DIR="$(mktemp -d)"
 
-    sudo rm -f "$OUTPUT_FILE"
+    rm -f "$OUTPUT_FILE"
 
-    if sudo unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
-        sudo cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
+    if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
+        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
-        sudo rm -rf "$TMP_DIR"
+        rm -rf "$TMP_DIR"
 
         return 1
     fi
 
-    sudo rm -rf "$TMP_DIR"
+    rm -rf "$TMP_DIR"
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
@@ -237,17 +237,17 @@ function copy_service_jar() {
 
     echo "Copying [$DOWNLOAD_PATH]($ARTIFACT) to [$SERVICE_JAR]..."
 
-    sudo rm -f "$SERVICE_JAR"
-    sudo cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
-    sudo chmod 660 "$SERVICE_JAR" || return 1
+    rm -f "$SERVICE_JAR"
+    cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
+    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
+    chmod 660 "$SERVICE_JAR" || return 1
 }
 
 function is_daemon_installed() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
-    if sudo systemctl is-enabled "$SERVICE_NAME" &>/dev/null; then
+    if systemctl is-enabled "$SERVICE_NAME" &>/dev/null; then
         return 0
     else
         return 1
@@ -258,7 +258,7 @@ function is_daemon_running() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
-    if sudo systemctl is-active "$SERVICE_NAME" &>/dev/null; then
+    if systemctl is-active "$SERVICE_NAME" &>/dev/null; then
         return 0
     else
         return 1
@@ -273,7 +273,7 @@ function is_cron_installed() {
     SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
     CRON_LAUNCHER_SCRIPT_PATH="$SERVICE_PATH/cron-launcher.sh"
 
-    if sudo crontab -u "$SERVICE_UN" -l 2>/dev/null | grep "$CRON_LAUNCHER_SCRIPT_PATH" &>/dev/null; then
+    if crontab -u "$SERVICE_UN" -l 2>/dev/null | grep "$CRON_LAUNCHER_SCRIPT_PATH" &>/dev/null; then
         return 0
     else
         return 1
@@ -320,7 +320,7 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-        sudo mkdir -p "$SERVICES_PATH" || return 1
+        mkdir -p "$SERVICES_PATH" || return 1
     fi
 
     export SERVICE_NAME
@@ -337,28 +337,28 @@ function config_service() {
     if getent group "$SERVICE_GROUP" >/dev/null; then
         echo "[$SERVICE_GROUP] group is already exists"
     else
-        sudo /usr/sbin/groupadd -r "$SERVICE_GROUP"
+        groupadd -r "$SERVICE_GROUP"
         echo "[$SERVICE_GROUP] group added"
     fi
 
-    sudo /usr/sbin/usermod -a -G "$SERVICE_GROUP" "$(whoami)"
+    usermod -a -G "$SERVICE_GROUP" "$(whoami)"
 
     # Check user existence
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        sudo /usr/sbin/useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
         echo "[$SERVICE_UN] user added"
     fi
 
-    sudo mkdir "$SERVICE_PATH" || return 1
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    sudo chmod -R g+s "$SERVICE_PATH" || return 1
-    sudo setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
-    sudo setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
-    sudo setfacl -d -m o::--- "$SERVICE_PATH" || return 1
+    mkdir "$SERVICE_PATH" || return 1
+    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+    chmod -R g+s "$SERVICE_PATH" || return 1
+    setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
+    setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
+    setfacl -d -m o::--- "$SERVICE_PATH" || return 1
 
-    sudo mkdir "$SERVICE_PATH/logs" || return 1
+    mkdir "$SERVICE_PATH/logs" || return 1
 
     export JAR_NAME
     JAR_NAME="$ARTIFACT"
@@ -423,7 +423,7 @@ function wait_log() {
     } >"$OUT_PATH" &
 
     # shellcheck disable=SC2024
-    sudo tail -F -n 0 "$LOG_FILE_PATH" --pid $! 2>/dev/null >>"$FIFO_PATH"
+    tail -F -n 0 "$LOG_FILE_PATH" --pid $! 2>/dev/null >>"$FIFO_PATH"
 
     # Show grep output
     cat "$OUT_PATH"
@@ -444,13 +444,13 @@ function unpack_ps_war() {
     WEBAPP_PATH=$1
     DOWNLOAD_PATH=$2
 
-    if sudo test -d "$WEBAPP_PATH"; then
-        sudo rm -rf "$WEBAPP_PATH" || return 1
+    if test -d "$WEBAPP_PATH"; then
+        rm -rf "$WEBAPP_PATH" || return 1
     fi
 
-    sudo mkdir -m 770 -p "$WEBAPP_PATH"
-    sudo unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
-    sudo chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
+    mkdir -m 770 -p "$WEBAPP_PATH"
+    unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
 }
 
 function cleanup_tomcat() {
@@ -458,9 +458,9 @@ function cleanup_tomcat() {
 
     TOMCAT_PATH=$1
 
-    sudo rm -rf "$TOMCAT_PATH"/work/*
-    sudo rm -rf "$TOMCAT_PATH"/logs/ps/*
-    sudo rm -rf "$TOMCAT_PATH"/logs/catalina.log
+    rm -rf "$TOMCAT_PATH"/work/*
+    rm -rf "$TOMCAT_PATH"/logs/ps/*
+    rm -rf "$TOMCAT_PATH"/logs/catalina.log "$TOMCAT_PATH"/logs/catalina.out
 }
 
 # Uses CLEANUP_TMP_FILES variable
@@ -472,7 +472,7 @@ function delete_on_exit() {
 function cleanup_tmp() {
     if [ -n "$CLEANUP_TMP_FILES" ]; then
         # shellcheck disable=SC2086
-        sudo rm -rf $CLEANUP_TMP_FILES &> /dev/null
+        rm -rf $CLEANUP_TMP_FILES &> /dev/null
     fi
 }
 
