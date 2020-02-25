@@ -139,7 +139,7 @@ function extract_launcher_script() {
     }
 
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
-    sudo chmod +x "$OUTPUT_FILE" || return 1
+    sudo chmod u+x,g+x "$OUTPUT_FILE" || return 1
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, CRON_LAUNCHER_IN_ARTIFACT_NAME, CRON_LAUNCHER_TEMPLATE_NAME variables
@@ -160,7 +160,7 @@ function extract_cron_launcher_script() {
     }
 
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
-    sudo chmod +x "$OUTPUT_FILE" || return 1
+    sudo chmod u+x,g+w "$OUTPUT_FILE" || return 1
 
     export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
 }
@@ -235,7 +235,7 @@ function copy_service_jar() {
     sudo rm -f "$SERVICE_JAR"
     sudo cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
-    sudo chmod 664 "$SERVICE_JAR" || return 1
+    sudo chmod 660 "$SERVICE_JAR" || return 1
 }
 
 function is_daemon_installed() {
