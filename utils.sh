@@ -347,9 +347,9 @@ function config_service() {
     sudo mkdir "$SERVICE_PATH" || return 1
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
     sudo chmod -R g+s "$SERVICE_PATH" || return 1
-    sudo setfacl -d -m u::rwx "$SERVICES_PATH" || return 1
-    sudo setfacl -d -m g::rwx "$SERVICES_PATH" || return 1
-    sudo setfacl -d -m o::--- "$SERVICES_PATH" || return 1
+    sudo setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
+    sudo setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
+    sudo setfacl -d -m o::--- "$SERVICE_PATH" || return 1
 
     sudo mkdir "$SERVICE_PATH/logs" || return 1
 
