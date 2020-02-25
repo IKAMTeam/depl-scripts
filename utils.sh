@@ -145,6 +145,7 @@ function extract_launcher_script() {
         cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
     chmod u+x,g+x "$OUTPUT_FILE" || return 1
 }
 
@@ -165,6 +166,7 @@ function extract_cron_launcher_script() {
         cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
     chmod u+x,g+x "$OUTPUT_FILE" || return 1
 
     export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
@@ -183,6 +185,8 @@ function extract_environment_conf() {
         echo "Fallback to default environment configuration template..."
         cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
+
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
 }
 
 # Uses SYSTEMD_CONF_IN_ARTIFACT_NAME, SYSTEMD_CONF_TEMPLATE_NAME variables
@@ -239,8 +243,7 @@ function copy_service_jar() {
 
     rm -f "$SERVICE_JAR"
     cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
-    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
-    chmod 660 "$SERVICE_JAR" || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
 }
 
 function is_daemon_installed() {
@@ -352,8 +355,8 @@ function config_service() {
     fi
 
     mkdir "$SERVICE_PATH" || return 1
-    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    chmod -R g+s "$SERVICE_PATH" || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+    chmod g+s "$SERVICE_PATH" || return 1
     setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m o::--- "$SERVICE_PATH" || return 1
