@@ -59,6 +59,7 @@ delete_on_exit "$ENV_CONF_EXTRACT_PATH"
 extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || exit 1
 
 (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
+chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
 
 echo "Dropping record from crontab if exists..."
 crontab -u "$SERVICE_UN" -l | grep -v "$CRON_LAUNCHER_SCRIPT_PATH" | crontab -u "$SERVICE_UN" - || exit 1
