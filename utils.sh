@@ -315,7 +315,7 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-        sudo mkdir -m 770 -p "$SERVICES_PATH" || return 1
+        sudo mkdir -m 771 -p "$SERVICES_PATH" || return 1
     fi
 
     export SERVICE_NAME
