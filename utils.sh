@@ -449,7 +449,7 @@ function unpack_ps_war() {
         rm -rf "$WEBAPP_PATH" || return 1
     fi
 
-    mkdir -m 770 -p "$WEBAPP_PATH"
+    mkdir -p "$WEBAPP_PATH"
     unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
     chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
 }
