@@ -14,7 +14,7 @@ find "$SERVICES_PATH" -maxdepth 1 -type d -print0 | while read -r -d '' SERVICE_
     SERVICE_NAME="$(basename "$SERVICE_DIR")"
     ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
 
-    if [ ! -f "$SERVICE_DIR/$ARTIFACT_JAR" ]; then
+    if ! sudo test -f "$SERVICE_DIR/$ARTIFACT_JAR"; then
         continue
     fi
 
