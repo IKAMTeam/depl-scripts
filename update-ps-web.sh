@@ -10,6 +10,8 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
+
 ARTIFACT=ps-web
 
 VERSION=$1

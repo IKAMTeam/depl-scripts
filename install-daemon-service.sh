@@ -45,6 +45,7 @@ export JAR_OPTS=$*
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 config_service "$WEBSITE" "$ARTIFACT" "$SUFFIX" || exit 1
 download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1
 

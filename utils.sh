@@ -23,6 +23,13 @@ export CLEANUP_TMP_FILES=""
 # shellcheck source=credentials.conf
 . "$(dirname "$0")/credentials.conf"
 
+function require_root_user() {
+    if [ $EUID -ne 0 ]; then
+        echo "This script must be run as root user"
+        exit 1
+    fi
+}
+
 function get_depl_env() {
     local VERSION DEPL_ENV
     VERSION=$1

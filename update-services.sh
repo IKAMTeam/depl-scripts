@@ -14,6 +14,8 @@ ROOT_DIR="$(dirname "$0")"
 # shellcheck source=utils.sh
 . "$ROOT_DIR/utils.sh"
 
+require_root_user
+
 export SERVICE_UN="$MATCH_ARTIFACT"
 export SERVICE_GROUP="$MATCH_ARTIFACT"
 

@@ -6,6 +6,8 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
+
 if [ -z "$SHORT_FORMAT" ]; then
     echo "List of available OneVizion services:"
 fi

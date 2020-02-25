@@ -15,6 +15,7 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 check_service_exists_or_exit "$SERVICE_NAME"
 
 if ! is_daemon_installed "$SERVICE_NAME"; then
