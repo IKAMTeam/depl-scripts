@@ -315,9 +315,7 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-
         sudo mkdir -p "$SERVICES_PATH" || return 1
-        sudo chown "$(whoami)" "$SERVICES_PATH" || return 1
     fi
 
     export SERVICE_NAME
@@ -338,6 +336,8 @@ function config_service() {
         echo "[$SERVICE_GROUP] group added"
     fi
 
+    sudo /usr/sbin/usermod -a -G "$SERVICE_GROUP" "$(whoami)"
+
     # Check user existence
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
@@ -348,7 +348,8 @@ function config_service() {
 
     sudo mkdir -p "$SERVICE_PATH/logs" || return 1
     sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    sudo chmod -R 775 "$SERVICE_PATH" || return 1
+    sudo chmod -R 770 "$SERVICE_PATH" || return 1
+    sudo chmod -R g+s "$SERVICE_PATH" || return 1
 
     export JAR_NAME
     JAR_NAME="$ARTIFACT"
