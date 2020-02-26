@@ -219,7 +219,7 @@ function extract_jar_file() {
     rm -f "$OUTPUT_FILE"
 
     if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
-        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
+        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" 2>/dev/null || return 1
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
         rm -rf "$TMP_DIR"
