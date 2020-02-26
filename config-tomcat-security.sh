@@ -15,7 +15,7 @@ require_root_user
 TOMCAT_PATH=$1
 
 chown -R "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH" || exit 1
-(find -L "$TOMCAT_PATH" -type d -print0 | xargs -0 chmod g-w,g+s,o-r,o-w,o-x) || exit 1
+(find -L "$TOMCAT_PATH" -type d -print0 | xargs -0 chmod g-w,g+s,g+x,o-r,o-w,o-x) || exit 1
 (find -L "$TOMCAT_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || exit 1
 chmod -R g+w "$TOMCAT_PATH/logs" "$TOMCAT_PATH/temp" "$TOMCAT_PATH/work" || exit 1
 
