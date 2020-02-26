@@ -451,6 +451,7 @@ function unpack_ps_war() {
 
     mkdir -p "$WEBAPP_PATH"
     unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
+    chmod -R g-w,o-r,o-w,o-x "$WEBAPP_PATH" || return 1
 }
 
 function cleanup_tomcat() {
