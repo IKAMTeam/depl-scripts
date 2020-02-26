@@ -140,7 +140,7 @@ function extract_launcher_script() {
     echo "Extracting launcher script..."
 
     # shellcheck disable=SC2153
-    extract_jar_file "$ARTIFACT" "$APP_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
+    extract_jar_file "$ARTIFACT" "$APP_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" "omit-cp-error" || {
         echo "Fallback to default app-launcher..."
         cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
@@ -161,7 +161,7 @@ function extract_cron_launcher_script() {
     echo "Extracting cron launcher script..."
 
     # shellcheck disable=SC2153
-    extract_jar_file "$ARTIFACT" "$CRON_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
+    extract_jar_file "$ARTIFACT" "$CRON_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" "omit-cp-error" || {
         echo "Fallback to default cron-launcher..."
         cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
@@ -181,7 +181,7 @@ function extract_environment_conf() {
     echo "Extracting environment configuration template..."
 
     # shellcheck disable=SC2153
-    extract_jar_file "$ARTIFACT" "$ENV_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
+    extract_jar_file "$ARTIFACT" "$ENV_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" "omit-cp-error" || {
         echo "Fallback to default environment configuration template..."
         cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
@@ -198,7 +198,7 @@ function extract_systemd_service() {
     echo "Extracting systemd service template..."
 
     # shellcheck disable=SC2153
-    extract_jar_file "$ARTIFACT" "$SYSTEMD_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
+    extract_jar_file "$ARTIFACT" "$SYSTEMD_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" "omit-cp-error" || {
         echo "Fallback to default systemd service template..."
         cp "$(dirname "$0")/$SYSTEMD_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
@@ -206,10 +206,15 @@ function extract_systemd_service() {
 
 # Uses SERVICE_PATH variable
 function extract_jar_file() {
-    local ARTIFACT INPUT_FILE OUTPUT_FILE SERVICE_JAR
+    local ARTIFACT INPUT_FILE OUTPUT_FILE SERVICE_JAR OMIT_CP_ERROR
     ARTIFACT="$1"
     INPUT_FILE="$2"
     OUTPUT_FILE="$3"
+    OMIT_CP_ERROR="0"
+
+    if [ -n "$4" ] && [ "$4" == "omit-cp-error" ]; then
+        OMIT_CP_ERROR="1"
+    fi
 
     # shellcheck disable=SC2153
     SERVICE_JAR="$SERVICE_PATH/$ARTIFACT.jar"
@@ -219,7 +224,11 @@ function extract_jar_file() {
     rm -f "$OUTPUT_FILE"
 
     if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
-        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
+        if [ "$OMIT_CP_ERROR" -eq 1 ]; then
+            cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" 2>/dev/null || return 1
+        else
+            cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
+        fi
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
         rm -rf "$TMP_DIR"
