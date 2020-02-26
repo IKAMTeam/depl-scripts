@@ -456,8 +456,7 @@ function unpack_ps_war() {
     chown -R "$(whoami):$TOMCAT_GROUP" "$WEBAPP_PATH" || return 1
     (find "$WEBAPP_PATH" -type d -print0 | xargs -0 chmod g-w,g+x,o-r,o-w,o-x) || return 1
     (find "$WEBAPP_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || return 1
-    test -d "$WEBAPP_PATH/css" && (chmod -R g+w "$WEBAPP_PATH/css" || return 1)
-    test -d "$WEBAPP_PATH/img" && (chmod -R g+w "$WEBAPP_PATH/img" || return 1)
+    (find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -print0 | xargs -0 chmod -R g+w) || exit 1
 }
 
 function cleanup_tomcat() {
