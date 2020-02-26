@@ -451,7 +451,6 @@ function unpack_ps_war() {
 
     mkdir -p "$WEBAPP_PATH"
     unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
-    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
 }
 
 function cleanup_tomcat() {
