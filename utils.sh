@@ -451,7 +451,11 @@ function unpack_ps_war() {
 
     mkdir -p "$WEBAPP_PATH"
     unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
-    chmod -R g-w,o-r,o-w,o-x "$WEBAPP_PATH" || return 1
+
+    # Set permissions
+    chown -R "$(whoami):$TOMCAT_GROUP" "$WEBAPP_PATH" || return 1
+    (find -L "$WEBAPP_PATH" -type d -print0 | xargs -0 chmod g-w,g+x,o-r,o-w,o-x) || return 1
+    (find -L "$WEBAPP_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || return 1
 }
 
 function cleanup_tomcat() {
