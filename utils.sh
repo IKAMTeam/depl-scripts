@@ -457,6 +457,7 @@ function unpack_ps_war() {
     (find "$WEBAPP_PATH" -type d -print0 | xargs -0 chmod g-w,g+x,o-r,o-w,o-x) || return 1
     (find "$WEBAPP_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || return 1
     test -d "$WEBAPP_PATH/css" && (chmod -R g+w "$WEBAPP_PATH/css" || return 1)
+    test -d "$WEBAPP_PATH/img" && (chmod -R g+w "$WEBAPP_PATH/img" || return 1)
 }
 
 function cleanup_tomcat() {

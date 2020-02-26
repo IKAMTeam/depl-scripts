@@ -17,7 +17,7 @@ TOMCAT_PATH=$1
 chown -LR "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH" || exit 1
 (find -L "$TOMCAT_PATH" -type d -print0 | xargs -0 chmod g-w,g+s,g+x,o-r,o-w,o-x) || exit 1
 (find -L "$TOMCAT_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || exit 1
-(find "$TOMCAT_PATH"/* -maxdepth 1 -type d -name 'css' -print0 | xargs -0 chmod -R g+w) || exit 1
+(find "$TOMCAT_PATH"/* -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -print0 | xargs -0 chmod -R g+w) || exit 1
 chmod -R g+w "$TOMCAT_PATH/logs" "$TOMCAT_PATH/temp" "$TOMCAT_PATH/work" || exit 1
 
 setfacl -LRd -m u::rwx "$TOMCAT_PATH" || exit 1
