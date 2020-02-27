@@ -65,7 +65,7 @@ Replace next placeholders:
 [placeholder for error reports email subject] - Usually equals to <username for OWNER schema>.<1st part of db URL>, for example prod01.trackor-prod 
 
 12. Install ps-web: 
-depl-scripts $ ./update-ps-web.sh <target version> /usr/share/tomcat <preferred hostname>
+depl-scripts $ sudo ./update-ps-web.sh <target version> /usr/share/tomcat <preferred hostname>
 
 (Tomcat will start automatically) 
 
