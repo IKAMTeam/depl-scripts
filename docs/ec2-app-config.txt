@@ -34,7 +34,7 @@ sudo cp setup/libsigar-amd64-linux.so /usr/lib
 integration-scheduler ALL=(ALL) NOPASSWD:ALL 
 
 8. Install OneVizion services:
-./install-daemon-service.sh <website> <service: services|integration-scheduler|report-scheduler|rule-service|mail-service|trackor-mail> <version> <service parameters>
+depl-scripts $ sudo ./install-daemon-service.sh <website> <service: services|integration-scheduler|report-scheduler|rule-service|mail-service|trackor-mail> <version> <service parameters>
 
 - Use OneVizion install domain name for "website", i.e. "test.onevizion.com"
 
@@ -52,17 +52,17 @@ USER/PASSWORD@HOST:PORT:SID (Example: prod01/password@localhost:1521:xe)
 At a minimum, "services" and "integration-scheduler" should be installed. "services" includes report-scheduler, rule-service, mail-service, trackor-mail.
 
 Service will be installed as <website>_<service> into /opt directory:
-./install-daemon-service.sh test.onevizion.com services 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1'
-./install-daemon-service.sh test.onevizion.com integration-scheduler 19.22.0 'prod01/password@url:1521:a1'
+depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com services 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1'
+depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com integration-scheduler 19.22.0 'prod01/password@url:1521:a1'
 
 
 9. Start services:
-systemctl start <website>_<service>
+sudo systemctl start <website>_<service>
 
 Make sure that log file /opt/<website>_<service>/run.out has no errors after service start. 
 
 10. Install syncs3: 
-./install-cron-service.sh <website> syncs3 <version> "<schedule>" '<owner_schema>'
+depl-scripts $ sudo ./install-cron-service.sh <website> syncs3 <version> "<schedule>" '<owner_schema>'
 
 Where: 
 <schedule> - cron format schedule, for example: 0 3 * * * 
@@ -80,16 +80,16 @@ II. INSTALLING ADDITIONAL SERVICES
 For each not default service in SERVICE and V_REPORT_SCHEDULER tables, a dedicated Linux daemon should be installed. Use additional --suffix parameter for install-daemon-service.sh and provide the value of SERVICE.NAME or V_REPORT_SCHEDULER.NAME as the last parameter to the install-daemon-service.sh
 
 13 report-scheduler example (V_REPORT_SCHEDULER.NAME=service2):
-./install-daemon-service.sh test.onevizion.com report-scheduler --suffix service2 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1' service2
+depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com report-scheduler --suffix service2 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1' service2
 
 
 14 rule-service example (SERVICE.NAME=HTTP-Rules):
-./install-daemon-service.sh test.onevizion.com rule-service --suffix HTTP-Rules 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' HTTP-Rules
+depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com rule-service --suffix HTTP-Rules 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' HTTP-Rules
 
 15 mail-service example (SERVICE.NAME=alt-mail):
-./install-daemon-service.sh test.onevizion.com mail-service --suffix alt-mail 19.22.0 'prod01/password@url:1521:a1' alt-mail
+depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com mail-service --suffix alt-mail 19.22.0 'prod01/password@url:1521:a1' alt-mail
 
 III. LIST AND STATUS OF ONEVIZION SERVICES
 
 16. to get list of installed services, versions and statuses run:
-./list-services.sh
+depl-scripts $ sudo ./list-services.sh
