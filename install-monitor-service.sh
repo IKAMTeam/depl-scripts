@@ -32,8 +32,7 @@ ARTIFACT="monitoring"
 
 require_root_user
 
-SERVICE_NAME="$(generate_service_name "" "$ARTIFACT")"
-
+config_service_env "" "$ARTIFACT"
 if ! is_daemon_installed "$SERVICE_NAME"; then
     config_service "" "$ARTIFACT" || exit 1
     download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1

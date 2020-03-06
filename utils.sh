@@ -321,6 +321,23 @@ function generate_service_name() {
     echo "$SERVICE_NAME"
 }
 
+# Will export next variables: SERVICE_NAME, SERVICE_PATH, SERVICE_UN, SERVICE_GROUP
+function config_service_env() {
+    local WEBSITE ARTIFACT SUFFIX
+
+    WEBSITE=$1
+    ARTIFACT=$2
+    SUFFIX=$3
+
+    export SERVICE_NAME
+    SERVICE_NAME="$(generate_service_name "$WEBSITE" "$ARTIFACT" "$SUFFIX")"
+
+    # shellcheck disable=SC2153
+    export SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
+    export SERVICE_UN="$ARTIFACT"
+    export SERVICE_GROUP="$ARTIFACT"
+}
+
 # Will export next variables: SERVICE_NAME, SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, JAR_NAME, JAR_PATH
 function config_service() {
     local WEBSITE ARTIFACT SUFFIX
@@ -335,13 +352,7 @@ function config_service() {
         mkdir -p "$SERVICES_PATH" || return 1
     fi
 
-    export SERVICE_NAME
-    SERVICE_NAME="$(generate_service_name "$WEBSITE" "$ARTIFACT" "$SUFFIX")"
-
-    # shellcheck disable=SC2153
-    export SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
-    export SERVICE_UN="$ARTIFACT"
-    export SERVICE_GROUP="$ARTIFACT"
+    config_service_env "$WEBSITE" "$ARTIFACT" "$SUFFIX"
 
     echo "Service [$SERVICE_NAME] will be created under [$SERVICE_PATH] directory and [$SERVICE_UN:$SERVICE_GROUP] account"
 
