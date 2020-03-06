@@ -45,6 +45,7 @@ export JAR_OPTS=$*
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 config_service "$WEBSITE" "$ARTIFACT" "$SUFFIX" || exit 1
 download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1
 
@@ -65,10 +66,11 @@ extract_systemd_service "$ARTIFACT" "$SYSTEMD_SERVICE_EXTRACT_PATH" || exit 1
 # Replace $ -> \$ for prevent bash eat it on launch stage
 export JAR_OPTS=${JAR_OPTS/$/\\$}
 
-(sudo cat "$ENV_CONF_EXTRACT_PATH" | envsubst | sudo tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
-(sudo cat "$SYSTEMD_SERVICE_EXTRACT_PATH" | envsubst | sudo tee "/usr/lib/systemd/system/${SERVICE_NAME}.service") >/dev/null || exit 1
+(< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
+(< "$SYSTEMD_SERVICE_EXTRACT_PATH" envsubst | tee "/usr/lib/systemd/system/${SERVICE_NAME}.service") >/dev/null || exit 1
+chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
 
 echo "Enabling service [$SERVICE_NAME]..."
-sudo systemctl enable "$SERVICE_NAME" || exit 1
+systemctl enable "$SERVICE_NAME" || exit 1
 
-echo "You can start daemon with [sudo systemctl start $SERVICE_NAME] command"
+echo "You can start daemon with [systemctl start $SERVICE_NAME] command"
