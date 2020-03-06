@@ -70,10 +70,10 @@ function download_artifact() {
     dev)
         DEV_METADATA_LINK="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/maven-metadata.xml"
         DEV_METADATA_DL_PATH="$(mktemp --suffix="_metadataxml")"
+        delete_on_exit "$DEV_METADATA_DL_PATH"
 
         if ! wget -q --no-check-certificate --output-document="$DEV_METADATA_DL_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$DEV_METADATA_LINK"; then
             echo "Can't download metadata for full dev artifact version by link [$DEV_METADATA_LINK]. Wrong artifact or version"
-            rm -f "$DEV_METADATA_DL_PATH"
             return 1
         else
             echo "Metadata downloaded successfully"
@@ -81,8 +81,6 @@ function download_artifact() {
 
         TIMESTAMP=$(grep '<timestamp' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
         BUILD_NUMBER=$(grep '<buildNumber' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
-
-        rm -f "$DEV_METADATA_DL_PATH"
 
         DEV_SNAPSHOT_VERSION="${VERSION//-SNAPSHOT/}"
         ARTIFACT_DL_URL="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$DEV_SNAPSHOT_VERSION-SNAPSHOT/$ARTIFACT-$DEV_SNAPSHOT_VERSION-$TIMESTAMP-$BUILD_NUMBER$DOWNLOAD_SUFFIX"
@@ -220,17 +218,14 @@ function extract_jar_file() {
     TMP_DIR="$(mktemp -d)"
 
     rm -f "$OUTPUT_FILE"
+    delete_on_exit "$TMP_DIR"
 
     if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
         cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" 2>/dev/null || return 1
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
-        rm -rf "$TMP_DIR"
-
         return 1
     fi
-
-    rm -rf "$TMP_DIR"
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables

@@ -23,8 +23,8 @@ DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
 
 echo "Deploying [$ARTIFACT $VERSION] at [$WEBAPP_PATH]..."
 
-download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || exit 1
 delete_on_exit "$DOWNLOAD_PATH"
+download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || exit 1
 
 # Prevent script fail if Tomcat is not running
 echo "Stopping Tomcat..."
