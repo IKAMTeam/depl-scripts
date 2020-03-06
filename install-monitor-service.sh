@@ -14,16 +14,11 @@ fi
 
 VERSION=$1
 
-# shellcheck disable=SC2034
-DB_OWNER_USER=$2
-# shellcheck disable=SC2034
-DB_USER=$3
-# shellcheck disable=SC2034
-DB_PASSWORD=$4
-# shellcheck disable=SC2034
-DB_URL=$5
-# shellcheck disable=SC2034
-AES_PASSWORD=$6
+export DB_OWNER_USER=$2
+export DB_USER=$3
+export DB_PASSWORD=$4
+export DB_URL=$5
+export AES_PASSWORD=$6
 
 ARTIFACT="monitoring"
 
