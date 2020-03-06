@@ -74,7 +74,6 @@ MONITOR_XML_SCHEMA_PATH="$(mktemp --suffix="_schema_xml_$ARTIFACT")"
 delete_on_exit "$MONITOR_XML_SCHEMA_PATH"
 (< "$MONITOR_XML_SCHEMA_TEMPLATE_NAME" envsubst | tee "$MONITOR_XML_SCHEMA_PATH") >/dev/null || exit 1
 
-sed "$(cat "$MONITOR_XML_SCHEMA_PATH")" "$MONITOR_XML" || exit 1
 sed "/<schema-placeholder\/>/ {r $MONITOR_XML_SCHEMA_PATH
 d}" "$MONITOR_XML" || exit 1
 
