@@ -361,8 +361,8 @@ function config_service() {
         echo "[$SERVICE_UN] user added"
     fi
 
-    mkdir "$SERVICE_PATH" || return 1
-    mkdir "$SERVICE_PATH/logs" || return 1
+    mkdir -p "$SERVICE_PATH" || return 1
+    mkdir -p "$SERVICE_PATH/logs" || return 1
     chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
     chmod -R g+s "$SERVICE_PATH" || return 1
     setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
