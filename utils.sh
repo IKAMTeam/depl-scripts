@@ -18,6 +18,9 @@ export ENV_CONF_IN_ARTIFACT_NAME="templates/environment.conf"
 export SYSTEMD_CONF_TEMPLATE_NAME="setup/templates/service.template"
 export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 
+export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
+export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.template"
+
 export CLEANUP_TMP_FILES=""
 
 # shellcheck source=credentials.conf
@@ -296,7 +299,12 @@ function generate_service_name() {
     ARTIFACT=$2
     SUFFIX=$3
 
-    SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    if [ -n "$WEBSITE" ]; then
+        SERVICE_NAME="${ARTIFACT}"
+    else
+        SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    fi
+
     if [ -n "$SUFFIX" ]; then
         SERVICE_NAME="${SERVICE_NAME}_${SUFFIX}"
     fi

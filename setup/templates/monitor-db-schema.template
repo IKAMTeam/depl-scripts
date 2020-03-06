@@ -1,0 +1,30 @@
+<schema>
+            <!-- OneVizion Installation owner schema -->
+            <main-user>${DB_OWNER_USER}</main-user>
+
+            <monitor-user>${DB_USER}</monitor-user>
+            <monitor-password>${DB_PASSWORD}</monitor-password>
+            <url>${DB_URL}</url>
+
+            <aes-password>${AES_PASSWORD}</aes-password>
+            <enabled>true</enabled>
+
+            <!-- Uncomment to disable certain monitors for this install. Use comma separated list of monitors
+            <disable-monitors>db job,db index,tomcat,report-scheduler,mail-service,trackor-mail,long-wait-sessions,syncs3,imp,rule-service,open-cursors</disable-monitors>
+            -->
+
+            <!-- Uncomment and set list of SFTP servers to monitor
+            <sftp-servers>
+                <sftp>
+                    <host></host>
+                    <port></port>
+                    <finger-print></finger-print>
+                    <username></username>
+                    <password></password>
+                    <private-key></private-key>
+                    <private-key-pass-phrase></private-key-pass-phrase>
+                </sftp>
+            </sftp-servers>
+            -->
+        </schema>
+        <schema-placeholder/>

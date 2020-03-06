@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<root>
+    <schemas>
+        <schema-placeholder/>
+    </schemas>
+
+    <!-- Setup AWS SQS to deliver monitoring statuses, multiple queries may be configured
+    <aws-sqs>
+        <sqs>
+            <access-key></access-key>
+            <secret-key></secret-key>
+            <queue-url></queue-url>
+        </sqs>
+    </aws-sqs>
+    -->
+
+    <!-- Email addresses to deliver monitoring warnings and errors -->
+    <error-email>
+        <host></host>
+        <port></port>
+        <username></username>
+        <password></password>
+        <from></from>
+        <to></to>
+    </error-email>
+    <warning-email>
+        <host></host>
+        <port></port>
+        <username></username>
+        <password></password>
+        <from></from>
+        <to></to>
+    </warning-email>
+
+    <!-- Set true, if you need temporary disable all monitors for all installs. May be useful for upgrades -->
+    <suspend>false</suspend>
+
+    <disable-monitors>db job,db
+        index,tomcat,report-scheduler,trackor-mail,long-wait-sessions,syncs3,imp,rule-service,open-cursors,sftp,sso-certificate-chains
+    </disable-monitors>
+</root>
