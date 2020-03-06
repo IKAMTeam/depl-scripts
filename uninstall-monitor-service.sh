@@ -1,3 +1,3 @@
 #!/bin/bash
-bash "uninstall-monitor-service.sh" "monitoring"
+bash "uninstall-daemon-service.sh" "monitoring"
 exit $?
