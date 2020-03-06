@@ -1,4 +1,4 @@
-<schema>
+        <schema>
             <!-- OneVizion Installation owner schema -->
             <main-user>${DB_OWNER_USER}</main-user>
 
