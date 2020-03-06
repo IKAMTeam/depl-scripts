@@ -309,9 +309,9 @@ function generate_service_name() {
     SUFFIX=$3
 
     if [ -n "$WEBSITE" ]; then
-        SERVICE_NAME="${ARTIFACT}"
-    else
         SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    else
+        SERVICE_NAME="${ARTIFACT}"
     fi
 
     if [ -n "$SUFFIX" ]; then
