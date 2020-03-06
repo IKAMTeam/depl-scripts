@@ -6,16 +6,16 @@ export TOMCAT_UN="tomcat"
 export TOMCAT_GROUP="tomcat"
 export TOMCAT_WAIT_LOG="catalina.log"
 
-export APP_LAUNCHER_TEMPLATE_NAME="app-launcher.template"
+export APP_LAUNCHER_TEMPLATE_NAME="setup/templates/app-launcher.template"
 export APP_LAUNCHER_IN_ARTIFACT_NAME="templates/app-launcher.sh"
 
-export CRON_LAUNCHER_TEMPLATE_NAME="cron-launcher.template"
+export CRON_LAUNCHER_TEMPLATE_NAME="setup/templates/cron-launcher.template"
 export CRON_LAUNCHER_IN_ARTIFACT_NAME="templates/cron-launcher.sh"
 
-export ENV_CONF_TEMPLATE_NAME="environment.template"
+export ENV_CONF_TEMPLATE_NAME="setup/templates/environment.template"
 export ENV_CONF_IN_ARTIFACT_NAME="templates/environment.conf"
 
-export SYSTEMD_CONF_TEMPLATE_NAME="service.template"
+export SYSTEMD_CONF_TEMPLATE_NAME="setup/templates/service.template"
 export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 
 export CLEANUP_TMP_FILES=""

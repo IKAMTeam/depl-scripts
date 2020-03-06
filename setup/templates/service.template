@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=forking
 User=${SERVICE_UN}
+WorkingDirectory=${SERVICE_PATH}
 EnvironmentFile=${SERVICE_PATH}/${JAR_NAME}.conf
 ExecStart=${SERVICE_PATH}/app-launcher.sh
 StandardOutput=${SERVICE_PATH}/run.out
