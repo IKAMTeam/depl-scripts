@@ -9,10 +9,8 @@ MATCH_ARTIFACT=$1
 MATCH_WEBSITE=$2
 NEW_VERSION=$3
 
-ROOT_DIR="$(dirname "$0")"
-
 # shellcheck source=utils.sh
-. "$ROOT_DIR/utils.sh"
+. "$(dirname "$0")/utils.sh"
 
 require_root_user
 
