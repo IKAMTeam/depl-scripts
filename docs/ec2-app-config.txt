@@ -24,7 +24,7 @@ REPOSITORY_UN= "username for ci.onevizion.com access"
 REPOSITORY_PWD="password for ci.onevizion.com access" 
 
 5. Test database connection: 
-java -jar setup/test-jdbc.jar <username> <password> <host>:<port>:<sid> 
+java -jar setup/test-jdbc.jar <username> <password> <host>:<port>:<sid>
 
 
 6. Install libsigar - library used in report-scheduler to monitor free RAM 
@@ -56,12 +56,30 @@ depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com services 19.2
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com integration-scheduler 19.22.0 'prod01/password@url:1521:a1'
 
 
-9. Start services:
+9. Install OneVizion monitoring service:
+depl-scripts $ sudo ./install-monitor-service.sh <version> <owner_schema> <monitor_schema> <monitor_schema_password> <monitor_schema_connect_identifier> [aes_password]
+
+Where:
+<version> - monitoring version, current is 2.0.8
+<owner_schema> - username of OWNER schema
+<monitor_schema> - username of MONITOR schema
+<monitor_schema_password> - password for MONITOR schema
+<monitor_schema_connect_identifier> - HOST:PORT:SID (Example: localhost:1521:xe)
+[aes_password] - AES encryption password used at installation (optional argument). It needed to correct work next monitors: mail-service, trackor-mail, sso-certificate-chains
+
+For create monitor schema use next SQL scripts:
+setup/monitoring/create-user-monitor.sql
+setup/monitoring/grant-privs-to-monitor.sql
+
+10. Start services:
 sudo systemctl start <website>_<service>
 
 Make sure that log file /opt/<website>_<service>/run.out has no errors after service start. 
 
-10. Install syncs3: 
+sudo systemctl start monitoring
+(if OneVizion monitoring service was installed before)
+
+11. Install syncs3:
 depl-scripts $ sudo ./install-cron-service.sh <website> syncs3 <version> "<schedule>" '<owner_schema>'
 
 Where: 
