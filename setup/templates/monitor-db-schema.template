@@ -9,6 +9,7 @@
             <!-- Set this property if sensitive data encryption feature enabled for this installation. -->
             <!-- It should be aesPassword value from ov.properties file. If the property is not set for encrypted installs, certain monitors (mail-service, trackor-mail, sso-certificate-chains) won't be able to run checks, since required credentials will be encrypted -->
             <aes-password>${AES_PASSWORD}</aes-password>
+
             <enabled>true</enabled>
 
             <!-- Uncomment to disable certain monitors for this install. Use comma separated list of monitors
