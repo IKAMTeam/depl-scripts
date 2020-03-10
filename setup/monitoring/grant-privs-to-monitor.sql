@@ -1,0 +1,16 @@
+grant select on vw_mon_param to monitor;
+grant select on vw_mon_users to monitor;
+grant select on vw_mon_tf_email_setup to monitor;
+grant select on vw_mon_tm_setup to monitor;
+grant select on vw_mon_notif_queue to monitor;
+grant select on vw_mon_report_files to monitor;
+grant select on vw_mon_xitor_type to monitor;
+grant select on usage_log to monitor;
+grant select on monitoring_chart to monitor;
+grant select on vw_mon_blob_data to monitor;
+grant select on vw_mon_imp_run to monitor;
+grant select on vw_mon_process_run to monitor;
+grant select on vw_mon_process to monitor;
+grant select on vw_mon_imp_spec to monitor;
+grant select on vw_mon_notif_service to monitor;
+grant select on vw_mon_sso_config to monitor;
