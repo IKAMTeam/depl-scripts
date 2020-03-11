@@ -47,8 +47,8 @@ depl-scripts $ sudo ./config-tomcat-security.sh /usr/share/tomcat
 NOTE:
 - We change tomcat directory owner to root:tomcat (recursive)
 - Revoke all public permissions and revoke group write.
-- Give group write permissions for logs, temp, work, sitename.onevizion.com/css and sitename.onevizion.com/img webapp directories for allow web server write to it.
-- Give setgid to all directories for allow group "tomcat" to read newly created files.
+- Give group write permissions for logs, temp, work, sitename.onevizion.com/css and sitename.onevizion.com/img webapp directories to allow web server write to it.
+- Give setgid to all directories to allow group "tomcat" to read newly created files.
 - Set default permissions through ACL: u:rwx, g:r-x, o:---; For logs, temp, work directories set special group permissions - g:rwx
 
 Reference: https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html#Non-Tomcat_settings
