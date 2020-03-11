@@ -44,6 +44,15 @@ sudo sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' /usr/share/tomcat/conf
 9. Configure Tomcat filesystem permissions:
 depl-scripts $ sudo ./config-tomcat-security.sh /usr/share/tomcat
 
+NOTE:
+- We change tomcat directory owner to root:tomcat (recursive)
+- Revoke all public permissions and revoke group write.
+- Give group write permissions for logs, temp, work, sitename.onevizion.com/css and sitename.onevizion.com/img webapp directories to allow web server write to it.
+- Give setgid to all directories to allow group "tomcat" to read newly created files.
+- Set default permissions through ACL: u:rwx, g:r-x, o:---; For logs, temp, work directories set special group permissions - g:rwx
+
+Reference: https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html#Non-Tomcat_settings
+
 II. INSTALLATION OF ONEVIZION WEB APP
 
 10. Open /usr/share/tomcat/conf/server.xml in a text editor and replace "sitename.onevizion.com" to the preferred hostname. Pay attention to the "Host" tag - it contains a sample config to use white-labeled images (background, logos, etc.).
