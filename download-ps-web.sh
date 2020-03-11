@@ -10,6 +10,8 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
+
 ARTIFACT=ps-web
 
 VERSION=$1
@@ -19,8 +21,8 @@ WEBAPP_DIRNAME=$3
 WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
 DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
 
-download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || exit 1
 delete_on_exit "$DOWNLOAD_PATH"
+download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || exit 1
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
 unpack_ps_war "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1

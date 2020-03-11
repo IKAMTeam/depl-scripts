@@ -6,22 +6,32 @@ export TOMCAT_UN="tomcat"
 export TOMCAT_GROUP="tomcat"
 export TOMCAT_WAIT_LOG="catalina.log"
 
-export APP_LAUNCHER_TEMPLATE_NAME="app-launcher.template"
+export APP_LAUNCHER_TEMPLATE_NAME="setup/templates/app-launcher.template"
 export APP_LAUNCHER_IN_ARTIFACT_NAME="templates/app-launcher.sh"
 
-export CRON_LAUNCHER_TEMPLATE_NAME="cron-launcher.template"
+export CRON_LAUNCHER_TEMPLATE_NAME="setup/templates/cron-launcher.template"
 export CRON_LAUNCHER_IN_ARTIFACT_NAME="templates/cron-launcher.sh"
 
-export ENV_CONF_TEMPLATE_NAME="environment.template"
+export ENV_CONF_TEMPLATE_NAME="setup/templates/environment.template"
 export ENV_CONF_IN_ARTIFACT_NAME="templates/environment.conf"
 
-export SYSTEMD_CONF_TEMPLATE_NAME="service.template"
+export SYSTEMD_CONF_TEMPLATE_NAME="setup/templates/service.template"
 export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
+
+export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
+export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.template"
 
 export CLEANUP_TMP_FILES=""
 
 # shellcheck source=credentials.conf
 . "$(dirname "$0")/credentials.conf"
+
+function require_root_user() {
+    if [ $EUID -ne 0 ]; then
+        echo "This script must be run as root user"
+        exit 1
+    fi
+}
 
 function get_depl_env() {
     local VERSION DEPL_ENV
@@ -60,10 +70,10 @@ function download_artifact() {
     dev)
         DEV_METADATA_LINK="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/maven-metadata.xml"
         DEV_METADATA_DL_PATH="$(mktemp --suffix="_metadataxml")"
+        delete_on_exit "$DEV_METADATA_DL_PATH"
 
         if ! wget -q --no-check-certificate --output-document="$DEV_METADATA_DL_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$DEV_METADATA_LINK"; then
             echo "Can't download metadata for full dev artifact version by link [$DEV_METADATA_LINK]. Wrong artifact or version"
-            rm -f "$DEV_METADATA_DL_PATH"
             return 1
         else
             echo "Metadata downloaded successfully"
@@ -71,8 +81,6 @@ function download_artifact() {
 
         TIMESTAMP=$(grep '<timestamp' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
         BUILD_NUMBER=$(grep '<buildNumber' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
-
-        rm -f "$DEV_METADATA_DL_PATH"
 
         DEV_SNAPSHOT_VERSION="${VERSION//-SNAPSHOT/}"
         ARTIFACT_DL_URL="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$DEV_SNAPSHOT_VERSION-SNAPSHOT/$ARTIFACT-$DEV_SNAPSHOT_VERSION-$TIMESTAMP-$BUILD_NUMBER$DOWNLOAD_SUFFIX"
@@ -115,7 +123,7 @@ function extract_artifact_version() {
     TMP_DIR="$(mktemp -d)"
     delete_on_exit "$TMP_DIR"
 
-    if ! sudo unzip -q -j "$ARTIFACT_JAR" "META-INF/MANIFEST.MF" -d "$TMP_DIR"; then
+    if ! unzip -q -j "$ARTIFACT_JAR" "META-INF/MANIFEST.MF" -d "$TMP_DIR"; then
         echo "Unable to extract [$ARTIFACT_JAR!/META-INF/MANIFEST.MF] to [$TMP_DIR]" 1>&2
         return 1
     fi
@@ -135,11 +143,11 @@ function extract_launcher_script() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$APP_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default app-launcher..."
-        sudo cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$APP_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
-    sudo chmod +x "$OUTPUT_FILE" || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, CRON_LAUNCHER_IN_ARTIFACT_NAME, CRON_LAUNCHER_TEMPLATE_NAME variables
@@ -156,11 +164,11 @@ function extract_cron_launcher_script() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$CRON_LAUNCHER_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default cron-launcher..."
-        sudo cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$CRON_LAUNCHER_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
-    sudo chmod +x "$OUTPUT_FILE" || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
 
     export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
 }
@@ -176,8 +184,10 @@ function extract_environment_conf() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$ENV_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default environment configuration template..."
-        sudo cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$ENV_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
+
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
 }
 
 # Uses SYSTEMD_CONF_IN_ARTIFACT_NAME, SYSTEMD_CONF_TEMPLATE_NAME variables
@@ -191,7 +201,7 @@ function extract_systemd_service() {
     # shellcheck disable=SC2153
     extract_jar_file "$ARTIFACT" "$SYSTEMD_CONF_IN_ARTIFACT_NAME" "$OUTPUT_FILE" || {
         echo "Fallback to default systemd service template..."
-        sudo cp "$(dirname "$0")/$SYSTEMD_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+        cp "$(dirname "$0")/$SYSTEMD_CONF_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
     }
 }
 
@@ -207,18 +217,15 @@ function extract_jar_file() {
 
     TMP_DIR="$(mktemp -d)"
 
-    sudo rm -f "$OUTPUT_FILE"
+    rm -f "$OUTPUT_FILE"
+    delete_on_exit "$TMP_DIR"
 
-    if sudo unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
-        sudo cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" || return 1
+    if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
+        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" 2>/dev/null || return 1
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
-        sudo rm -rf "$TMP_DIR"
-
         return 1
     fi
-
-    sudo rm -rf "$TMP_DIR"
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
@@ -232,17 +239,17 @@ function copy_service_jar() {
 
     echo "Copying [$DOWNLOAD_PATH]($ARTIFACT) to [$SERVICE_JAR]..."
 
-    sudo rm -f "$SERVICE_JAR"
-    sudo cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
-    sudo chmod 664 "$SERVICE_JAR" || return 1
+    rm -f "$SERVICE_JAR"
+    cp "$DOWNLOAD_PATH" "$SERVICE_JAR" || return 1
+    chmod 660 "$SERVICE_JAR" || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
 }
 
 function is_daemon_installed() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
-    if sudo systemctl is-enabled "$SERVICE_NAME" &>/dev/null; then
+    if systemctl is-enabled "$SERVICE_NAME" &>/dev/null; then
         return 0
     else
         return 1
@@ -253,7 +260,7 @@ function is_daemon_running() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
-    if sudo systemctl is-active "$SERVICE_NAME" &>/dev/null; then
+    if systemctl is-active "$SERVICE_NAME" &>/dev/null; then
         return 0
     else
         return 1
@@ -268,7 +275,7 @@ function is_cron_installed() {
     SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
     CRON_LAUNCHER_SCRIPT_PATH="$SERVICE_PATH/cron-launcher.sh"
 
-    if sudo crontab -u "$SERVICE_UN" -l 2>/dev/null | grep "$CRON_LAUNCHER_SCRIPT_PATH" &>/dev/null; then
+    if crontab -u "$SERVICE_UN" -l 2>/dev/null | grep "$CRON_LAUNCHER_SCRIPT_PATH" &>/dev/null; then
         return 0
     else
         return 1
@@ -296,12 +303,34 @@ function generate_service_name() {
     ARTIFACT=$2
     SUFFIX=$3
 
-    SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    if [ -n "$WEBSITE" ]; then
+        SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    else
+        SERVICE_NAME="${ARTIFACT}"
+    fi
+
     if [ -n "$SUFFIX" ]; then
         SERVICE_NAME="${SERVICE_NAME}_${SUFFIX}"
     fi
 
     echo "$SERVICE_NAME"
+}
+
+# Will export next variables: SERVICE_NAME, SERVICE_PATH, SERVICE_UN, SERVICE_GROUP
+function config_service_env() {
+    local WEBSITE ARTIFACT SUFFIX
+
+    WEBSITE=$1
+    ARTIFACT=$2
+    SUFFIX=$3
+
+    export SERVICE_NAME
+    SERVICE_NAME="$(generate_service_name "$WEBSITE" "$ARTIFACT" "$SUFFIX")"
+
+    # shellcheck disable=SC2153
+    export SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
+    export SERVICE_UN="$ARTIFACT"
+    export SERVICE_GROUP="$ARTIFACT"
 }
 
 # Will export next variables: SERVICE_NAME, SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, JAR_NAME, JAR_PATH
@@ -315,18 +344,10 @@ function config_service() {
     # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH" ]; then
         echo "Creating services directory [$SERVICES_PATH]..."
-
-        sudo mkdir -p "$SERVICES_PATH" || return 1
-        sudo chown "$(whoami)" "$SERVICES_PATH" || return 1
+        mkdir -p "$SERVICES_PATH" || return 1
     fi
 
-    export SERVICE_NAME
-    SERVICE_NAME="$(generate_service_name "$WEBSITE" "$ARTIFACT" "$SUFFIX")"
-
-    # shellcheck disable=SC2153
-    export SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
-    export SERVICE_UN="$ARTIFACT"
-    export SERVICE_GROUP="$ARTIFACT"
+    config_service_env "$WEBSITE" "$ARTIFACT" "$SUFFIX"
 
     echo "Service [$SERVICE_NAME] will be created under [$SERVICE_PATH] directory and [$SERVICE_UN:$SERVICE_GROUP] account"
 
@@ -334,7 +355,7 @@ function config_service() {
     if getent group "$SERVICE_GROUP" >/dev/null; then
         echo "[$SERVICE_GROUP] group is already exists"
     else
-        sudo /usr/sbin/groupadd -r "$SERVICE_GROUP"
+        groupadd -r "$SERVICE_GROUP"
         echo "[$SERVICE_GROUP] group added"
     fi
 
@@ -342,13 +363,17 @@ function config_service() {
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        sudo /usr/sbin/useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
         echo "[$SERVICE_UN] user added"
     fi
 
-    sudo mkdir -p "$SERVICE_PATH/logs" || return 1
-    sudo chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    sudo chmod -R 775 "$SERVICE_PATH" || return 1
+    mkdir -p "$SERVICE_PATH" || return 1
+    mkdir -p "$SERVICE_PATH/logs" || return 1
+    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+    (find "$SERVICE_PATH" -type d -print0 | xargs -0 chmod g+s) || return 1
+    setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
+    setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
+    setfacl -d -m o::--- "$SERVICE_PATH" || return 1
 
     export JAR_NAME
     JAR_NAME="$ARTIFACT"
@@ -413,7 +438,7 @@ function wait_log() {
     } >"$OUT_PATH" &
 
     # shellcheck disable=SC2024
-    sudo tail -F -n 0 "$LOG_FILE_PATH" --pid $! 2>/dev/null >>"$FIFO_PATH"
+    tail -F -n 0 "$LOG_FILE_PATH" --pid $! 2>/dev/null >>"$FIFO_PATH"
 
     # Show grep output
     cat "$OUT_PATH"
@@ -434,13 +459,18 @@ function unpack_ps_war() {
     WEBAPP_PATH=$1
     DOWNLOAD_PATH=$2
 
-    if sudo test -d "$WEBAPP_PATH"; then
-        sudo rm -rf "$WEBAPP_PATH" || return 1
+    if test -d "$WEBAPP_PATH"; then
+        rm -rf "$WEBAPP_PATH" || return 1
     fi
 
-    sudo mkdir -p "$WEBAPP_PATH"
-    sudo unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
-    sudo chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$WEBAPP_PATH"
+    mkdir -p "$WEBAPP_PATH"
+    unzip -q "$DOWNLOAD_PATH" -d "$WEBAPP_PATH" || return 1
+
+    # Set permissions
+    chown -R "$(whoami):$TOMCAT_GROUP" "$WEBAPP_PATH" || return 1
+    (find "$WEBAPP_PATH" -type d -print0 | xargs -0 chmod g-w,g+x,o-r,o-w,o-x) || return 1
+    (find "$WEBAPP_PATH" -type f -print0 | xargs -0 chmod g-w,o-r,o-w,o-x) || return 1
+    (find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -print0 | xargs -0 chmod -R g+w) || exit 1
 }
 
 function cleanup_tomcat() {
@@ -448,9 +478,9 @@ function cleanup_tomcat() {
 
     TOMCAT_PATH=$1
 
-    sudo rm -rf "$TOMCAT_PATH"/work/*
-    sudo rm -rf "$TOMCAT_PATH"/logs/ps/*
-    sudo rm -rf "$TOMCAT_PATH"/logs/catalina.log
+    rm -rf "$TOMCAT_PATH"/work/*
+    rm -rf "$TOMCAT_PATH"/logs/ps/*
+    rm -rf "$TOMCAT_PATH"/logs/catalina.log "$TOMCAT_PATH"/logs/catalina.out
 }
 
 # Uses CLEANUP_TMP_FILES variable
@@ -462,7 +492,7 @@ function delete_on_exit() {
 function cleanup_tmp() {
     if [ -n "$CLEANUP_TMP_FILES" ]; then
         # shellcheck disable=SC2086
-        sudo rm -rf $CLEANUP_TMP_FILES &> /dev/null
+        rm -rf $CLEANUP_TMP_FILES &> /dev/null
     fi
 }
 

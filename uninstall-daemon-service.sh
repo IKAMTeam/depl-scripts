@@ -15,6 +15,7 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 check_service_exists_or_exit "$SERVICE_NAME"
 
 if ! is_daemon_installed "$SERVICE_NAME"; then
@@ -24,13 +25,13 @@ if ! is_daemon_installed "$SERVICE_NAME"; then
     fi
 fi
 
-sudo systemctl stop "$SERVICE_NAME"
+systemctl stop "$SERVICE_NAME"
 
 echo "Disabling service [$SERVICE_NAME]..."
-sudo systemctl disable "$SERVICE_NAME"
+systemctl disable "$SERVICE_NAME"
 
 # shellcheck disable=SC2153
 SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
 
 echo "Removing service data [$SERVICE_NAME]..."
-sudo rm -rf "/usr/lib/systemd/system/${SERVICE_NAME}.service" "$SERVICE_PATH"
+rm -rf "/usr/lib/systemd/system/${SERVICE_NAME}.service" "$SERVICE_PATH"

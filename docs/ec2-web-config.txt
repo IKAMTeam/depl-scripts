@@ -41,14 +41,16 @@ sudo rm -f /usr/share/tomcat/conf/tomcat-users.xml
 8. Setup timeout for Tomcat shutdown process before it will be killed: 
 sudo sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' /usr/share/tomcat/conf/tomcat.conf 
 
+9. Configure Tomcat filesystem permissions:
+depl-scripts $ sudo ./config-tomcat-security.sh /usr/share/tomcat
 
 II. INSTALLATION OF ONEVIZION WEB APP
 
-9. Open /usr/share/tomcat/conf/server.xml in a text editor and replace "sitename.onevizion.com" to the preferred hostname. Pay attention to the "Host" tag - it contains a sample config to use white-labeled images (background, logos, etc.). 
+10. Open /usr/share/tomcat/conf/server.xml in a text editor and replace "sitename.onevizion.com" to the preferred hostname. Pay attention to the "Host" tag - it contains a sample config to use white-labeled images (background, logos, etc.).
 
-10. Rename directory /usr/share/tomcat/conf/Catalina/sitename.onevizion.com to the preferred hostname. 
+11. Rename directory /usr/share/tomcat/conf/Catalina/sitename.onevizion.com to the preferred hostname.
 
-11. In /usr/share/tomcat/conf/Catalina/<preferred hostname>/ROOT.xml
+12. In /usr/share/tomcat/conf/Catalina/<preferred hostname>/ROOT.xml
 Change docBase attribute to correct directory name (this directory will contain ps-web.war extracted content) - replace to ${catalina.home}/<preferred hostname>. 
 Change Parameter[name="app.serverUrl"] tag value to target website url e.g. https://<preferred hostname> 
 
@@ -64,26 +66,26 @@ Replace next placeholders:
 [placeholder for PKG schema password] - Password for _PKG schema 
 [placeholder for error reports email subject] - Usually equals to <username for OWNER schema>.<1st part of db URL>, for example prod01.trackor-prod 
 
-12. Install ps-web: 
-depl-scripts $ ./update-ps-web.sh <target version> /usr/share/tomcat <preferred hostname>
+13. Install ps-web:
+depl-scripts $ sudo ./update-ps-web.sh <target version> /usr/share/tomcat <preferred hostname>
 
 (Tomcat will start automatically) 
 
 
 III. ENABLE SSL CONNECTION TO THE ORACLE DB (OPTIONAL)
 
-13. Make sure SSL is enabled in AWS RDS option group with following settings: port 2484, SSL_VERSION= 1.2, CIPHER_SUITE=SSL_RSA_WITH_AES_256_GCM_SHA384
+14. Make sure SSL is enabled in AWS RDS option group with following settings: port 2484, SSL_VERSION= 1.2, CIPHER_SUITE=SSL_RSA_WITH_AES_256_GCM_SHA384
 
-14. Use instructions from https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html to generate Java keystore file with AWS certificates:
+15. Use instructions from https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html to generate Java keystore file with AWS certificates:
 download certificate from https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem
 openssl x509 -outform der -in rds-ca-2019-root.pem -out rds-ca-2019-root.der
 
-15. Import AWS Certificate into Java trust store (located in $JAVA_HOME/jre/lib/security/cacerts, also Tomcat prints out JAVA_HOME into logs on startup):
+16. Import AWS Certificate into Java trust store (located in $JAVA_HOME/jre/lib/security/cacerts, also Tomcat prints out JAVA_HOME into logs on startup):
 sudo keytool -import -trustcacerts -keystore cacerts -storepass changeit -alias Root -file rds-ca-2019-root.der
 
-16. Modify "web.dbSid" parameter in ROOT.xml to:
+17. Modify "web.dbSid" parameter in ROOT.xml to:
 '(DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))'
 
 Replace [placeholder for Oracle SID] and [placeholder for Oracle host] with correct values
 
-17. restart Tomcat
+18. restart Tomcat

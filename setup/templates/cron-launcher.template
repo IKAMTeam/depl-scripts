@@ -42,10 +42,6 @@ if [ -z "$JAR_PATH" ]; then
     echo "JAR_PATH is not set"
     exit 1
 fi
-if [ -z "$JAR_OPTS" ]; then
-    echo "JAR_OPTS is not set"
-    exit 1
-fi
 
 touch "$SERVICE_OUT"
 cd "$ROOT_DIR" || exit 1

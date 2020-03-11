@@ -9,10 +9,10 @@ MATCH_ARTIFACT=$1
 MATCH_WEBSITE=$2
 NEW_VERSION=$3
 
-ROOT_DIR="$(dirname "$0")"
-
 # shellcheck source=utils.sh
-. "$ROOT_DIR/utils.sh"
+. "$(dirname "$0")/utils.sh"
+
+require_root_user
 
 export SERVICE_UN="$MATCH_ARTIFACT"
 export SERVICE_GROUP="$MATCH_ARTIFACT"
@@ -63,7 +63,7 @@ for SERVICE_NAME in "${SERVICE_NAMES_FOR_UPDATE[@]}"; do
 
     if is_daemon_running "$SERVICE_NAME"; then
         echo "Stopping [$SERVICE_NAME]..."
-        sudo systemctl stop "$SERVICE_NAME"
+        systemctl stop "$SERVICE_NAME"
     fi
 
     ARTIFACT="$(get_artifact_name "$SERVICE_NAME")"
@@ -73,7 +73,7 @@ for SERVICE_NAME in "${SERVICE_NAMES_FOR_UPDATE[@]}"; do
         extract_launcher_script "$ARTIFACT" || exit 1
 
         echo "Starting [$SERVICE_NAME]..."
-        sudo systemctl start "$SERVICE_NAME" || exit $?
+        systemctl start "$SERVICE_NAME" || exit $?
     elif is_cron_installed "$SERVICE_NAME"; then
         extract_cron_launcher_script "$ARTIFACT" || exit 1
     fi

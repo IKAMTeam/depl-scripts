@@ -1,0 +1,34 @@
+#!/bin/bash
+if [ "$#" -ne 1 ]; then
+    echo "### Script for update monitor service artifacts ###"
+    echo "Usage: $(basename "$0") <new version>"
+    exit 1
+fi
+
+NEW_VERSION=$1
+
+ARTIFACT="monitoring"
+
+# shellcheck source=utils.sh
+. "$(dirname "$0")/utils.sh"
+
+require_root_user
+
+config_service_env "" "$ARTIFACT"
+
+echo "Updating [$SERVICE_NAME] at [$SERVICE_PATH]..."
+download_service_artifacts "$ARTIFACT" "$NEW_VERSION" || exit 1
+
+if is_daemon_running "$SERVICE_NAME"; then
+    echo "Stopping [$SERVICE_NAME]..."
+    sudo systemctl stop "$SERVICE_NAME"
+fi
+
+copy_service_artifacts "$ARTIFACT" || exit 1
+
+if is_daemon_installed "$SERVICE_NAME"; then
+    extract_launcher_script "$ARTIFACT" || exit 1
+
+    echo "Starting [$SERVICE_NAME]..."
+    sudo systemctl start "$SERVICE_NAME" || exit $?
+fi

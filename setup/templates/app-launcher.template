@@ -28,10 +28,6 @@ if [ -z "$JAR_PATH" ]; then
     echo "JAR_PATH is not set"
     exit 1
 fi
-if [ -z "$JAR_OPTS" ]; then
-    echo "JAR_OPTS is not set"
-    exit 1
-fi
 
 # shellcheck disable=SC2209
 _NOHUP=nohup

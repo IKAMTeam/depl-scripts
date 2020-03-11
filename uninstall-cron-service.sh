@@ -15,6 +15,7 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 check_service_exists_or_exit "$SERVICE_NAME"
 
 if ! is_cron_installed "$SERVICE_NAME"; then
@@ -30,7 +31,7 @@ SERVICE_UN="$(get_artifact_name "$SERVICE_NAME")"
 CRON_LAUNCHER_SCRIPT_PATH="$SERVICE_PATH/cron-launcher.sh"
 
 echo "Dropping record from crontab..."
-sudo crontab -u "$SERVICE_UN" -l | grep -v "$CRON_LAUNCHER_SCRIPT_PATH" | sudo crontab -u "$SERVICE_UN" - || exit 1
+crontab -u "$SERVICE_UN" -l | grep -v "$CRON_LAUNCHER_SCRIPT_PATH" | crontab -u "$SERVICE_UN" - || exit 1
 
 echo "Removing service data [$SERVICE_NAME]..."
-sudo rm -rf "$SERVICE_PATH"
+rm -rf "$SERVICE_PATH"

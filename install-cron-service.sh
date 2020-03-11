@@ -44,6 +44,7 @@ export JAR_OPTS=$*
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+require_root_user
 config_service "$WEBSITE" "$ARTIFACT" "$SUFFIX" || exit 1
 download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1
 
@@ -57,13 +58,14 @@ ENV_CONF_EXTRACT_PATH="$(mktemp --suffix="_env_$ARTIFACT")"
 delete_on_exit "$ENV_CONF_EXTRACT_PATH"
 extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || exit 1
 
-(sudo cat "$ENV_CONF_EXTRACT_PATH" | envsubst | sudo tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
+(< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
+chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
 
 echo "Dropping record from crontab if exists..."
-sudo crontab -u "$SERVICE_UN" -l | grep -v "$CRON_LAUNCHER_SCRIPT_PATH" | sudo crontab -u "$SERVICE_UN" - || exit 1
+crontab -u "$SERVICE_UN" -l | grep -v "$CRON_LAUNCHER_SCRIPT_PATH" | crontab -u "$SERVICE_UN" - || exit 1
 
 echo "Adding record to crontab..."
 (
-    sudo crontab -u "$SERVICE_UN" -l
+    crontab -u "$SERVICE_UN" -l
     echo "$SCHEDULE ""$CRON_LAUNCHER_SCRIPT_PATH"""
-) | sudo crontab -u "$SERVICE_UN" - || exit 1
+) | crontab -u "$SERVICE_UN" - || exit 1
