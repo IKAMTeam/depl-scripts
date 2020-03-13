@@ -72,6 +72,12 @@ CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
 "$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
 "$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
 
+# Set AES password if specified
+if [ -n "$AES_PASSWORD" ]; then
+    mkdir -p "$TOMCAT_DIR/$WEBSITE"
+    echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_DIR/$WEBSITE/ov.properties"
+fi
+
 "$SCRIPTS_DIR/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp"
 
 # Finished
