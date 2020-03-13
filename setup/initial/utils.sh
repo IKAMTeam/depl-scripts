@@ -38,3 +38,36 @@ function init_ec2_instance() {
     # Update nickname for terms
     echo "export NICKNAME=$EC2_URL_INTERNAL" | sed 's/\./-/g' >"/etc/profile.d/prompt.sh"
 }
+
+# Uses EC2_URL_INTERNAL, EC2_IPV4 variable
+function update_route53() {
+    DOMAIN="ov.internal"
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+
+    if [ -z "$ZONE_ID" ]; then
+        echo "No Zone ID received for domain [$DOMAIN]!"
+        return 1
+    fi
+
+    # Create a new A record on Route 53, replacing the old entry if nessesary
+    aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch file:///dev/stdin <<EOF
+{
+  "Comment": "Updating internal URL.",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "${EC2_URL_INTERNAL}.${DOMAIN}",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "${EC2_IPV4}"
+          }
+        ]
+      }
+    }
+  ]
+}
+EOF
+}
