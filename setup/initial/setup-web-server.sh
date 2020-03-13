@@ -35,14 +35,15 @@ ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
 java -jar "$SCRIPTS_DIR/setup/test-jdbc.jar" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_URL"
 
 # Setup timeout for Tomcat shutdown process before it will be killed
-sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_DIR/conf/tomcat.conf"
+if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
+    sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_DIR/conf/tomcat.conf"
+fi
 
 # Enable Tomcat service to start at boot time
-systemctl enable tomcat
+systemctl enable "$TOMCAT_SERVICE"
 
 # Copy configuration template
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/conf/* "$TOMCAT_DIR/conf"
-chown -R "$TOMCAT_OWNER" "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com"
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/webapps/* "$TOMCAT_DIR/webapps"
 rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
 
@@ -50,22 +51,28 @@ rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
 "$SCRIPTS_DIR/config-tomcat-security.sh" "$TOMCAT_DIR"
 
 # Set up the config files and replace values as appropriate
-sed -i -- "s/sitename.onevizion.com/$WEBSITE/g" "$TOMCAT_DIR/conf/server.xml"
 mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
 
-CONFIG_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
+"$(dirname "$0")/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    appBase "$WEBSITE-webapp"
+"$(dirname "$0")/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    name "$WEBSITE"
 
-sed -i -- "s/[placeholder for Oracle host]:[placeholder for Oracle port]:[placeholder for Oracle SID]/$DB_URL/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder username for OWNER schema]/$DB_OWNER_USER/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder for OWNER schema password]/$DB_OWNER_PASSWORD/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder username for USER schema]/${DB_OWNER_USER}_USER/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder for USER schema password]/$DB_USER_PASSWORD/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder username for PKG schema]/${DB_OWNER_USER}_PKG/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder for PKG schema password]/$DB_PKG_PASSWORD/g" "$CONFIG_FILE"
-sed -i -- "s/[placeholder for error reports email subject]/$ERROR_REPORTS_SUBJECT/g" "$CONFIG_FILE"
+CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
 
-# TODO: run ps-web
-"$SCRIPTS_DIR/update-ps-web.sh" ${_VERSION} ${_TOMCAT_DIR} ps
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwner"]' value "$DB_OWNER_USER"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwnerPassword"]' value "$DB_OWNER_PASSWORD"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUser"]' value "${DB_OWNER_USER}_USER"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUserPassword"]' value "$DB_USER_PASSWORD"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_PKG"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
+"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
+
+"$SCRIPTS_DIR/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp"
 
 # Finished
 echo "Web server setup is complete."
