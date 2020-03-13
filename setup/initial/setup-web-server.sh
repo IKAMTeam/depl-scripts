@@ -19,7 +19,10 @@ fi
 
 require_root_user
 
-# TODO: import config
+CONFIG_FILE="$1"
+
+# shellcheck source=setup-web-server.conf.template
+. "$CONFIG_FILE"
 
 set -o errexit
 set -o pipefail
