@@ -46,12 +46,29 @@ chmod 440 /etc/sudoers.d/integration-scheduler
     "${DB_OWNER_USER}_user/${DB_USER_PASSWORD}@$DB_URL" "${DB_OWNER_USER}_rpt/${DB_RPT_PASSWORD}@$DB_URL"
 "$SCRIPTS_DIR/install-daemon-service.sh" "$WEBSITE" integration-scheduler "$VERSION" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 "$SCRIPTS_DIR/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
-"$SCRIPTS_DIR/install-monitoring-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$AES_PASSWORD"
+
+if [ -n "$MONITORING_VERSION" ]; then
+    "$SCRIPTS_DIR/install-monitoring-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$AES_PASSWORD"
+fi
+
+# Set AES password if specified
+if [ -n "$AES_PASSWORD" ]; then
+    # shellcheck source=../../utils.sh
+    . "$SCRIPTS_DIR/utils.sh"
+
+    config_service_env "$WEBSITE" "services"
+    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
+    config_service_env "$WEBSITE" "integration-scheduler"
+    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
+fi
 
 # Start up services
 systemctl start "${WEBSITE}_services"
 systemctl start "${WEBSITE}_integration-scheduler"
-systemctl start "monitoring"
+
+if [ -n "$MONITORING_VERSION" ]; then
+    systemctl start "monitoring"
+fi
 
 # Finished
 echo "Application server setup is complete."
