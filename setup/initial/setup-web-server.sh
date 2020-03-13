@@ -28,9 +28,6 @@ set -o nounset
 # Update timezone to EST
 ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
 
-# Update depl-scripts
-checkout_depl_scripts
-
 # Test database connection
 java -jar "$SCRIPTS_DIR/setup/test-jdbc.jar" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_URL"
 
