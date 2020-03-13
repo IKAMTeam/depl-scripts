@@ -30,6 +30,8 @@ amazon-linux-extras install -y java-openjdk11
 
 init_ec2_instance
 
+yum install -y python3
+
 # Sometimes these libraries are missing from default install
 python3 -m pip install argparse
 python3 -m pip install oauth
