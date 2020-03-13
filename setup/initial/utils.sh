@@ -7,15 +7,16 @@ function require_root_user() {
     fi
 }
 
+# Uses AWS_REGION variable
 function init_ec2_instance() {
     # Install Git, jq
     yum install -y git jq
 
-    EC2_ID="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
-    URL_INTERNAL=$(aws ec2 describe-tags --region "us-east-1" --filters "Name=resource-id,Values=$EC2_ID" "Name=key,Values=url-internal" |
-        jq ".Tags[0].Value" | sed -r 's/\"//g')
+    EC2_ID="$(ec2-metadata --instance-id | cut -d' ' -f2)"
+    URL_INTERNAL=$(aws ec2 describe-tags --region "$AWS_REGION" --filters "Name=resource-id,Values=$EC2_ID" \
+        --filters "Name=key,Values=url-internal" | jq ".Tags[0].Value" | sed -r 's/\"//g')
     ENV="${URL_INTERNAL#*.}"
-    IPV4="$(ec2-metadata -o | cut -d ' ' -f2)"
+    IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 
     # Update hostname
     echo "HOSTNAME=$URL_INTERNAL" >>"/etc/sysconfig/network"
