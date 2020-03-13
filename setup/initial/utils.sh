@@ -1,4 +1,5 @@
 #!/bin/bash
+export AWS_DOMAIN="ov.internal"
 
 function require_root_user() {
     if [ $EUID -ne 0 ]; then
@@ -27,25 +28,25 @@ function init_ec2_instance() {
 
     config_ec2_env
 
+    # Update hostname
+    TARGET_DOMAIN="${EC2_URL_INTERNAL}.${AWS_DOMAIN}"
+    hostnamectl set-hostname "$TARGET_DOMAIN"
+    {
+        echo -n "$EC2_IPV4 $TARGET_DOMAIN"
+        echo " $EC2_URL_INTERNAL" | sed 's/\./-/g'
+    } >> "/etc/hosts"
+
     echo "Updating Route 53..."
     update_route53
-
-    # Update hostname
-    echo "HOSTNAME=$EC2_URL_INTERNAL" >>"/etc/sysconfig/network"
-    echo -n "$EC2_IPV4 ${EC2_URL_INTERNAL}.ov.internal" >>"/etc/hosts"
-    echo " $EC2_URL_INTERNAL" | sed 's/\./-/g' >>"/etc/hosts"
-
-    # Update nickname for terms
-    echo "export NICKNAME=$EC2_URL_INTERNAL" | sed 's/\./-/g' >"/etc/profile.d/prompt.sh"
 }
 
-# Uses EC2_URL_INTERNAL, EC2_IPV4 variable
+# Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
 function update_route53() {
-    DOMAIN="ov.internal"
-    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+    local ZONE_ID
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
 
     if [ -z "$ZONE_ID" ]; then
-        echo "No Zone ID received for domain [$DOMAIN]!"
+        echo "No Zone ID received for domain [$AWS_DOMAIN]!"
         return 1
     fi
 
@@ -57,7 +58,7 @@ function update_route53() {
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "${EC2_URL_INTERNAL}.${DOMAIN}",
+        "Name": "${EC2_URL_INTERNAL}.${AWS_DOMAIN}",
         "Type": "A",
         "TTL": 300,
         "ResourceRecords": [
