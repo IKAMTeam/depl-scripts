@@ -11,6 +11,4 @@
     <Parameter name="web.enterpriseEdition" value="true"/>
     <Parameter name="web.whiteLabeled" value="false"/>
     <Parameter name="app.serverUrl" value="https://sitename.onevizion.com" override="false"/>
-
-    <Environment name="dbUser" value="[placeholder for error reports email subject]" type="java.lang.String" override="false"/>
 </Context>
