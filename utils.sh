@@ -117,6 +117,8 @@ function check_service_exists_or_exit() {
 }
 
 function extract_artifact_version() {
+    init_cleanup
+
     local ARTIFACT_JAR
     ARTIFACT_JAR=$1
 
@@ -496,4 +498,9 @@ function cleanup_tmp() {
     fi
 }
 
-trap cleanup_tmp EXIT ERR
+# Should be called from subshells separately
+function init_cleanup() {
+    trap cleanup_tmp EXIT ERR
+}
+
+init_cleanup
