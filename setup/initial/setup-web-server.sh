@@ -39,6 +39,10 @@ if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
     sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_DIR/conf/tomcat.conf"
 fi
 
+# Configure Auto-Restart for Tomcat if it will be crashed
+sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
+systemctl daemon-reload
+
 # Enable Tomcat service to start at boot time
 systemctl enable "$TOMCAT_SERVICE"
 
