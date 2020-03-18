@@ -1,0 +1,3 @@
+AWS_DOMAIN="ov.internal"
+
+# Put here contents from setup-app-server.conf.template or setup-web-server.conf.template

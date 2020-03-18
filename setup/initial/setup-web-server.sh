@@ -28,6 +28,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+init_credentials
+
 # Update timezone to EST
 ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
 

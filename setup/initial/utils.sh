@@ -21,6 +21,15 @@ function config_ec2_env() {
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 }
 
+function init_credentials() {
+    {
+        echo "RELEASES_REPO_URL=$RELEASES_REPO_URL"
+        echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
+        echo "REPOSITORY_UN=$REPOSITORY_UN"
+        echo "REPOSITORY_PWD=$REPOSITORY_PWD"
+    } > "$SCRIPTS_DIR/credentials.conf"
+}
+
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable
 function init_ec2_instance() {
     # Install jq
