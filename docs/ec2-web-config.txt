@@ -101,4 +101,5 @@ sudo keytool -import -trustcacerts -keystore cacerts -storepass changeit -alias 
 
 Replace [placeholder for Oracle SID] and [placeholder for Oracle host] with correct values
 
-18. restart Tomcat
+19. Restart Tomcat
+sudo systemctl restart tomcat
