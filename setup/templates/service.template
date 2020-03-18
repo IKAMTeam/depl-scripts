@@ -11,6 +11,8 @@ ExecStart=${SERVICE_PATH}/app-launcher.sh
 StandardOutput=${SERVICE_PATH}/run.out
 PIDFile=${SERVICE_PATH}/run.pid
 SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

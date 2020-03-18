@@ -20,7 +20,7 @@ export SERVICE_GROUP="$MATCH_ARTIFACT"
 export SERVICE_NAME
 export SERVICE_PATH
 
-mapfile -t ALL_SERVICE_NAMES < <("$ROOT_DIR/list-services.sh" --short-format)
+mapfile -t ALL_SERVICE_NAMES < <("$(dirname "$0")/list-services.sh" --short-format)
 SERVICE_NAMES_FOR_UPDATE=()
 SERVICE_PATHS_FOR_UPDATE=()
 

@@ -117,6 +117,8 @@ function check_service_exists_or_exit() {
 }
 
 function extract_artifact_version() {
+    init_cleanup
+
     local ARTIFACT_JAR
     ARTIFACT_JAR=$1
 
@@ -221,7 +223,7 @@ function extract_jar_file() {
     delete_on_exit "$TMP_DIR"
 
     if unzip -q -j "$SERVICE_JAR" "$INPUT_FILE" -d "$TMP_DIR"; then
-        cp "$TMP_DIR/$INPUT_FILE" "$OUTPUT_FILE" 2>/dev/null || return 1
+        cp "$TMP_DIR/$(basename "$INPUT_FILE")" "$OUTPUT_FILE" 2>/dev/null || return 1
     else
         echo "Unable to extract [$SERVICE_JAR!/$INPUT_FILE] to [$TMP_DIR]"
         return 1
@@ -496,4 +498,9 @@ function cleanup_tmp() {
     fi
 }
 
-trap cleanup_tmp EXIT ERR
+# Should be called from subshells separately
+function init_cleanup() {
+    trap cleanup_tmp EXIT ERR
+}
+
+init_cleanup
