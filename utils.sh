@@ -23,13 +23,8 @@ export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.templ
 
 export CLEANUP_TMP_FILES=""
 
-export CREDENTIALS_CONF
-if [ -z "$CREDENTIALS_CONF" ]; then
-    CREDENTIALS_CONF="$(dirname "$0")/credentials.conf"
-fi
-
 # shellcheck source=credentials.conf
-. "$CREDENTIALS_CONF"
+. "$(dirname "$0")/credentials.conf"
 
 function require_root_user() {
     if [ $EUID -ne 0 ]; then
