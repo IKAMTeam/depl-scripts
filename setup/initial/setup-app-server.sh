@@ -50,7 +50,7 @@ chmod 440 /etc/sudoers.d/integration-scheduler
 "$SCRIPTS_DIR/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 
 if [ -n "$MONITORING_VERSION" ]; then
-    "$SCRIPTS_DIR/install-monitoring-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$AES_PASSWORD"
+    "$SCRIPTS_DIR/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
 fi
 
 # Set AES password if specified
