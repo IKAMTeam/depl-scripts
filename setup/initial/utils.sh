@@ -6,6 +6,18 @@ function require_root_user() {
     fi
 }
 
+function init_credentials() {
+    {
+        echo "RELEASES_REPO_URL=$RELEASES_REPO_URL"
+        echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
+        echo "REPOSITORY_UN=$REPOSITORY_UN"
+        echo "REPOSITORY_PWD=$REPOSITORY_PWD"
+    } > "$SCRIPTS_DIR/credentials.conf"
+    chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
+    chmod 600 "$SCRIPTS_DIR/credentials.conf"
+}
+
+# Will export next variables: EC2_ID, EC2_REGION, EC2_URL_INTERNAL, EC2_IPV4
 function config_ec2_env() {
     export EC2_ID
     export EC2_REGION
@@ -17,17 +29,6 @@ function config_ec2_env() {
     EC2_URL_INTERNAL=$(aws ec2 describe-tags --region "$EC2_REGION" --filters "Name=resource-id,Values=$EC2_ID" \
         --filters "Name=key,Values=url-internal" | jq ".Tags[0].Value" | sed -r 's/\"//g')
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
-}
-
-function init_credentials() {
-    {
-        echo "RELEASES_REPO_URL=$RELEASES_REPO_URL"
-        echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
-        echo "REPOSITORY_UN=$REPOSITORY_UN"
-        echo "REPOSITORY_PWD=$REPOSITORY_PWD"
-    } > "$SCRIPTS_DIR/credentials.conf"
-    chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
-    chmod 600 "$SCRIPTS_DIR/credentials.conf"
 }
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable
