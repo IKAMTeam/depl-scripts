@@ -26,6 +26,8 @@ function init_credentials() {
         echo "REPOSITORY_UN=$REPOSITORY_UN"
         echo "REPOSITORY_PWD=$REPOSITORY_PWD"
     } > "$SCRIPTS_DIR/credentials.conf"
+    chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
+    chmod 600 "$SCRIPTS_DIR/credentials.conf"
 }
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable

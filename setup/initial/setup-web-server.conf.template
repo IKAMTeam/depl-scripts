@@ -1,6 +1,7 @@
 TOMCAT_DIR="/usr/share/tomcat"
 TOMCAT_SERVICE="tomcat"
 SCRIPTS_DIR="/home/ec2-user/depl-scripts"
+SCRIPTS_OWNER="ec2-user"
 
 RELEASES_REPO_URL="[placeholder]"
 SNAPSHOT_REPO_URL="[placeholder]"
