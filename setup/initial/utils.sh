@@ -17,6 +17,43 @@ function init_credentials() {
     chmod 600 "$SCRIPTS_DIR/credentials.conf"
 }
 
+function generate_service_name() {
+    local WEBSITE ARTIFACT SUFFIX SERVICE_NAME
+
+    WEBSITE=$1
+    ARTIFACT=$2
+    SUFFIX=$3
+
+    if [ -n "$WEBSITE" ]; then
+        SERVICE_NAME="${WEBSITE}_${ARTIFACT}"
+    else
+        SERVICE_NAME="${ARTIFACT}"
+    fi
+
+    if [ -n "$SUFFIX" ]; then
+        SERVICE_NAME="${SERVICE_NAME}_${SUFFIX}"
+    fi
+
+    echo "$SERVICE_NAME"
+}
+
+# Will export next variables: SERVICE_NAME, SERVICE_PATH, SERVICE_UN, SERVICE_GROUP
+function config_service_env() {
+    local WEBSITE ARTIFACT SUFFIX
+
+    WEBSITE=$1
+    ARTIFACT=$2
+    SUFFIX=$3
+
+    export SERVICE_NAME
+    SERVICE_NAME="$(generate_service_name "$WEBSITE" "$ARTIFACT" "$SUFFIX")"
+
+    # shellcheck disable=SC2153
+    export SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
+    export SERVICE_UN="$ARTIFACT"
+    export SERVICE_GROUP="$ARTIFACT"
+}
+
 # Will export next variables: EC2_ID, EC2_REGION, EC2_URL_INTERNAL, EC2_IPV4
 function config_ec2_env() {
     export EC2_ID

@@ -55,9 +55,6 @@ fi
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
-    # shellcheck source=../../utils.sh
-    . "$SCRIPTS_DIR/utils.sh"
-
     config_service_env "$WEBSITE" "services"
     echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
     config_service_env "$WEBSITE" "integration-scheduler"
