@@ -50,6 +50,11 @@ function update_route53() {
         return 1
     fi
 
+    TARGET_DOMAIN="${EC2_URL_INTERNAL}.${AWS_DOMAIN}"
+
+    echo "Zone ID: $ZONE_ID"
+    echo "Target domain: $TARGET_DOMAIN"
+
     # Create a new A record on Route 53, replacing the old entry if nessesary
     aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch file:///dev/stdin <<EOF
 {
@@ -58,7 +63,7 @@ function update_route53() {
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "${EC2_URL_INTERNAL}.${AWS_DOMAIN}",
+        "Name": "${TARGET_DOMAIN}",
         "Type": "A",
         "TTL": 300,
         "ResourceRecords": [
