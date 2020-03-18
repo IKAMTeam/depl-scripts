@@ -55,6 +55,9 @@ fi
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
+    export CREDENTIALS_CONF
+    CREDENTIALS_CONF="$SCRIPTS_DIR/credentials.conf"
+
     # shellcheck source=../../utils.sh
     . "$SCRIPTS_DIR/utils.sh"
 
