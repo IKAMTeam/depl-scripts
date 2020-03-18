@@ -23,8 +23,8 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable
 function init_ec2_instance() {
-    # Install Git, jq
-    yum install -y git jq
+    # Install jq
+    yum install -y jq
 
     config_ec2_env
 
