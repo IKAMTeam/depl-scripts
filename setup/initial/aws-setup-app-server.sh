@@ -25,7 +25,6 @@ CONFIG_FILE="$1"
 
 set -o errexit
 set -o pipefail
-set -o nounset
 
 init_ec2_instance
 
