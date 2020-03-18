@@ -5,6 +5,7 @@ SNAPSHOT_REPO_URL="[placeholder]"
 REPOSITORY_UN="[placeholder]"
 REPOSITORY_PWD="[placeholder]"
 
+WEBSITE="[placeholder]"
 VERSION="[placeholder]"
 
 DB_OWNER_USER="[placeholder]"
