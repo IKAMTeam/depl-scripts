@@ -59,7 +59,7 @@ MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
 if [ ! -f "$MONITOR_XML" ]; then
     echo "Copying initial configuration [$MONITOR_XML]..."
 
-    cp "$MONITOR_XML_TEMPLATE_NAME" "$MONITOR_XML" || exit 1
+    cp "$(dirname "$0")/$MONITOR_XML_TEMPLATE_NAME" "$MONITOR_XML" || exit 1
     chown "$SERVICE_UN:$SERVICE_GROUP" "$MONITOR_XML" || exit 1
 fi
 
@@ -67,7 +67,7 @@ echo "Adding new schema to configuration [$MONITOR_XML]..."
 
 MONITOR_XML_SCHEMA_PATH="$(mktemp --suffix="_schema_xml_$ARTIFACT")"
 delete_on_exit "$MONITOR_XML_SCHEMA_PATH"
-(< "$MONITOR_XML_SCHEMA_TEMPLATE_NAME" envsubst | tee "$MONITOR_XML_SCHEMA_PATH") >/dev/null || exit 1
+(< "$(dirname "$0")/$MONITOR_XML_SCHEMA_TEMPLATE_NAME" envsubst | tee "$MONITOR_XML_SCHEMA_PATH") >/dev/null || exit 1
 
 sed -i "/<schema-placeholder\/>/ {r $MONITOR_XML_SCHEMA_PATH
 d}" "$MONITOR_XML" || exit 1
