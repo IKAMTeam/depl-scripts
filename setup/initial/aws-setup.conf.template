@@ -4,4 +4,34 @@ AWS_DOMAIN="ov.internal"
 # url-internal=<internal_name> - used for create Route53 entry <url-internal>.<AWS_DOMAIN>
 # Name=<website> - used for logging into CloudWatch
 
-# Put here contents from setup-app-server.conf.template or setup-web-server.conf.template
+SCRIPTS_DIR="/home/ec2-user/depl-scripts"
+SCRIPTS_OWNER="ec2-user"
+
+RELEASES_REPO_URL="[placeholder]"
+SNAPSHOT_REPO_URL="[placeholder]"
+REPOSITORY_UN="[placeholder]"
+REPOSITORY_PWD="[placeholder]"
+
+WEBSITE="[placeholder]"
+VERSION="[placeholder]"
+
+# Database credentials
+DB_OWNER_USER="[placeholder]"
+DB_OWNER_PASSWORD="[placeholder]"
+DB_USER_PASSWORD="[placeholder]"
+DB_PKG_PASSWORD="[placeholder]"
+DB_RPT_PASSWORD="[placeholder]"
+DB_URL="[placeholder]"
+
+AES_PASSWORD="[placeholder]"
+
+# App specific
+DB_MONITOR_USER="[placeholder]"
+DB_MONITOR_PASSWORD="[placeholder]"
+MONITORING_VERSION="[placeholder]"
+
+# Web specific
+TOMCAT_DIR="/usr/share/tomcat"
+TOMCAT_SERVICE="tomcat"
+
+ENTERPRISE_EDITION="[placeholder]"
