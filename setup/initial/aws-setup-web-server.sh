@@ -2,7 +2,6 @@
 
 function usage() {
     echo "### This script will automatically set up the services needed to run on the web server (based on AWS) ###"
-    echo "Before run this script you need to install Java 11, Tomcat 8.5 and Git on server"
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "
