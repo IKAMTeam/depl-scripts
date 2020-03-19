@@ -14,8 +14,8 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-# shellcheck source=utils.sh
-. "$(dirname "$0")/utils.sh"
+# shellcheck source=setup-utils.sh
+. "$(dirname "$0")/setup-utils.sh"
 
 require_root_user
 
