@@ -1,7 +1,7 @@
 AWS_DOMAIN="ov.internal"
 
-# Remember that you need specify next tags for EC2 instances:
-# url-internal=<internal_name> - will used for create Route53 entry <url-internal>.<AWS_DOMAIN>
-# Name=<website> - will used for logging into CloudWatch
+# Following are the list of EC2 instance tags used in scripts:
+# url-internal=<internal_name> - used for create Route53 entry <url-internal>.<AWS_DOMAIN>
+# Name=<website> - used for logging into CloudWatch
 
 # Put here contents from setup-app-server.conf.template or setup-web-server.conf.template
