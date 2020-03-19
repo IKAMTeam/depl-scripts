@@ -86,4 +86,4 @@ fi
 "$SCRIPTS_DIR/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp"
 
 # Finished
-echo "Web server setup is complete."
+echo "Web server setup complete."

@@ -75,4 +75,4 @@ if [ -n "$MONITORING_VERSION" ]; then
 fi
 
 # Finished
-echo "Application server setup is complete."
+echo "Application server setup complete."
