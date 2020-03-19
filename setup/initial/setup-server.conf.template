@@ -1,5 +1,3 @@
-TOMCAT_DIR="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
 SCRIPTS_DIR="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user"
 
@@ -10,12 +8,24 @@ REPOSITORY_PWD="[placeholder]"
 
 WEBSITE="[placeholder]"
 VERSION="[placeholder]"
-ENTERPRISE_EDITION="[placeholder]"
 
+# Database credentials
 DB_OWNER_USER="[placeholder]"
 DB_OWNER_PASSWORD="[placeholder]"
 DB_USER_PASSWORD="[placeholder]"
 DB_PKG_PASSWORD="[placeholder]"
+DB_RPT_PASSWORD="[placeholder]"
 DB_URL="[placeholder]"
 
 AES_PASSWORD="[placeholder]"
+
+# App specific
+DB_MONITOR_USER="[placeholder]"
+DB_MONITOR_PASSWORD="[placeholder]"
+MONITORING_VERSION="[placeholder]"
+
+# Web specific
+TOMCAT_DIR="/usr/share/tomcat"
+TOMCAT_SERVICE="tomcat"
+
+ENTERPRISE_EDITION="[placeholder]"

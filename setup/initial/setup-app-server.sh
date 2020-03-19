@@ -6,7 +6,7 @@ function usage() {
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "
-    echo "Example: $(basename "$0") setup-app-server.conf"
+    echo "Example: $(basename "$0") setup-server.conf"
 }
 
 if [ "$#" -ne 1 ]; then
@@ -21,7 +21,7 @@ require_root_user
 
 CONFIG_FILE="$1"
 
-# shellcheck source=setup-app-server.conf.template
+# shellcheck source=setup-server.conf.template
 . "$CONFIG_FILE"
 
 set -o errexit
