@@ -1,6 +1,6 @@
 AWS_DOMAIN="ov.internal"
 
-# Following are the list of EC2 instance tags used in scripts:
+# Following is the list of EC2 instance tags used in scripts:
 # url-internal=<internal_name> - used for create Route53 entry <url-internal>.<AWS_DOMAIN>
 # Name=<website> - used for logging into CloudWatch
 
