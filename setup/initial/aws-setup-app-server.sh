@@ -23,6 +23,8 @@ CONFIG_FILE="$1"
 # shellcheck source=aws-setup.conf.template
 . "$CONFIG_FILE"
 
+trap 'rm -f $CONFIG_FILE &>/dev/null' EXIT
+
 set -o errexit
 set -o pipefail
 
