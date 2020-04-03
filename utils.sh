@@ -21,6 +21,8 @@ export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
 export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.template"
 
+export SERVER_XML_HOST_TEMPLATE_NAME="setup/templates/tomcat-host.template"
+
 export CLEANUP_TMP_FILES=""
 
 export CREDENTIALS_CONF
