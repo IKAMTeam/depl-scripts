@@ -19,13 +19,9 @@ fi
 require_root_user
 
 CONFIG_FILE="$1"
+CONFIG_DATA="$(cat "$CONFIG_FILE")"
 
-# shellcheck source=aws-setup.conf.template
-. "$CONFIG_FILE"
-
-if [ -f "$CONFIG_FILE" ]; then
-    trap 'rm -f $CONFIG_FILE &>/dev/null' EXIT
-fi
+eval "$CONFIG_DATA"
 
 set -o errexit
 set -o pipefail

@@ -20,9 +20,9 @@ fi
 require_root_user
 
 CONFIG_FILE="$1"
+CONFIG_DATA="$(cat "$CONFIG_FILE")"
 
-# shellcheck source=setup-server.conf.template
-. "$CONFIG_FILE"
+eval "$CONFIG_DATA"
 
 set -o errexit
 set -o pipefail
