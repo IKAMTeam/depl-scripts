@@ -60,24 +60,24 @@ rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
 # Set up the config files and replace values as appropriate
 mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
 
-"$(dirname "$0")/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
     appBase "$WEBSITE-webapp"
-"$(dirname "$0")/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
     name "$WEBSITE"
 
 CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
 
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwner"]' value "$DB_OWNER_USER"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwnerPassword"]' value "$DB_OWNER_PASSWORD"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUser"]' value "${DB_OWNER_USER}_user"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUserPassword"]' value "$DB_USER_PASSWORD"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_pkg"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
-"$(dirname "$0")/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwner"]' value "$DB_OWNER_USER"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwnerPassword"]' value "$DB_OWNER_PASSWORD"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUser"]' value "${DB_OWNER_USER}_user"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUserPassword"]' value "$DB_USER_PASSWORD"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_pkg"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
+"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
