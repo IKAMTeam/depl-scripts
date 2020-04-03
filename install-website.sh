@@ -1,0 +1,68 @@
+#!/bin/bash
+
+function usage() {
+    echo "### Script for install new website into Tomcat ###"
+    echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> <tomcat_path> [enterprise_edition] [aes_password]"
+    echo " "
+    echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
+    echo "Where enterprise_edition is true or false - defaults to true"
+}
+
+if [ "$#" -lt 8 ]; then
+    usage
+    exit 1
+fi
+
+# shellcheck source=utils.sh
+. "$(dirname "$0")/utils.sh"
+
+require_root_user
+
+WEBSITE=$1
+VERSION=$2
+DB_OWNER_USER=$3
+DB_OWNER_PASSWORD=$4
+DB_USER_PASSWORD=$5
+DB_PKG_PASSWORD=$6
+DB_URL=$7
+TOMCAT_DIR=$8
+ENTERPRISE_EDITION=$9
+AES_PASSWORD=${10}
+
+if [ -z "$ENTERPRISE_EDITION" ]; then
+    ENTERPRISE_EDITION="true"
+fi
+
+SERVER_XML_FILE="$TOMCAT_DIR/conf/server.xml"
+CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
+
+sed -i "/<!-- <Host-Placeholder> -->/ {r $SERVER_XML_HOST_TEMPLATE_NAME
+d}" "$SERVER_XML_FILE" || exit 1
+
+# Set up the config files and replace values as appropriate
+mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
+
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    appBase "$WEBSITE-webapp"
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    name "$WEBSITE"
+
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwner"]' value "$DB_OWNER_USER"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwnerPassword"]' value "$DB_OWNER_PASSWORD"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUser"]' value "${DB_OWNER_USER}_user"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUserPassword"]' value "$DB_USER_PASSWORD"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_pkg"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
+
+# Set AES password if specified
+if [ -n "$AES_PASSWORD" ]; then
+    mkdir -p "$TOMCAT_DIR/$WEBSITE"
+    echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_DIR/$WEBSITE/ov.properties"
+fi
+
+"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp"
