@@ -20,9 +20,9 @@ fi
 require_root_user
 
 CONFIG_FILE="$1"
+CONFIG_DATA="$(cat "$CONFIG_FILE")"
 
-# shellcheck source=setup-server.conf.template
-. "$CONFIG_FILE"
+eval "$CONFIG_DATA"
 
 set -o errexit
 set -o pipefail
@@ -41,6 +41,7 @@ if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
 fi
 
 # Configure Auto-Restart for Tomcat if it will be crashed
+# TODO: prevent do replace previous script run result on second call
 sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
 systemctl daemon-reload
 
@@ -48,6 +49,7 @@ systemctl daemon-reload
 systemctl enable "$TOMCAT_SERVICE"
 
 # Copy configuration template
+# TODO: prevent do replace previous script run result on second call
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/conf/* "$TOMCAT_DIR/conf"
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/webapps/* "$TOMCAT_DIR/webapps"
 rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"

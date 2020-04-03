@@ -21,12 +21,7 @@ require_root_user
 CONFIG_FILE="$1"
 CONFIG_DATA="$(cat "$CONFIG_FILE")"
 
-# shellcheck source=aws-setup.conf.template
-. "/dev/stdin" <<< "$CONFIG_DATA"
-
-if [ -f "$CONFIG_FILE" ]; then
-    trap 'rm -f $CONFIG_FILE &>/dev/null' EXIT
-fi
+eval "$CONFIG_DATA"
 
 set -o errexit
 set -o pipefail
@@ -37,4 +32,4 @@ init_ec2_instance
 amazon-linux-extras install -y tomcat8.5
 
 # Run setup-web-server.sh
-"$(dirname "$0")/setup-web-server.sh" "/dev/stdin" <<< "$CONFIG_DATA"
+"$(dirname "$0")/setup-web-server.sh" "-" <<< "$CONFIG_DATA"
