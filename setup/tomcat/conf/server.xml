@@ -27,22 +27,8 @@
                        showReport="false"
                        showServerInfo="false" />
             </Host>
-            <Host name="sitename.onevizion.com" appBase="sitename.onevizion.com" unpackWARs="false" autoDeploy="false">
-                <!-- CWE ID 209 fix: don't show server information and stacktrace -->
-                <Valve className="org.apache.catalina.valves.ErrorReportValve"
-                       showReport="false"
-                       showServerInfo="false" />
 
-                <!-- Uncomment this to use custom images:
-                - login_background.jpg
-                - logo.svg
-                - favicon.png
-
-                (this will work only if you pass web.whiteLabeled=true parameter in Catalina/sitename.onevizion.com/ROOT.xml)
-                -->
-                <!-- <Context docBase="${catalina.base}/custom/img" path="/custom/img" /> -->
-            </Host>
-
+            <!-- <Host-Placeholder> -->
         </Engine>
     </Service>
 </Server>
