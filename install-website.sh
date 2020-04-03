@@ -36,7 +36,7 @@ fi
 SERVER_XML_FILE="$TOMCAT_DIR/conf/server.xml"
 CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
 
-sed -i "/<!-- <Host-Placeholder> -->/ {r $SERVER_XML_HOST_TEMPLATE_NAME
+sed -i "/<!-- <Host-Placeholder> -->/ {r $(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME
 d}" "$SERVER_XML_FILE" || exit 1
 
 # Set up the config files and replace values as appropriate
