@@ -40,6 +40,7 @@ sed -i "/<!-- <Host-Placeholder> -->/ {r $SERVER_XML_HOST_TEMPLATE_NAME
 d}" "$SERVER_XML_FILE" || exit 1
 
 # Set up the config files and replace values as appropriate
+rm -rf "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
 mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE" || exit 1
 
 "$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
