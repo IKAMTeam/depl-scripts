@@ -41,51 +41,31 @@ if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
 fi
 
 # Configure Auto-Restart for Tomcat if it will be crashed
-# TODO: prevent do replace previous script run result on second call
-sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
+grep 'Restart=' /usr/lib/systemd/system/tomcat.service &>/dev/null ||
+    sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
 systemctl daemon-reload
 
 # Enable Tomcat service to start at boot time
 systemctl enable "$TOMCAT_SERVICE"
 
 # Copy configuration template
-# TODO: prevent do replace previous script run result on second call
+if grep '<!-- <Host-Placeholder> -->' "$TOMCAT_DIR/conf/server.conf" &>/dev/null; then
+    # Ignore server.xml from match files to copy
+    GLOBIGNORE="$SCRIPTS_DIR/setup/tomcat/webapps/server.xml"
+fi
+
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/conf/* "$TOMCAT_DIR/conf"
 cp -rf "$SCRIPTS_DIR"/setup/tomcat/webapps/* "$TOMCAT_DIR/webapps"
+GLOBIGNORE=''
+
 rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
 
 # Configure Tomcat filesystem permissions
 "$SCRIPTS_DIR/config-tomcat-security.sh" "$TOMCAT_DIR"
 
-# Set up the config files and replace values as appropriate
-mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
-
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
-    appBase "$WEBSITE-webapp"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$TOMCAT_DIR/conf/server.xml" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
-    name "$WEBSITE"
-
-CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
-
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwner"]' value "$DB_OWNER_USER"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbOwnerPassword"]' value "$DB_OWNER_PASSWORD"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUser"]' value "${DB_OWNER_USER}_user"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbUserPassword"]' value "$DB_USER_PASSWORD"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_pkg"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE"
-"$SCRIPTS_DIR/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION"
-
-# Set AES password if specified
-if [ -n "$AES_PASSWORD" ]; then
-    mkdir -p "$TOMCAT_DIR/$WEBSITE"
-    echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_DIR/$WEBSITE/ov.properties"
-fi
-
-"$SCRIPTS_DIR/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp"
+# Install website
+"$SCRIPTS_DIR/install-website.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
+    "$DB_PKG_PASSWORD" "$DB_URL" "$TOMCAT_DIR" "$ENTERPRISE_EDITION" "$AES_PASSWORD"
 
 # Finished
 echo "Web server setup complete."
