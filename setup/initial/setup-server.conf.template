@@ -23,7 +23,7 @@ AES_PASSWORD="[placeholder]"
 DB_MONITOR_USER="[placeholder]"
 DB_MONITOR_PASSWORD="[placeholder]"
 
-# Set to empty for cancel monitoring install
+# Leave empty to omit monitoring setup
 MONITORING_VERSION="[placeholder]"
 
 # Web specific

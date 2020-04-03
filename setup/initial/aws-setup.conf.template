@@ -1,4 +1,4 @@
-# Set to empty for cancel update route 53 and hostname of EC2 instance
+# Leave empty to skip private DNS entry creation
 AWS_DOMAIN="ov.internal"
 
 # Following is the list of EC2 instance tags used in scripts:
@@ -30,7 +30,7 @@ AES_PASSWORD="[placeholder]"
 DB_MONITOR_USER="[placeholder]"
 DB_MONITOR_PASSWORD="[placeholder]"
 
-# Set to empty for cancel monitoring install
+# Leave empty to omit monitoring setup
 MONITORING_VERSION="[placeholder]"
 
 # Web specific
