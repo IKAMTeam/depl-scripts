@@ -46,4 +46,4 @@ python3 -m pip install pandas
 python3 -m pip install boto3
 
 # Run setup-app-server.sh
-"$(dirname "$0")/setup-app-server.sh" "$CONFIG_FILE"
+"$(dirname "$0")/setup-app-server.sh" "-" <<< "$CONFIG_DATA"
