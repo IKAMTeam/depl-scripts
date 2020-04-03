@@ -64,6 +64,11 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable
 function init_ec2_instance() {
+    if [ -z "$AWS_DOMAIN" ]; then
+        echo "Update hostname and route 53 is omitted"
+        return 0
+    fi
+
     # Install jq
     yum install -y jq
 
