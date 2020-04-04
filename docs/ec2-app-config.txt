@@ -100,14 +100,14 @@ II. INSTALLING ADDITIONAL SERVICES
 
 For each not default service in SERVICE and V_REPORT_SCHEDULER tables, a dedicated Linux daemon should be installed. Use additional --suffix parameter for install-daemon-service.sh and provide the value of SERVICE.NAME or V_REPORT_SCHEDULER.NAME as the last parameter to the install-daemon-service.sh
 
-13 report-scheduler example (V_REPORT_SCHEDULER.NAME=service2):
+13. report-scheduler example (V_REPORT_SCHEDULER.NAME=service2):
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com report-scheduler --suffix service2 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1' service2
 
 
-14 rule-service example (SERVICE.NAME=HTTP-Rules):
+14. rule-service example (SERVICE.NAME=HTTP-Rules):
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com rule-service --suffix HTTP-Rules 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' HTTP-Rules
 
-15 mail-service example (SERVICE.NAME=alt-mail):
+15. mail-service example (SERVICE.NAME=alt-mail):
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com mail-service --suffix alt-mail 19.22.0 'prod01/password@url:1521:a1' alt-mail
 
 III. LIST AND STATUS OF ONEVIZION SERVICES
