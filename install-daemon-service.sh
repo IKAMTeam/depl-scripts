@@ -34,6 +34,12 @@ fi
 VERSION=$1
 shift
 
+if [ "$1" == "--aes-password" ]; then
+    AES_PASSWORD=$2
+    shift
+    shift
+fi
+
 if [ "$#" -eq 0 ]; then
     usage
     exit 1
@@ -69,6 +75,11 @@ export JAR_OPTS=${JAR_OPTS/$/\\$}
 (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
 (< "$SYSTEMD_SERVICE_EXTRACT_PATH" envsubst | tee "/usr/lib/systemd/system/${SERVICE_NAME}.service") >/dev/null || exit 1
 chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
+
+# Set AES password if specified
+if [ -n "$AES_PASSWORD" ]; then
+    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
+fi
 
 echo "Enabling service [$SERVICE_NAME]..."
 systemctl enable "$SERVICE_NAME" || exit 1

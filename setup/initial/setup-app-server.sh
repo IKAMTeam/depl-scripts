@@ -43,27 +43,13 @@ echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration
 chmod 440 /etc/sudoers.d/integration-scheduler
 
 # Install services for this instance
-"$SCRIPTS_DIR/install-daemon-service.sh" "$WEBSITE" services "$VERSION" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL" \
+"$SCRIPTS_DIR/install-daemon-service.sh" "$WEBSITE" services "$VERSION" --aes-password "$AES_PASSWORD" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL" \
     "${DB_OWNER_USER}_user/${DB_USER_PASSWORD}@$DB_URL" "${DB_OWNER_USER}_rpt/${DB_RPT_PASSWORD}@$DB_URL"
-"$SCRIPTS_DIR/install-daemon-service.sh" "$WEBSITE" integration-scheduler "$VERSION" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
-"$SCRIPTS_DIR/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
+"$SCRIPTS_DIR/install-daemon-service.sh" "$WEBSITE" integration-scheduler "$VERSION" --aes-password "$AES_PASSWORD" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
+"$SCRIPTS_DIR/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" --aes-password "$AES_PASSWORD" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 
 if [ -n "$MONITORING_VERSION" ]; then
     "$SCRIPTS_DIR/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
-fi
-
-# Set AES password if specified
-if [ -n "$AES_PASSWORD" ]; then
-    export CREDENTIALS_CONF
-    CREDENTIALS_CONF="$SCRIPTS_DIR/credentials.conf"
-
-    # shellcheck source=../../utils.sh
-    . "$SCRIPTS_DIR/utils.sh"
-
-    config_service_env "$WEBSITE" "services"
-    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
-    config_service_env "$WEBSITE" "integration-scheduler"
-    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
 fi
 
 # Start up services

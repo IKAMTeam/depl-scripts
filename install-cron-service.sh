@@ -2,9 +2,9 @@
 
 function usage() {
     echo "### Script for install new service for periodically run ###"
-    echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> <schedule> <jar launch args>"
+    echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <schedule> <jar launch args>"
     echo " "
-    echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
+    echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
     echo " "
     echo "Where *_schema_connect_identifier is Oracle host:port:sid or host:port/service_name"
     echo "Where schedule is Cron format like ""0 3 * * *"" for run every day at 3:00 AM"
@@ -29,6 +29,12 @@ fi
 
 VERSION=$1
 shift
+
+if [ "$1" == "--aes-password" ]; then
+    AES_PASSWORD=$2
+    shift
+    shift
+fi
 
 SCHEDULE=$1
 shift
@@ -69,3 +75,8 @@ echo "Adding record to crontab..."
     crontab -u "$SERVICE_UN" -l
     echo "$SCHEDULE ""$CRON_LAUNCHER_SCRIPT_PATH"""
 ) | crontab -u "$SERVICE_UN" - || exit 1
+
+# Set AES password if specified
+if [ -n "$AES_PASSWORD" ]; then
+    echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
+fi
