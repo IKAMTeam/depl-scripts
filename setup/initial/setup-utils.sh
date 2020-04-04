@@ -12,6 +12,7 @@ function init_credentials() {
         echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
         echo "REPOSITORY_UN=$REPOSITORY_UN"
         echo "REPOSITORY_PWD=$REPOSITORY_PWD"
+        echo "TOMCAT_SERVICE=$TOMCAT_SERVICE"
     } > "$SCRIPTS_DIR/credentials.conf"
     chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
     chmod 600 "$SCRIPTS_DIR/credentials.conf"
