@@ -32,9 +32,6 @@ init_credentials
 # Update timezone to EST
 ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
 
-# Test database connection
-java -jar "$SCRIPTS_DIR/setup/test-jdbc.jar" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_URL"
-
 # Setup timeout for Tomcat shutdown process before it will be killed
 if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
     sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_DIR/conf/tomcat.conf"
