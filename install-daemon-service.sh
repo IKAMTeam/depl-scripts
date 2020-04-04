@@ -2,14 +2,14 @@
 
 function usage() {
     echo "### Script for install new service as daemon ###"
-    echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> <jar launch args>"
+    echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <jar launch args>"
     echo " "
-    echo "Usage for services: $(basename "$0") <website> services [--suffix <suffix>] <version> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name] [services_to_run]"
+    echo "Usage for services: $(basename "$0") <website> services [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name] [services_to_run]"
     echo "Supported values for [services_to_run]: mail_service,trackor_mail,report_scheduler,rule_service (comma separated wout spaces)"
     echo " "
-    echo "Usage for report-scheduler: $(basename "$0") <website> report-scheduler [--suffix <suffix>] <version> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name]"
+    echo "Usage for report-scheduler: $(basename "$0") <website> report-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name]"
     echo " "
-    echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler [--suffix <suffix>] <version> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier>"
+    echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier>"
     echo " "
     echo "Where *_schema_connect_identifier is Oracle host:port:sid or host:port/service_name"
 }
