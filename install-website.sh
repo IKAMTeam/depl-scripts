@@ -43,14 +43,6 @@ rm -rf "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com"
 cp -rf "$(dirname "$0")"/setup/tomcat/conf/Catalina/* "$TOMCAT_DIR/conf/Catalina" || exit 1
 mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE" || exit 1
 
-sed -i "/<!-- <Host-Placeholder> -->/ {r $(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME
-d}" "$SERVER_XML_FILE" || exit 1
-
-"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
-    appBase "$WEBSITE-webapp" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
-    name "$WEBSITE" || exit 1
-
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbSid"]' value "$DB_URL" || exit 1
@@ -62,6 +54,14 @@ d}" "$SERVER_XML_FILE" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION" || exit 1
+
+sed -i "/<!-- <Host-Placeholder> -->/ {r $(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME
+d}" "$SERVER_XML_FILE" || exit 1
+
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    appBase "$WEBSITE-webapp" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+    name "$WEBSITE" || exit 1
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
