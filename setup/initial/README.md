@@ -62,15 +62,15 @@ ENTERPRISE_EDITION="true"
 EOF
 ```
 
-After complete this snippet you get ready to work deployment scripts at `/home/ec2-user/depl-scripts` and installed/running Apache Tomcat with OneVizion package.
+After complete this snippet you get ready to work deployment scripts at `/home/ec2-user/depl-scripts` and installed/running Apache Tomcat with OneVizion package
 
-**Note**: Another scripts `aws-setup-web-server.sh` and `aws-setup-app-server.sh` should be used here.
+**Note**: Another scripts `aws-setup-web-server.sh` and `aws-setup-app-server.sh` should be used here
 
-Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about configuration
+Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about configuration.
 
 **Note**: You can run this snippet multiple times for install multiple websites or services on single server
 
-**Note**: For setup Route53 record you need to specify IAM Role for EC2 Instance.
+**Note**: For setup Route53 record you need to specify IAM Role for EC2 Instance
 
 This IAM Role should contains next permissions:
 - `Route53:ListHostedZonesByName` - For convert hosted zone name to ID
