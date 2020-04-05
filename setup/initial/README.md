@@ -1,17 +1,12 @@
 # Quick setup scripts bundle
 
-Use this scripts for quick build app and web servers
+Use this scripts for quick build App and Web servers
 
 ## Table of contents
-- [Setup App server](#setup-app-server)
-- [Setup Web server](#setup-web-server)
+- [Setup Web/App servers](#setup-webapp-servers)
 - [Setup Web/App servers on AWS platform](#setup-webapp-servers-on-aws-platform)
 
-## Setup App server
-
-**Note**: You can run this snippet multiple times for install multiple websites or services on single server
-
-## Setup Web server
+## Setup Web/App servers
 
 **Note**: You can run this snippet multiple times for install multiple websites or services on single server
 
@@ -22,7 +17,7 @@ Quick way to setup OneVizion App/Web packages to AWS is to run installation code
 **Requirements:**
 - Amazon Linux 2 Latest AMI
 
-Example snippet:
+**Example snippet**:
 ```
 SCRIPTS_DIR="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user"
