@@ -12,7 +12,7 @@ Use this scripts for quick build App and Web servers
 
 ## Setup Web/App servers on AWS platform
 
-Quick way to setup OneVizion App/Web packages to AWS is to run installation code from [EC2 Instance UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
+Quick way to setup OneVizion App/Web packages to AWS is to run installation script from [EC2 Instance UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
 
 **Requirements:**
 - Amazon Linux 2 Latest AMI
@@ -66,11 +66,15 @@ After complete this snippet you get ready to work deployment scripts at `/home/e
 
 **Note**: Another scripts `aws-setup-web-server.sh` and `aws-setup-app-server.sh` should be used here.
 
+Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about configuration
+
 **Note**: You can run this snippet multiple times for install multiple websites or services on single server
 
-**Note**: For setup Route53 record set you need to specify IAM Role for EC2 Instance.
+**Note**: For setup Route53 record you need to specify IAM Role for EC2 Instance.
 
 This IAM Role should contains next permissions:
 - `Route53:ListHostedZonesByName` - For convert hosted zone name to ID
 - `Route53:ChangeResourceRecordSets` - For create record (Limit for hosted zone you use only)
 - `EC2:DescribeTags` - For read `url-internal` tag attached to specific instance
+
+**Note**: For prevent setup script to update Route53 record every run - set `AWS_DOMAIN` to empty value for 2+ runs
