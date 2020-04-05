@@ -11,7 +11,7 @@
 ######################################################
 
 JAVA_COMMAND="java"
-JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -XX:+HeapDumpOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError"
+JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -XX:+HeapDumpOnOutOfMemoryError"
 JAR_PATH="${JAR_PATH}"
 JAR_OPTS="${JAR_OPTS}"
 

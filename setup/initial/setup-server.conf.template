@@ -4,24 +4,24 @@ SCRIPTS_OWNER="ec2-user"
 RELEASES_REPO_URL="[placeholder]"
 SNAPSHOT_REPO_URL="[placeholder]"
 REPOSITORY_UN="[placeholder]"
-REPOSITORY_PWD="[placeholder]"
+REPOSITORY_PWD='[placeholder]'
 
 WEBSITE="[placeholder]"
 VERSION="[placeholder]"
 
 # Database credentials
 DB_OWNER_USER="[placeholder]"
-DB_OWNER_PASSWORD="[placeholder]"
-DB_USER_PASSWORD="[placeholder]"
-DB_PKG_PASSWORD="[placeholder]"
-DB_RPT_PASSWORD="[placeholder]"
-DB_URL="[placeholder]"
+DB_OWNER_PASSWORD='[placeholder]'
+DB_USER_PASSWORD='[placeholder]'
+DB_PKG_PASSWORD='[placeholder]'
+DB_RPT_PASSWORD='[placeholder]'
+DB_URL='[placeholder]'
 
-AES_PASSWORD="[placeholder]"
+AES_PASSWORD='[placeholder]'
 
 # App specific
 DB_MONITOR_USER="[placeholder]"
-DB_MONITOR_PASSWORD="[placeholder]"
+DB_MONITOR_PASSWORD='[placeholder]'
 
 # Leave empty to omit monitoring setup
 MONITORING_VERSION="[placeholder]"

@@ -59,7 +59,7 @@ function config_ec2_env() {
     EC2_ID="$(ec2-metadata --instance-id | cut -d' ' -f2)"
     EC2_REGION=$(ec2-metadata --availability-zone | cut -d ' ' -f2 | sed 's/[a-z]$//')
     EC2_URL_INTERNAL=$(aws ec2 describe-tags --region "$EC2_REGION" --filters "Name=resource-id,Values=$EC2_ID" \
-        --filters "Name=key,Values=url-internal" | jq ".Tags[0].Value" | sed -r 's/\"//g')
+        "Name=resource-type,Values=instance" "Name=key,Values=url-internal" | jq ".Tags[0].Value" | sed -r 's/\"//g')
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 }
 
