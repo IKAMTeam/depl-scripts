@@ -58,9 +58,9 @@ mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina
 "$(dirname "$0")/setup/insert-xml-node.py" "$SERVER_XML_FILE" "$(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME" \
     'Service/Engine[@name="Catalina"]' || exit 1
 
-"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[last()]' \
     appBase "$WEBSITE-webapp" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[@name="sitename.onevizion.com"]' \
+"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[last()]' \
     name "$WEBSITE" || exit 1
 
 # Set AES password if specified
