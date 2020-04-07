@@ -44,6 +44,7 @@ MONITOR_WARN_MAIL_USERNAME="[placeholder]"
 MONITOR_WARN_MAIL_PASSWORD='[placeholder]'
 MONITOR_WARN_MAIL_FROM="[placeholder]"
 MONITOR_WARN_MAIL_TO="[placeholder]"
+
 MONITOR_ERROR_MAIL_HOST="[placeholder]"
 MONITOR_ERROR_MAIL_PORT="[placeholder]"
 MONITOR_ERROR_MAIL_USERNAME="[placeholder]"

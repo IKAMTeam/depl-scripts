@@ -54,6 +54,8 @@ DB_URL='rds.endpoint:1521:A1'
 AES_PASSWORD=''
 
 # App specific
+SERVICES_PATH="/opt"
+
 DB_MONITOR_USER="monitor"
 DB_MONITOR_PASSWORD='password'
 
@@ -69,6 +71,7 @@ MONITOR_WARN_MAIL_USERNAME="[placeholder]"
 MONITOR_WARN_MAIL_PASSWORD='[placeholder]'
 MONITOR_WARN_MAIL_FROM="[placeholder]"
 MONITOR_WARN_MAIL_TO="[placeholder]"
+
 MONITOR_ERROR_MAIL_HOST="[placeholder]"
 MONITOR_ERROR_MAIL_PORT="[placeholder]"
 MONITOR_ERROR_MAIL_USERNAME="[placeholder]"
