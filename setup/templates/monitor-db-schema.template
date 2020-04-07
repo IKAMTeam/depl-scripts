@@ -1,14 +1,14 @@
         <schema>
             <!-- OneVizion Installation owner schema -->
-            <main-user>${DB_OWNER_USER}</main-user>
+            <main-user></main-user>
 
-            <monitor-user>${DB_USER}</monitor-user>
-            <monitor-password>${DB_PASSWORD}</monitor-password>
-            <url>${DB_URL}</url>
+            <monitor-user></monitor-user>
+            <monitor-password></monitor-password>
+            <url></url>
 
             <!-- Set this property if sensitive data encryption feature enabled for this installation. -->
             <!-- It should be aesPassword value from ov.properties file. If the property is not set for encrypted installs, certain monitors (mail-service, trackor-mail, sso-certificate-chains) won't be able to run checks, since required credentials will be encrypted -->
-            <aes-password>${AES_PASSWORD}</aes-password>
+            <aes-password></aes-password>
 
             <enabled>true</enabled>
 
