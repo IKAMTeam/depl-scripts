@@ -11,7 +11,7 @@ function init_credentials() {
         echo "RELEASES_REPO_URL=$RELEASES_REPO_URL"
         echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
         echo "REPOSITORY_UN=$REPOSITORY_UN"
-        echo "REPOSITORY_PWD=$REPOSITORY_PWD"
+        echo "REPOSITORY_PWD='$REPOSITORY_PWD'"
         echo "TOMCAT_SERVICE=$TOMCAT_SERVICE"
     } > "$SCRIPTS_DIR/credentials.conf"
     chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
