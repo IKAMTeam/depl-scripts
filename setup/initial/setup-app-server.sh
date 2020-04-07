@@ -52,12 +52,9 @@ if [ -n "$MONITORING_VERSION" ]; then
     config_service_env "" "monitoring"
     MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
 
-    if [ -n "$MONITOR_AWS_SQS_ACCESS_KEY" ] && [ -n "$MONITOR_AWS_SQS_SECRET_KEY" ] && [ -n "$MONITOR_AWS_SQS_QUEUE_URL" ]; then
-        "$SCRIPTS_PATH/setup/insert-xml-node.py" "$MONITOR_XML" "$SCRIPTS_PATH/setup/templates/monitor-aws-sqs.template" ''
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL"
-    fi
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL"
 
     "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' "$MONITOR_ERROR_MAIL_HOST"
     "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' "$MONITOR_ERROR_MAIL_PORT"
