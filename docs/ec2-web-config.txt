@@ -28,6 +28,8 @@ SNAPSHOT_REPO_URL= "https://ci.onevizion.com/archiva/repository/snapshots"
 REPOSITORY_UN= "username for ci.onevizion.com access" 
 REPOSITORY_PWD="password for ci.onevizion.com access" 
 TOMCAT_SERVICE="tomcat"
+TOMCAT_UN="tomcat"
+TOMCAT_GROUP="tomcat"
 
 6. Test database connection: 
 java -jar setup/test-jdbc.jar <username> <password> <host>:<port>:<sid> 
@@ -45,7 +47,7 @@ sudo sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/
 sudo systemctl daemon-reload
 
 10. Configure Tomcat filesystem permissions:
-depl-scripts $ sudo ./config-tomcat-security.sh /usr/share/tomcat
+depl-scripts $ sudo ./config-tomcat-security.sh
 
 NOTE:
 - We change tomcat directory owner to root:tomcat (recursive)
@@ -61,7 +63,7 @@ II. INSTALLATION OF ONEVIZION WEB APP
 
 11. Install website:
 depl-scripts $ sudo ./install-web.sh <preferred hostname> <version> <owner_schema_username> <owner_schema_password>
-    <user_schema_password> <pkg_schema_password> <connect_identifier> /usr/share/tomcat [enterprise_edition] [aes_password]
+    <user_schema_password> <pkg_schema_password> <connect_identifier> [enterprise_edition] [aes_password]
 
 Where:
 <owner_schema_username> - Username for OWNER schema

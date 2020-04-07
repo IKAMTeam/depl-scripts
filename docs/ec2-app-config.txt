@@ -21,7 +21,8 @@ cp credentials.conf.template credentials.conf
 RELEASES_REPO_URL="https://ci.onevizion.com/archiva/repository/releases" 
 SNAPSHOT_REPO_URL= "https://ci.onevizion.com/archiva/repository/snapshots" 
 REPOSITORY_UN= "username for ci.onevizion.com access" 
-REPOSITORY_PWD="password for ci.onevizion.com access" 
+REPOSITORY_PWD="password for ci.onevizion.com access"
+SERVICES_PATH="/opt"
 
 5. Test database connection: 
 java -jar setup/test-jdbc.jar <username> <password> <host>:<port>:<sid>
