@@ -64,6 +64,9 @@ ENV_CONF_EXTRACT_PATH="$(mktemp --suffix="_env_$ARTIFACT")"
 delete_on_exit "$ENV_CONF_EXTRACT_PATH"
 extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || exit 1
 
+# Replace $ -> \$ for prevent bash eat it on launch stage
+export JAR_OPTS=${JAR_OPTS/$/\\$}
+
 (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
 chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
 
