@@ -1,9 +1,14 @@
 #!/bin/bash
-if [ "$#" -ne 3 ]; then
+
+function usage() {
     echo "### Script for update existing OneVizion web application to another version ###"
-    echo "Usage: $(basename "$0") <version> <tomcat path> <webapp directory name>"
+    echo "Usage: $(basename "$0") <version> <webapp directory name>"
     echo " "
-    echo "Example: $(basename "$0") 1.0 /opt/tomcat sitename.onevizion.com"
+    echo "Example: $(basename "$0") 1.0 sitename.onevizion.com"
+}
+
+if [ "$#" -ne 2 ]; then
+    usage
     exit 1
 fi
 
@@ -15,8 +20,7 @@ require_root_user
 ARTIFACT=ps-web
 
 VERSION=$1
-TOMCAT_PATH=$2
-WEBAPP_DIRNAME=$3
+WEBAPP_DIRNAME=$2
 
 WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
 DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"

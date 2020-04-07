@@ -2,13 +2,13 @@
 
 function usage() {
     echo "### Script for install new website into Tomcat ###"
-    echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> <tomcat_path> [enterprise_edition] [aes_password]"
+    echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [enterprise_edition] [aes_password]"
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
     echo "Where enterprise_edition is true or false - defaults to true"
 }
 
-if [ "$#" -lt 8 ]; then
+if [ "$#" -lt 7 ]; then
     usage
     exit 1
 fi
@@ -25,9 +25,8 @@ DB_OWNER_PASSWORD=$4
 DB_USER_PASSWORD=$5
 DB_PKG_PASSWORD=$6
 DB_URL=$7
-TOMCAT_DIR=$8
-ENTERPRISE_EDITION=$9
-AES_PASSWORD=${10}
+ENTERPRISE_EDITION=$8
+AES_PASSWORD=$9
 
 if [ -z "$ENTERPRISE_EDITION" ]; then
     ENTERPRISE_EDITION="true"
@@ -69,4 +68,4 @@ if [ -n "$AES_PASSWORD" ]; then
     echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_PATH/$WEBSITE/ov.properties" || exit 1
 fi
 
-"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$TOMCAT_PATH" "$WEBSITE-webapp" || exit 1
+"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$WEBSITE-webapp" || exit 1
