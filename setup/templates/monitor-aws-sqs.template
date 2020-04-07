@@ -1,0 +1,8 @@
+    <!-- Setup AWS SQS to deliver monitoring statuses, multiple queries may be configured -->
+    <aws-sqs>
+        <sqs>
+            <access-key></access-key>
+            <secret-key></secret-key>
+            <queue-url></queue-url>
+        </sqs>
+    </aws-sqs>
