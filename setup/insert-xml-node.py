@@ -43,7 +43,7 @@ treeChild = ElementTree.parse(childInFile, parser2)
 root = tree.getroot()
 childRoot = treeChild.getroot()
 
-nodes = root.findall(xpath)
+nodes = [root] if len(xpath) == 0 else root.findall(xpath)
 
 for node in nodes:
     node.append(childRoot)
