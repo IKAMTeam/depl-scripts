@@ -70,7 +70,7 @@ Where:
 <pkg_schema_password> - Password for _PKG schema
 <connect_identifier> - Oracle HOST:PORT:SID or HOST:PORT/SERVICE_NAME
 [enterprise_edition] - Optional. Is Enterprise Edition? (true or false). Defaults to true
-[aes_password] - Optional. Password for AES Encryption. Leave blank to omit use AES Encryption
+[aes_password] - Optional. Password for AES Encryption. Leave blank if the "Sensitive data encryption" feature is not enabled
 
 (Tomcat will start automatically)
 

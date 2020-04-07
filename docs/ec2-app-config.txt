@@ -55,7 +55,7 @@ Service will be installed as <website>_<service> into /opt directory:
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com services 19.22.0 'prod01/password@url:1521:a1' 'prod01_user/password@url:1521:a1' 'prod01_rpt/password@url:1521:a1'
 depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com integration-scheduler 19.22.0 'prod01/password@url:1521:a1'
 
-Note: for use AES Encryption append --aes-password 'password_used_at_installation' after version argument.
+Note: to use AES Encryption append --aes-password 'password_used_at_installation' after version argument.
 
 9. Install OneVizion monitoring service:
 depl-scripts $ sudo ./install-monitor-service.sh <version> <owner_schema> <monitor_schema> <monitor_schema_password> <monitor_schema_connect_identifier> [aes_password]
@@ -87,7 +87,7 @@ Where:
 <schedule> - cron format schedule, for example: 0 3 * * * 
 <owner_schema> - Credentials for OWNER schema: USER/PASSWORD@HOST:PORT:SID (Example: prod01/password@localhost:1521:xe) 
 
-Note: for use AES Encryption append --aes-password 'password_used_at_installation' after version argument.
+Note: to use AES Encryption append --aes-password 'password_used_at_installation' after version argument.
 
 12. Test syncs3 by execution command:
 sudo -u syncs3 /opt/<website>_syncs3/cron-launcher.sh 
@@ -112,5 +112,5 @@ depl-scripts $ sudo ./install-daemon-service.sh test.onevizion.com mail-service 
 
 III. LIST AND STATUS OF ONEVIZION SERVICES
 
-16. to get list of installed services, versions and statuses run:
+16. To get list of installed services, versions and statuses run:
 depl-scripts $ sudo ./list-services.sh
