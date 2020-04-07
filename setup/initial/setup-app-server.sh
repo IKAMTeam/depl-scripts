@@ -46,7 +46,29 @@ chmod 440 /etc/sudoers.d/integration-scheduler
 "$SCRIPTS_DIR/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" --aes-password "$AES_PASSWORD" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 
 if [ -n "$MONITORING_VERSION" ]; then
-    "$SCRIPTS_DIR/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
+    "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
+
+    require_credentials
+    config_service_env "" "monitoring"
+    MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
+
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs[last()]/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs[last()]/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs[last()]/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL"
+
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' "$MONITOR_ERROR_MAIL_HOST"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' "$MONITOR_ERROR_MAIL_PORT"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' "$MONITOR_ERROR_MAIL_USERNAME"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' "$MONITOR_ERROR_MAIL_PASSWORD"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' "$MONITOR_ERROR_MAIL_FROM"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' "$MONITOR_ERROR_MAIL_TO"
+
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' "$MONITOR_WARN_MAIL_HOST"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' "$MONITOR_WARN_MAIL_PORT"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' "$MONITOR_WARN_MAIL_USERNAME"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' "$MONITOR_WARN_MAIL_PASSWORD"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' "$MONITOR_WARN_MAIL_FROM"
+    "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' "$MONITOR_WARN_MAIL_TO"
 fi
 
 # Start up services
