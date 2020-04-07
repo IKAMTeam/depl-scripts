@@ -65,12 +65,14 @@ fi
 
 echo "Adding new schema to configuration [$MONITOR_XML]..."
 
-MONITOR_XML_SCHEMA_PATH="$(mktemp --suffix="_schema_xml_$ARTIFACT")"
-delete_on_exit "$MONITOR_XML_SCHEMA_PATH"
-(< "$(dirname "$0")/$MONITOR_XML_SCHEMA_TEMPLATE_NAME" envsubst | tee "$MONITOR_XML_SCHEMA_PATH") >/dev/null || exit 1
+"$(dirname "$0")/setup/insert-xml-node.py" "$MONITOR_XML" "$(dirname "$0")/$MONITOR_XML_SCHEMA_TEMPLATE_NAME" \
+    'schemas' || exit 1
 
-sed -i "/<schema-placeholder\/>/ {r $MONITOR_XML_SCHEMA_PATH
-d}" "$MONITOR_XML" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/main-user' '' "$DB_OWNER_USER" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/monitor-user' '' "$DB_USER" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/monitor-password' '' "$DB_PASSWORD" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/url' '' "$DB_URL" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/aes-password' '' "$AES_PASSWORD" || exit 1
 
 if is_daemon_running "$SERVICE_NAME"; then
     echo "Done. [$SERVICE_NAME] already started"
