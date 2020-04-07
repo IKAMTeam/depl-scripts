@@ -21,19 +21,19 @@ Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-da
 ```
 #!/bin/bash
 
-SCRIPTS_DIR="/home/ec2-user/depl-scripts"
-SCRIPTS_OWNER="ec2-user"
+SCRIPTS_PATH="/home/ec2-user/depl-scripts"
+SCRIPTS_OWNER="ec2-user:ec2-user"
 
 yum install -y git
-git clone https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_DIR"
-chown "$SCRIPTS_OWNER:$SCRIPTS_OWNER" "$SCRIPTS_DIR"
+git clone https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
+chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR"
 
-"$SCRIPTS_DIR/setup/initial/aws-setup-web-server.sh" - <<'EOF'
+"$SCRIPTS_PATH/setup/initial/aws-setup-web-server.sh" - <<'EOF'
 # Leave empty to skip private DNS entry creation
 AWS_DOMAIN='ov.internal'
 
-SCRIPTS_DIR="/home/ec2-user/depl-scripts"
-SCRIPTS_OWNER="ec2-user"
+SCRIPTS_PATH="/home/ec2-user/depl-scripts"
+SCRIPTS_OWNER="ec2-user:ec2-user"
 
 RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."
@@ -61,7 +61,7 @@ DB_MONITOR_PASSWORD='password'
 MONITORING_VERSION="2.0.8"
 
 # Web specific
-TOMCAT_DIR="/usr/share/tomcat"
+TOMCAT_PATH="/usr/share/tomcat"
 TOMCAT_SERVICE="tomcat"
 
 ENTERPRISE_EDITION="true"

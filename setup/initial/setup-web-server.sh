@@ -33,8 +33,8 @@ init_credentials
 ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
 
 # Setup timeout for Tomcat shutdown process before it will be killed
-if [ -f "$TOMCAT_DIR/conf/tomcat.conf" ]; then
-    sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_DIR/conf/tomcat.conf"
+if [ -f "$TOMCAT_PATH/conf/tomcat.conf" ]; then
+    sed -i 's/# SHUTDOWN_WAIT="30"/SHUTDOWN_WAIT="30"/g' "$TOMCAT_PATH/conf/tomcat.conf"
 fi
 
 # Configure Auto-Restart for Tomcat if it will be crashed
@@ -46,23 +46,23 @@ systemctl daemon-reload
 systemctl enable "$TOMCAT_SERVICE"
 
 # Copy configuration template
-if grep 'server="ov"' "$TOMCAT_DIR/conf/server.xml" &>/dev/null; then
+if grep 'server="ov"' "$TOMCAT_PATH/conf/server.xml" &>/dev/null; then
     # Ignore server.xml from match files to copy
-    GLOBIGNORE="$SCRIPTS_DIR/setup/tomcat/conf/server.xml"
+    GLOBIGNORE="$SCRIPTS_PATH/setup/tomcat/conf/server.xml"
 fi
 
-cp -rf "$SCRIPTS_DIR"/setup/tomcat/conf/* "$TOMCAT_DIR/conf"
-cp -rf "$SCRIPTS_DIR"/setup/tomcat/webapps/* "$TOMCAT_DIR/webapps"
+cp -rf "$SCRIPTS_PATH"/setup/tomcat/conf/* "$TOMCAT_PATH/conf"
+cp -rf "$SCRIPTS_PATH"/setup/tomcat/webapps/* "$TOMCAT_PATH/webapps"
 GLOBIGNORE=''
 
-rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
+rm -f "$TOMCAT_PATH/conf/tomcat-users.xml"
 
 # Configure Tomcat filesystem permissions
-"$SCRIPTS_DIR/config-tomcat-security.sh" "$TOMCAT_DIR"
+"$SCRIPTS_PATH/config-tomcat-security.sh" "$TOMCAT_PATH"
 
 # Install web
-"$SCRIPTS_DIR/install-web.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
-    "$DB_PKG_PASSWORD" "$DB_URL" "$TOMCAT_DIR" "$ENTERPRISE_EDITION" "$AES_PASSWORD"
+"$SCRIPTS_PATH/install-web.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
+    "$DB_PKG_PASSWORD" "$DB_URL" "$TOMCAT_PATH" "$ENTERPRISE_EDITION" "$AES_PASSWORD"
 
 # Finished
 echo "Web server setup complete."

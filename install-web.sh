@@ -33,15 +33,15 @@ if [ -z "$ENTERPRISE_EDITION" ]; then
     ENTERPRISE_EDITION="true"
 fi
 
-SERVER_XML_FILE="$TOMCAT_DIR/conf/server.xml"
-CONTEXT_XML_FILE="$TOMCAT_DIR/conf/Catalina/$WEBSITE/ROOT.xml"
+SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
+CONTEXT_XML_FILE="$TOMCAT_PATH/conf/Catalina/$WEBSITE/ROOT.xml"
 
 # Set up the config files and replace values as appropriate
-rm -rf "$TOMCAT_DIR/conf/Catalina/$WEBSITE"
-rm -rf "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com"
+rm -rf "$TOMCAT_PATH/conf/Catalina/$WEBSITE"
+rm -rf "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com"
 
-cp -rf "$(dirname "$0")"/setup/tomcat/conf/Catalina/* "$TOMCAT_DIR/conf/Catalina" || exit 1
-mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina/$WEBSITE" || exit 1
+cp -rf "$(dirname "$0")"/setup/tomcat/conf/Catalina/* "$TOMCAT_PATH/conf/Catalina" || exit 1
+mv "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com" "$TOMCAT_PATH/conf/Catalina/$WEBSITE" || exit 1
 
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" '' docBase "\${catalina.home}/$WEBSITE-webapp" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "$WEBSITE" || exit 1
@@ -65,8 +65,8 @@ mv "$TOMCAT_DIR/conf/Catalina/sitename.onevizion.com" "$TOMCAT_DIR/conf/Catalina
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
-    mkdir -p "$TOMCAT_DIR/$WEBSITE"
-    echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_DIR/$WEBSITE/ov.properties" || exit 1
+    mkdir -p "$TOMCAT_PATH/$WEBSITE"
+    echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_PATH/$WEBSITE/ov.properties" || exit 1
 fi
 
-"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$TOMCAT_DIR" "$WEBSITE-webapp" || exit 1
+"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$TOMCAT_PATH" "$WEBSITE-webapp" || exit 1

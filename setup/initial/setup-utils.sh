@@ -12,10 +12,20 @@ function init_credentials() {
         echo "SNAPSHOT_REPO_URL=$SNAPSHOT_REPO_URL"
         echo "REPOSITORY_UN=$REPOSITORY_UN"
         echo "REPOSITORY_PWD='$REPOSITORY_PWD'"
+        echo "TOMCAT_PATH=$TOMCAT_PATH"
         echo "TOMCAT_SERVICE=$TOMCAT_SERVICE"
-    } > "$SCRIPTS_DIR/credentials.conf"
-    chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR/credentials.conf"
-    chmod 600 "$SCRIPTS_DIR/credentials.conf"
+        echo "TOMCAT_UN=$TOMCAT_UN"
+        echo "TOMCAT_GROUP=$TOMCAT_GROUP"
+        # shellcheck disable=SC2153
+        echo "SERVICES_PATH=$SERVICES_PATH"
+    } > "$SCRIPTS_PATH/credentials.conf"
+    chown "$SCRIPTS_OWNER" "$SCRIPTS_PATH/credentials.conf"
+    chmod 600 "$SCRIPTS_PATH/credentials.conf"
+}
+
+function require_credentials() {
+    # shellcheck source=../../credentials.conf
+    . "$SCRIPTS_PATH/credentials.conf"
 }
 
 function generate_service_name() {

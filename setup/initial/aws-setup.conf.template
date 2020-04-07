@@ -5,8 +5,8 @@ AWS_DOMAIN="ov.internal"
 # url-internal=<internal_name> - used to create Route53 entry <url-internal>.<AWS_DOMAIN>
 # Name=<website> - used to write logs to CloudWatch
 
-SCRIPTS_DIR="/home/ec2-user/depl-scripts"
-SCRIPTS_OWNER="ec2-user"
+SCRIPTS_PATH="/home/ec2-user/depl-scripts"
+SCRIPTS_OWNER="ec2-user:ec2-user"
 
 RELEASES_REPO_URL="[placeholder]"
 SNAPSHOT_REPO_URL="[placeholder]"
@@ -27,6 +27,8 @@ DB_URL='[placeholder]'
 AES_PASSWORD='[placeholder]'
 
 # App specific
+SERVICES_PATH="/opt"
+
 DB_MONITOR_USER="[placeholder]"
 DB_MONITOR_PASSWORD='[placeholder]'
 
@@ -53,7 +55,9 @@ MONITOR_ERROR_MAIL_TO="[placeholder]"
 MONITORING_VERSION="[placeholder]"
 
 # Web specific
-TOMCAT_DIR="/usr/share/tomcat"
+TOMCAT_PATH="/usr/share/tomcat"
 TOMCAT_SERVICE="tomcat"
+TOMCAT_UN="tomcat"
+TOMCAT_GROUP="tomcat"
 
 ENTERPRISE_EDITION="[placeholder]"
