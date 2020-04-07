@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <root>
     <schemas>
-        <schema-placeholder/>
     </schemas>
 
     <!-- Setup AWS SQS to deliver monitoring statuses, multiple queries may be configured
