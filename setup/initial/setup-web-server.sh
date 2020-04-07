@@ -46,7 +46,7 @@ systemctl daemon-reload
 systemctl enable "$TOMCAT_SERVICE"
 
 # Copy configuration template
-if grep '<!-- <Host-Placeholder> -->' "$TOMCAT_DIR/conf/server.xml" &>/dev/null; then
+if grep 'server="ov"' "$TOMCAT_DIR/conf/server.xml" &>/dev/null; then
     # Ignore server.xml from match files to copy
     GLOBIGNORE="$SCRIPTS_DIR/setup/tomcat/conf/server.xml"
 fi
@@ -60,8 +60,8 @@ rm -f "$TOMCAT_DIR/conf/tomcat-users.xml"
 # Configure Tomcat filesystem permissions
 "$SCRIPTS_DIR/config-tomcat-security.sh" "$TOMCAT_DIR"
 
-# Install website
-"$SCRIPTS_DIR/install-website.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
+# Install web
+"$SCRIPTS_DIR/install-web.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
     "$DB_PKG_PASSWORD" "$DB_URL" "$TOMCAT_DIR" "$ENTERPRISE_EDITION" "$AES_PASSWORD"
 
 # Finished

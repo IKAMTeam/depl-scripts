@@ -4,7 +4,7 @@ import sys
 import xml.etree.ElementTree as ElementTree
 
 if len(sys.argv) < 5:
-    print('Usage: update-xml-value.py <in-out-file> [xpath] <attr-name> <new-value>')
+    print('Usage: update-xml-value.py <in-out-file> [xpath] [attr-name] <new-value>')
     exit(1)
 
 inFile = sys.argv[1]
@@ -20,14 +20,21 @@ class CommentedTreeBuilder(ElementTree.TreeBuilder):
         self.end(ElementTree.Comment)
 
 
+def update_value(node0):
+    if len(attr) == 0:
+        node0.text = value
+    else:
+        node0.attrib[attr] = value
+
+
 parser = ElementTree.XMLParser(target=CommentedTreeBuilder())
 tree = ElementTree.parse(inFile, parser)
 root = tree.getroot()
 
 if len(xpath) == 0:
-    root.attrib[attr] = value
+    update_value(root)
 else:
     for node in root.findall(xpath):
-        node.attrib[attr] = value
+        update_value(node)
 
 tree.write(inFile, encoding='utf-8', xml_declaration=True)

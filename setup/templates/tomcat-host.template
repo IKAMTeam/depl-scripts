@@ -13,4 +13,3 @@
                 -->
                 <!-- <Context docBase="${catalina.base}/custom/img" path="/custom/img" /> -->
             </Host>
-            <!-- <Host-Placeholder> -->

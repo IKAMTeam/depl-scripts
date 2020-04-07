@@ -11,9 +11,13 @@
 ######################################################
 
 JAVA_COMMAND="java"
-JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -XX:+HeapDumpOnOutOfMemoryError"
+JAVA_OPTS="-Djava.security.egd=file:///dev/urandom"
 JAR_PATH="${JAR_PATH}"
 JAR_OPTS="${JAR_OPTS}"
 
 SERVICE_PID="${SERVICE_PATH}/run.pid"
 SERVICE_OUT="${SERVICE_PATH}/run.out"
+
+#Uncomment to crash JVM on out of memory errors and create a heap dump for further analysis.
+#Warning, heap dump file size exceeds the size of JVM heap in memory, so make sure enough disk space is available.
+#JAVA_OPTS+="-XX:+HeapDumpOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError"
