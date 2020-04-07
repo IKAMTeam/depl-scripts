@@ -28,7 +28,7 @@ yum install -y git
 git clone https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_DIR"
 chown "$SCRIPTS_OWNER:$SCRIPTS_OWNER" "$SCRIPTS_DIR"
 
-"$SCRIPTS_DIR/setup/initial/aws-setup-web-server.sh" - <<EOF
+"$SCRIPTS_DIR/setup/initial/aws-setup-web-server.sh" - <<'EOF'
 # Leave empty to skip private DNS entry creation
 AWS_DOMAIN='ov.internal'
 
