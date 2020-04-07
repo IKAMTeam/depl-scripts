@@ -1,18 +1,10 @@
 #!/bin/bash
-if [ "$#" -ne 1 ]; then
-    echo "### Script for configure Tomcat filesystem security ###"
-    echo "Usage: $(basename "$0") <tomcat path>"
-    echo " "
-    echo "Example: $(basename "$0") /opt/tomcat"
-    exit 1
-fi
+### Script for configure Tomcat filesystem security ###
 
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
 require_root_user
-
-TOMCAT_PATH=$1
 
 chown -LR "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH" || exit 1
 find -L "$TOMCAT_PATH" -type d -exec chmod g-w,g+s,g+x,o-r,o-w,o-x {} + || exit 1
