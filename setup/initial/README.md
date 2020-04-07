@@ -8,7 +8,84 @@ OneVizion web and app instances configuration scripts
 
 ## Setup Web/App servers
 
-**Note**: You can run this snippet multiple times for install multiple websites or services on single server
+1. Prepare instance
+- Install Git
+- Install Python 2.7
+- Install Java 11 (Oracle or OpenJDK)
+- Install Tomcat 8.5 (if you want to configure server as web instance)
+
+2. Clone deployment scripts: `git clone https://github.com/IKAMTeam/depl-scripts.git`
+3. Create configuration file `setup-server.conf` based on [setup-server.conf.template](setup-server.conf.template).
+4. Fill configuration (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
+5. Start configuration
+
+- Run `./setup-web-server.sh setup-server.conf` to configure server as web instance
+- Run `./setup-web-server.sh setup-server.conf` to configure server as app instance
+
+**Note**: You can run setup scripts multiple times to install multiple websites or services on single server
+
+**Example configuration**:
+```
+SCRIPTS_PATH="/home/my-user/depl-scripts"
+SCRIPTS_OWNER="my-user:my-user"
+
+RELEASES_REPO_URL="https://..."
+SNAPSHOT_REPO_URL="https://..."
+REPOSITORY_UN="username"
+REPOSITORY_PWD='password'
+
+WEBSITE="test01.onevizion.com"
+VERSION="20.5.0"
+
+# Database credentials
+DB_OWNER_USER="prod01"
+DB_OWNER_PASSWORD='password'
+DB_USER_PASSWORD='password'
+DB_PKG_PASSWORD='password'
+DB_RPT_PASSWORD='password'
+DB_URL='rds.endpoint:1521:A1'
+
+AES_PASSWORD=''
+
+# App specific
+SERVICES_PATH="/opt"
+
+DB_MONITOR_USER="monitor"
+DB_MONITOR_PASSWORD='password'
+
+# Use AWS SQS to deliver monitoring statuses, leave blank for omit
+MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
+MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
+MONITOR_AWS_SQS_QUEUE_URL="[placeholder]"
+
+# Email addresses to deliver monitoring warnings and errors, leave blank for omit
+MONITOR_WARN_MAIL_HOST="[placeholder]"
+MONITOR_WARN_MAIL_PORT="[placeholder]"
+MONITOR_WARN_MAIL_USERNAME="[placeholder]"
+MONITOR_WARN_MAIL_PASSWORD='[placeholder]'
+MONITOR_WARN_MAIL_FROM="[placeholder]"
+MONITOR_WARN_MAIL_TO="[placeholder]"
+
+MONITOR_ERROR_MAIL_HOST="[placeholder]"
+MONITOR_ERROR_MAIL_PORT="[placeholder]"
+MONITOR_ERROR_MAIL_USERNAME="[placeholder]"
+MONITOR_ERROR_MAIL_PASSWORD='[placeholder]'
+MONITOR_ERROR_MAIL_FROM="[placeholder]"
+MONITOR_ERROR_MAIL_TO="[placeholder]"
+
+# Leave empty to omit monitoring setup
+MONITORING_VERSION="2.0.8"
+
+# Web specific
+TOMCAT_PATH="/usr/share/tomcat"
+TOMCAT_SERVICE="tomcat"
+TOMCAT_UN="tomcat"
+TOMCAT_GROUP="tomcat"
+
+ENTERPRISE_EDITION="true"
+
+EOF
+```
 
 ## Setup Web/App servers on AWS platform
 
@@ -99,7 +176,7 @@ After complete this snippet you get ready to work deployment scripts at `/home/e
 
 Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about configuration.
 
-**Note**: You can run this snippet multiple times for install multiple websites or services on single server
+**Note**: You can run this snippet multiple times to install multiple websites or services on single server
 
 **Note**: To setup Route53 record you need to specify IAM Role for EC2 Instance
 
