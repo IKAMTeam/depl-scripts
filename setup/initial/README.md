@@ -1,6 +1,6 @@
 # Quick setup scripts bundle
 
-Use this scripts for quick build App and Web servers
+OneVizion web and app instances configuration scripts
 
 ## Table of contents
 - [Setup Web/App servers](#setup-webapp-servers)
@@ -12,21 +12,24 @@ Use this scripts for quick build App and Web servers
 
 ## Setup Web/App servers on AWS platform
 
-Quick way to setup OneVizion App/Web packages to AWS is to run installation script from [EC2 Instance UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
+Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
 
 **Requirements:**
 - Amazon Linux 2 Latest AMI
 
 **Example snippet**:
 ```
+#!/bin/bash
+
 SCRIPTS_DIR="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user"
 
 yum install -y git
 git clone https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_DIR"
-chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR"
+chown "$SCRIPTS_OWNER:$SCRIPTS_OWNER" "$SCRIPTS_DIR"
 
 "$SCRIPTS_DIR/setup/initial/aws-setup-web-server.sh" - <<EOF
+# Leave empty to skip private DNS entry creation
 AWS_DOMAIN='ov.internal'
 
 SCRIPTS_DIR="/home/ec2-user/depl-scripts"
@@ -40,6 +43,7 @@ REPOSITORY_PWD='password'
 WEBSITE="test01.onevizion.com"
 VERSION="20.5.0"
 
+# Database credentials
 DB_OWNER_USER="prod01"
 DB_OWNER_PASSWORD='password'
 DB_USER_PASSWORD='password'
@@ -49,8 +53,11 @@ DB_URL='rds.endpoint:1521:A1'
 
 AES_PASSWORD=''
 
+# App specific
 DB_MONITOR_USER="monitor"
 DB_MONITOR_PASSWORD='password'
+
+# Leave empty to omit monitoring setup
 MONITORING_VERSION="2.0.8"
 
 # Web specific
@@ -70,11 +77,11 @@ Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about
 
 **Note**: You can run this snippet multiple times for install multiple websites or services on single server
 
-**Note**: For setup Route53 record you need to specify IAM Role for EC2 Instance
+**Note**: To setup Route53 record you need to specify IAM Role for EC2 Instance
 
 This IAM Role should contains next permissions:
 - `Route53:ListHostedZonesByName` - For convert hosted zone name to ID
 - `Route53:ChangeResourceRecordSets` - For create record (Limit for hosted zone you use only)
 - `EC2:DescribeTags` - For read `url-internal` tag attached to specific instance
 
-**Note**: For prevent setup script to update Route53 record every run - set `AWS_DOMAIN` to empty value for 2+ runs
+**Note**: To prevent setup script to update Route53 record every run - set `AWS_DOMAIN` to empty value for 2+ runs
