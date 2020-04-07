@@ -1,8 +1,4 @@
 #!/bin/bash
-export SERVICES_PATH="/opt"
-
-export TOMCAT_UN="tomcat"
-export TOMCAT_GROUP="tomcat"
 export TOMCAT_WAIT_LOG="catalina.log"
 
 export APP_LAUNCHER_TEMPLATE_NAME="setup/templates/app-launcher.template"
@@ -23,11 +19,6 @@ export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.templ
 export SERVER_XML_HOST_TEMPLATE_NAME="setup/templates/tomcat-host.template"
 
 export CLEANUP_TMP_FILES=""
-
-export TOMCAT_SERVICE
-if [ -z "$TOMCAT_SERVICE" ]; then
-    TOMCAT_SERVICE="tomcat"
-fi
 
 export CREDENTIALS_CONF
 if [ -z "$CREDENTIALS_CONF" ]; then
