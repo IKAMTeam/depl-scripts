@@ -23,11 +23,6 @@ function init_credentials() {
     chmod 600 "$SCRIPTS_PATH/credentials.conf"
 }
 
-function require_credentials() {
-    # shellcheck source=../../credentials.conf
-    . "$SCRIPTS_PATH/credentials.conf"
-}
-
 function generate_service_name() {
     local WEBSITE ARTIFACT SERVICE_NAME
 

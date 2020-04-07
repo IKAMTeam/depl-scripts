@@ -48,7 +48,6 @@ chmod 440 /etc/sudoers.d/integration-scheduler
 if [ -n "$MONITORING_VERSION" ]; then
     "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
 
-    require_credentials
     config_service_env "" "monitoring"
     MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
 
