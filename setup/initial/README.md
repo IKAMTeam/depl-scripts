@@ -15,16 +15,15 @@ OneVizion web and app instances configuration scripts
 - Install Tomcat 8.5 (if you want to configure server as web instance)
 
 2. Clone deployment scripts: `git clone https://github.com/IKAMTeam/depl-scripts.git`
-3. Create configuration file `setup-server.conf` based on [setup-server.conf.template](setup-server.conf.template).
-4. Fill configuration (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
-5. Start configuration
+3. Create and fill configuration file (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
+4. Start config script:
 
 - Run `./setup-web-server.sh setup-server.conf` to configure server as web instance
-- Run `./setup-web-server.sh setup-server.conf` to configure server as app instance
+- Run `./setup-app-server.sh setup-server.conf` to configure server as app instance
 
 **Note**: You can run setup scripts multiple times to install multiple websites or services on single server
 
-**Example configuration**:
+**Sample of `setup-server.conf`**:
 ```
 SCRIPTS_PATH="/home/my-user/depl-scripts"
 SCRIPTS_OWNER="my-user:my-user"
