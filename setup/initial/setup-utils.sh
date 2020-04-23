@@ -88,6 +88,9 @@ function init_ec2_instance() {
         echo " $EC2_URL_INTERNAL" | sed 's/\./-/g'
     } >> "/etc/hosts"
 
+    # Update bashrc
+    sed -i "s/\\\h/\${HOSTNAME%.$AWS_DOMAIN}/g" /etc/bashrc
+
     echo "Updating Route 53..."
     update_route53
 }
