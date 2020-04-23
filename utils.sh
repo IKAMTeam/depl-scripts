@@ -478,7 +478,7 @@ function unpack_ps_war() {
 }
 
 function read_xml_value() {
-    local IN_FILE, XPATH, ATTR_NAME
+    local IN_FILE XPATH ATTR_NAME
 
     IN_FILE=$1
     XPATH=$2
