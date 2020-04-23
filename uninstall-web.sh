@@ -17,20 +17,17 @@ require_root_user
 
 WEBSITE=$1
 
-START_TOMCAT=0
-if is_daemon_running "$TOMCAT_SERVICE"; then
-    echo "Stopping Tomcat..."
-    systemctl stop "$TOMCAT_SERVICE" || exit 1
-
-    START_TOMCAT=1
-fi
-
 SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
 CONTEXT_XML_FILE="$TOMCAT_PATH/conf/Catalina/$WEBSITE/ROOT.xml"
 
 ENGINE_XPATH="Service/Engine[@name=\"Catalina\"]"
 HOST_XPATH="Host[@name=\"$WEBSITE\"]"
 FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
+
+if [ -z "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")" ]; then
+    echo "No website with name [$WEBSITE] is available!"
+    exit 1
+fi
 
 APP_BASE_PATH="$TOMCAT_PATH/$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")"
 DOC_BASE_PATH="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
@@ -41,6 +38,15 @@ PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
 # shellcheck disable=SC2016
 CATALINA_HOME_VAR='${catalina.home}'
 DOC_BASE_PATH="${DOC_BASE_PATH//$CATALINA_HOME_VAR/$TOMCAT_PATH}"
+
+# Stop Tomcat
+START_TOMCAT=0
+if is_daemon_running "$TOMCAT_SERVICE"; then
+    echo "Stopping Tomcat..."
+    systemctl stop "$TOMCAT_SERVICE" || exit 1
+
+    START_TOMCAT=1
+fi
 
 test -d "$APP_BASE_PATH" && (rm -rf "$APP_BASE_PATH" || exit 1)
 test -d "$DOC_BASE_PATH" && (rm -rf "$DOC_BASE_PATH" || exit 1)
