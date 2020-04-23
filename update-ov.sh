@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for update web/services artifacts ###"
+    echo "### Script for update web application or services ###"
     echo "Usage: $(basename "$0") <artifact> <website> <new version>"
     echo " "
     echo "Usage for services: $(basename "$0") services <website> <new version>"
