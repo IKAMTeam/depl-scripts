@@ -47,10 +47,10 @@ echo "$DOC_BASE_PATH"
 echo "$CONTEXT_PATH"
 echo "$PROPERTIES_PATH"
 
-(test -d "$APP_BASE_PATH" && rm -rf "$APP_BASE_PATH") || exit 1
-(test -d "$DOC_BASE_PATH" && rm -rf "$DOC_BASE_PATH") || exit 1
-(test -d "$CONTEXT_PATH" && rm -rf "$CONTEXT_PATH") || exit 1
-(test -d "$PROPERTIES_PATH" && rm -rf "$PROPERTIES_PATH") || exit 1
+test -d "$APP_BASE_PATH" && (rm -rf "$APP_BASE_PATH" || exit 1)
+test -d "$DOC_BASE_PATH" && (rm -rf "$DOC_BASE_PATH" || exit 1)
+test -d "$CONTEXT_PATH" && (rm -rf "$CONTEXT_PATH" || exit 1)
+test -d "$PROPERTIES_PATH" && (rm -rf "$PROPERTIES_PATH" || exit 1)
 
 echo debug
 
