@@ -477,6 +477,16 @@ function unpack_ps_war() {
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 }
 
+function read_xml_value() {
+    local IN_FILE, XPATH, ATTR_NAME
+
+    IN_FILE=$1
+    XPATH=$2
+    ATTR_NAME=$3
+
+    "$(dirname "$0")/setup/read-xml-value.py" "$IN_FILE" "$XPATH" "$ATTR_NAME" || return 1
+}
+
 function cleanup_tomcat() {
     local TOMCAT_PATH
 
