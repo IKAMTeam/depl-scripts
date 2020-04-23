@@ -24,12 +24,13 @@ ENGINE_XPATH="Service/Engine[@name=\"Catalina\"]"
 HOST_XPATH="Host[@name=\"$WEBSITE\"]"
 FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
 
-if [ -z "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")" ]; then
+APP_BASE="$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")"
+if [ -z "$APP_BASE" ]; then
     echo "No website with name [$WEBSITE] is available!"
     exit 1
 fi
 
-APP_BASE_PATH="$TOMCAT_PATH/$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")"
+APP_BASE_PATH="$TOMCAT_PATH/$APP_BASE"
 DOC_BASE_PATH="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
 CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
 PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
