@@ -31,14 +31,8 @@ if [ -z "$APP_BASE" ]; then
 fi
 
 APP_BASE_PATH="$TOMCAT_PATH/$APP_BASE"
-DOC_BASE_PATH="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
 CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
 PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
-
-# Expand catalina.home
-# shellcheck disable=SC2016
-CATALINA_HOME_VAR='${catalina.home}'
-DOC_BASE_PATH="${DOC_BASE_PATH//$CATALINA_HOME_VAR/$TOMCAT_PATH}"
 
 # Stop Tomcat
 START_TOMCAT=0
@@ -50,7 +44,6 @@ if is_daemon_running "$TOMCAT_SERVICE"; then
 fi
 
 test -d "$APP_BASE_PATH" && (rm -rf "$APP_BASE_PATH" || exit 1)
-test -d "$DOC_BASE_PATH" && (rm -rf "$DOC_BASE_PATH" || exit 1)
 test -d "$CONTEXT_PATH" && (rm -rf "$CONTEXT_PATH" || exit 1)
 test -d "$PROPERTIES_PATH" && (rm -rf "$PROPERTIES_PATH" || exit 1)
 
