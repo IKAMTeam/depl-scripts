@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context docBase="${catalina.home}/sitename.onevizion.com" clearReferencesStopTimerThreads="true"
          clearReferencesStopThreads="true">
-    <Parameter name="web.dbSid" value="[placeholder for Oracle host]:[placeholder for Oracle port]:[placeholder for Oracle SID]" override="false"/>
-    <Parameter name="web.dbUser" value="[placeholder username for USER schema]" override="false"/>
-    <Parameter name="web.dbUserPassword" value="[placeholder for USER schema password]" override="false"/>
-    <Parameter name="web.dbOwner" value="[placeholder username for OWNER schema]" override="false"/>
-    <Parameter name="web.dbOwnerPassword" value="[placeholder for OWNER schema password]" override="false"/>
-    <Parameter name="web.dbPkg" value="[placeholder username for PKG schema]" override="false"/>
-    <Parameter name="web.dbPkgPassword" value="[placeholder for PKG schema password]" override="false"/>
+    <Parameter name="web.dbSid" value="[placeholder for Oracle host]:[placeholder for Oracle port]:[placeholder for Oracle SID]"/>
+    <Parameter name="web.dbUser" value="[placeholder username for USER schema]"/>
+    <Parameter name="web.dbUserPassword" value="[placeholder for USER schema password]"/>
+    <Parameter name="web.dbOwner" value="[placeholder username for OWNER schema]"/>
+    <Parameter name="web.dbOwnerPassword" value="[placeholder for OWNER schema password]"/>
+    <Parameter name="web.dbPkg" value="[placeholder username for PKG schema]"/>
+    <Parameter name="web.dbPkgPassword" value="[placeholder for PKG schema password]"/>
     <Parameter name="web.enterpriseEdition" value="true"/>
     <Parameter name="web.whiteLabeled" value="false"/>
-    <Parameter name="app.serverUrl" value="https://sitename.onevizion.com" override="false"/>
+    <Parameter name="app.serverUrl" value="https://sitename.onevizion.com"/>
 </Context>
