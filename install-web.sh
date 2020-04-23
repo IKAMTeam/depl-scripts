@@ -68,4 +68,4 @@ if [ -n "$AES_PASSWORD" ]; then
     echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_PATH/$WEBSITE/ov.properties" || exit 1
 fi
 
-"$(dirname "$0")/update-ps-web.sh" "$VERSION" "$WEBSITE-webapp" || exit 1
+"$(dirname "$0")/update-ov.sh" "tomcat" "$WEBSITE-webapp" "$VERSION" || exit 1
