@@ -28,10 +28,13 @@ if is_daemon_running "$TOMCAT_SERVICE"; then
     START_TOMCAT=1
 fi
 
-HOST_XPATH="Service/Engine[@name=\"Catalina\"]/Host[@name=\"$WEBSITE\"]"
+ENGINE_XPATH="Service/Engine[@name=\"Catalina\"]"
+HOST_XPATH="Host[@name=\"$WEBSITE\"]"
+FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
 
+PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
 CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
-APP_BASE_PATH="$TOMCAT_PATH/$(read_xml_value "$SERVER_XML_FILE" "$HOST_XPATH" "appBase")"
+APP_BASE_PATH="$TOMCAT_PATH/$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")"
 DOC_BASE_PATH="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
 
 # Expand catalina.home
@@ -42,8 +45,9 @@ DOC_BASE_PATH="${DOC_BASE_PATH//$CATALINA_HOME_VAR/$TOMCAT_PATH}"
 (test -d "$APP_BASE_PATH" && rm -rf "$APP_BASE_PATH") || exit 1
 (test -d "$DOC_BASE_PATH" && rm -rf "$DOC_BASE_PATH") || exit 1
 (test -d "$CONTEXT_PATH" && rm -rf "$CONTEXT_PATH") || exit 1
+(test -d "$PROPERTIES_PATH" && rm -rf "$PROPERTIES_PATH") || exit 1
 
-"$(dirname "$0")/setup/delete-xml-node.py" "$SERVER_XML_FILE" "$HOST_XPATH" || exit 1
+"$(dirname "$0")/setup/delete-xml-node.py" "$SERVER_XML_FILE" "$ENGINE_XPATH" "$HOST_XPATH" || exit 1
 
 if [ "$START_TOMCAT" -eq 1 ]; then
     echo "Starting Tomcat..."
