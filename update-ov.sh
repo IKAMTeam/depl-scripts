@@ -23,16 +23,26 @@ require_root_user
 
 if [ "$1" == "tomcat" ]; then
     ARTIFACT=ps-web
-    WEBAPP_DIRNAME=$2
-    VERSION=$3
+    WEBSITE=$2
+    NEW_VERSION=$3
 
-    WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
+    SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
+
+    HOST_XPATH="Service/Engine[@name=\"Catalina\"]/Host[@name=\"$WEBSITE\"]"
+
+    APP_BASE="$(read_xml_value "$SERVER_XML_FILE" "$HOST_XPATH" "appBase")"
+    if [ -z "$APP_BASE" ]; then
+        echo "No website with name [$WEBSITE] is available!"
+        exit 1
+    fi
+
+    WEBAPP_PATH="$TOMCAT_PATH/$APP_BASE"
     DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
 
-    echo "Deploying [$ARTIFACT $VERSION] at [$WEBAPP_PATH]..."
+    echo "Deploying [$ARTIFACT $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || exit 1
+    download_artifact "$ARTIFACT" "$NEW_VERSION" "$DOWNLOAD_PATH" || exit 1
 
     # Prevent script fail if Tomcat is not running
     echo "Stopping Tomcat..."
