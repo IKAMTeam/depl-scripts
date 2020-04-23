@@ -2,8 +2,7 @@
 AWS_DOMAIN="ov.internal"
 
 # Following is the list of EC2 instance tags used in scripts:
-# url-internal=<internal_name> - used to create Route53 entry <url-internal>.<AWS_DOMAIN>
-# Name=<website> - used to write logs to CloudWatch
+# Name=<website> - used to create Route53 entry <Name>.<AWS_DOMAIN> and write logs to CloudWatch
 
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"

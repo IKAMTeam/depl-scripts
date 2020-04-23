@@ -180,6 +180,6 @@ Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about
 This IAM Role should contains next permissions:
 - `Route53:ListHostedZonesByName` - For convert hosted zone name to ID
 - `Route53:ChangeResourceRecordSets` - For create record (Limit for hosted zone you use only)
-- `EC2:DescribeTags` - For read `url-internal` tag attached to specific instance
+- `EC2:DescribeTags` - For read `Name` tag attached to specific instance
 
 **Note**: To prevent setup script to update Route53 record every run - set `AWS_DOMAIN` to empty value for 2+ runs
