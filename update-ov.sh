@@ -1,8 +1,18 @@
 #!/bin/bash
-if [ "$#" -ne 3 ]; then
+
+function usage() {
     echo "### Script for update web/services artifacts ###"
     echo "Usage: $(basename "$0") <artifact> <website> <new version>"
-    echo "Usage: $(basename "$0") tomcat <webapp directory name> <new version>"
+    echo " "
+    echo "Usage for services: $(basename "$0") services <website> <new version>"
+    echo "Usage for report-scheduler: $(basename "$0") report-scheduler <website> <new version>"
+    echo "Usage for integration-scheduler: $(basename "$0") integration-scheduler <website> <new version>"
+    echo "Usage for syncs3: $(basename "$0") syncs3 <website> <new version>"
+    echo "Usage for update Web Application (Tomcat): $(basename "$0") tomcat <website> <new version>"
+}
+
+if [ "$#" -ne 3 ]; then
+    usage
     exit 1
 fi
 
