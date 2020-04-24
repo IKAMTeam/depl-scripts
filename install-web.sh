@@ -6,6 +6,8 @@ function usage() {
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
     echo "Where enterprise_edition is true or false - defaults to true"
+    echo " "
+    echo "If installation with the same name already exists, it will be updated with new settings"
 }
 
 if [ "$#" -lt 7 ]; then
