@@ -39,11 +39,12 @@ ENGINE_XPATH="Service/Engine[@name=\"Catalina\"]"
 HOST_XPATH="Host[@name=\"$WEBSITE\"]"
 FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
 
+# Override existing installation if one with the same name already exists
 if [ -n "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")" ]; then
     "$(dirname "$0")/setup/delete-xml-node.py" "$SERVER_XML_FILE" "$ENGINE_XPATH" "$HOST_XPATH" || exit 1
 fi
 
-# Set up the config files and replace values as appropriate
+# Delete existing configuration if exists
 rm -rf "$TOMCAT_PATH/conf/Catalina/$WEBSITE"
 rm -rf "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com"
 
