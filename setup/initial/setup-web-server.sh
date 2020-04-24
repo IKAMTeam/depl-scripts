@@ -60,6 +60,19 @@ rm -f "$TOMCAT_PATH/conf/tomcat-users.xml"
 # Configure Tomcat filesystem permissions
 "$SCRIPTS_PATH/config-tomcat-security.sh"
 
+# Update logrotate configuration if exists
+test -d "/etc/logrotate.d" && cat > "/etc/logrotate.d/tomcat" <<EOF
+$TOMCAT_PATH/logs/catalina.log {
+    copytruncate
+    weekly
+    rotate 52
+    compress
+    missingok
+    su tomcat tomcat
+    create 0660 tomcat tomcat
+}
+EOF
+
 # Install web
 "$SCRIPTS_PATH/install-web.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
     "$DB_PKG_PASSWORD" "$DB_URL" "$ENTERPRISE_EDITION" "$AES_PASSWORD"
