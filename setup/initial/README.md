@@ -14,7 +14,7 @@ OneVizion web and app instances configuration scripts
 - Install Java 11 (Oracle or OpenJDK)
 - Install Tomcat 8.5 (if you want to configure server as web instance)
 
-2. Clone deployment scripts: `git clone https://github.com/IKAMTeam/depl-scripts.git`
+2. Clone deployment scripts: `git clone -b stable https://github.com/IKAMTeam/depl-scripts.git`
 3. Create and fill configuration file (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
 4. Start config script:
 
@@ -99,7 +99,7 @@ SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"
 
 yum install -y git
-git clone https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
+git clone -b stable https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
 chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR"
 
 "$SCRIPTS_PATH/setup/initial/aws-setup-web-server.sh" - <<'EOF'
