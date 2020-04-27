@@ -49,8 +49,11 @@ AES_PASSWORD=''
 # App specific
 SERVICES_PATH="/opt"
 
-DB_MONITOR_USER="monitor"
-DB_MONITOR_PASSWORD='password'
+# Leave empty to omit monitoring setup
+MONITOR_VERSION="2.0.8"
+
+MONITOR_DB_USER="monitor"
+MONITOR_DB_PASSWORD='password'
 
 # Use AWS SQS to deliver monitoring statuses, leave blank for omit
 MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
@@ -71,9 +74,6 @@ MONITOR_ERROR_MAIL_USERNAME="[placeholder]"
 MONITOR_ERROR_MAIL_PASSWORD='[placeholder]'
 MONITOR_ERROR_MAIL_FROM="[placeholder]"
 MONITOR_ERROR_MAIL_TO="[placeholder]"
-
-# Leave empty to omit monitoring setup
-MONITORING_VERSION="2.0.8"
 
 # Web specific
 TOMCAT_PATH="/usr/share/tomcat"
@@ -130,8 +130,8 @@ AES_PASSWORD=''
 # App specific
 SERVICES_PATH="/opt"
 
-DB_MONITOR_USER="monitor"
-DB_MONITOR_PASSWORD='password'
+MONITOR_DB_USER="monitor"
+MONITOR_DB_PASSWORD='password'
 
 # Use AWS SQS to deliver monitoring statuses, leave blank for omit
 MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
@@ -154,7 +154,7 @@ MONITOR_ERROR_MAIL_FROM="[placeholder]"
 MONITOR_ERROR_MAIL_TO="[placeholder]"
 
 # Leave empty to omit monitoring setup
-MONITORING_VERSION="2.0.8"
+MONITOR_VERSION="2.0.8"
 
 # Web specific
 TOMCAT_PATH="/usr/share/tomcat"

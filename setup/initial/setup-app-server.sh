@@ -45,8 +45,8 @@ chmod 440 /etc/sudoers.d/integration-scheduler
 "$SCRIPTS_PATH/install-daemon-service.sh" "$WEBSITE" integration-scheduler "$VERSION" --aes-password "$AES_PASSWORD" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 "$SCRIPTS_PATH/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" --aes-password "$AES_PASSWORD" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 
-if [ -n "$MONITORING_VERSION" ]; then
-    "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITORING_VERSION" "$DB_OWNER_USER" "$DB_MONITOR_USER" "$DB_MONITOR_PASSWORD" "$DB_URL" "$AES_PASSWORD"
+if [ -n "$MONITOR_VERSION" ]; then
+    "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITOR_VERSION" "$DB_OWNER_USER" "$MONITOR_DB_USER" "$MONITOR_DB_PASSWORD" "$DB_URL" "$AES_PASSWORD"
 
     config_service_env "" "monitoring"
     MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
@@ -80,7 +80,7 @@ fi
 systemctl start "${WEBSITE}_services"
 systemctl start "${WEBSITE}_integration-scheduler"
 
-if [ -n "$MONITORING_VERSION" ]; then
+if [ -n "$MONITOR_VERSION" ]; then
     systemctl start "monitoring"
 fi
 
