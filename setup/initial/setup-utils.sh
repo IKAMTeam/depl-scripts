@@ -100,7 +100,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/bin/config.json"
 
-    rpm -U "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
+    rpm -U --force "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
     tee "$CONF_FILE" <<'EOF'
 {
 	"agent": {
@@ -142,7 +142,7 @@ function install_cloudwatch_agent() {
 	}
 }
 EOF
-    chown root:root "$CONF_FILE"
+    chown "$(whoami)" "$CONF_FILE"
     amazon-cloudwatch-agent-ctl -a start
 }
 
