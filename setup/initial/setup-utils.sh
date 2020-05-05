@@ -70,6 +70,8 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4 variable
 function init_ec2_instance() {
+    install_cloudwatch_agent
+
     if [ -z "$AWS_DOMAIN" ]; then
         echo "Update hostname and route 53 is cancelled"
         return 0
@@ -79,7 +81,6 @@ function init_ec2_instance() {
     yum install -y jq
 
     config_ec2_env
-    install_cloudwatch_agent
 
     # Update hostname
     TARGET_DOMAIN="${EC2_URL_INTERNAL}.${AWS_DOMAIN}"
