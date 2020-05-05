@@ -79,6 +79,7 @@ function init_ec2_instance() {
     yum install -y jq
 
     config_ec2_env
+    install_cloudwatch_agent
 
     # Update hostname
     TARGET_DOMAIN="${EC2_URL_INTERNAL}.${AWS_DOMAIN}"
@@ -93,6 +94,56 @@ function init_ec2_instance() {
 
     echo "Updating Route 53..."
     update_route53
+}
+
+function install_cloudwatch_agent() {
+    local CONF_FILE
+    CONF_FILE="/opt/aws/amazon-cloudwatch-agent/bin/config.json"
+
+    rpm -U "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
+    tee "$CONF_FILE" <<'EOF'
+{
+	"agent": {
+		"metrics_collection_interval": 60,
+		"run_as_user": "root"
+	},
+	"metrics": {
+		"append_dimensions": {
+			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+			"ImageId": "${aws:ImageId}",
+			"InstanceId": "${aws:InstanceId}",
+			"InstanceType": "${aws:InstanceType}"
+		},
+		"metrics_collected": {
+			"collectd": {
+				"metrics_aggregation_interval": 60
+			},
+			"disk": {
+				"measurement": [
+					"used_percent"
+				],
+				"metrics_collection_interval": 60,
+				"resources": [
+					"*"
+				]
+			},
+			"mem": {
+				"measurement": [
+					"mem_used_percent"
+				],
+				"metrics_collection_interval": 60
+			},
+			"statsd": {
+				"metrics_aggregation_interval": 60,
+				"metrics_collection_interval": 10,
+				"service_address": ":8125"
+			}
+		}
+	}
+}
+EOF
+    chown root:root "$CONF_FILE"
+    amazon-cloudwatch-agent-ctl -a start
 }
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
