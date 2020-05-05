@@ -91,7 +91,11 @@ Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-da
 **Requirements:**
 - Amazon Linux 2 Latest AMI
 
-**Example snippet**:
+**Example snippet for Web Server setup**:
+
+Use `aws-setup-app-server.sh` to setup application server.
+
+
 ```
 #!/bin/bash
 
@@ -169,7 +173,7 @@ EOF
 
 After complete this snippet you get ready to work deployment scripts at `/home/ec2-user/depl-scripts` and installed/running Apache Tomcat with OneVizion package
 
-**Note**: Another scripts `aws-setup-web-server.sh` and `aws-setup-app-server.sh` should be used here
+User Data script execution logs are available in the `/var/log/cloud-init-output.log`
 
 Check [aws-setup.conf.template](aws-setup.conf.template) for get more info about configuration.
 
