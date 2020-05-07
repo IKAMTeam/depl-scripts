@@ -68,7 +68,7 @@ function config_ec2_env() {
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 }
 
-# Uses EC2_URL_INTERNAL, EC2_IPV4 variable
+# Uses EC2_URL_INTERNAL, EC2_IPV4 variables
 function init_ec2_instance() {
     install_cloudwatch_agent
     update_motd
@@ -148,7 +148,7 @@ EOF
     amazon-cloudwatch-agent-ctl -a start
 }
 
-# Uses AWS_DOMAIN variable
+# Uses AWS_DOMAIN, SCRIPTS_PATH variables
 function update_motd() {
     if [ -z "$AWS_DOMAIN" ]; then
         return 0
