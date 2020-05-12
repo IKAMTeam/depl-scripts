@@ -492,7 +492,7 @@ function recalculate_tomcat_metaspace_size() {
     METASPACE_MAX_SIZE_MB="512"
 
     WEBSITE_COUNT="$(read_xml_value "$SERVER_XML_FILE" "Service/Engine[@name=\"Catalina\"]/Host" "name" | wc -l)"
-    (( WEBSITE_COUNT-- ))
+    (( WEBSITE_COUNT-= 2 ))
 
     if [ "$WEBSITE_COUNT" -gt 0 ]; then
         (( METASPACE_SIZE_MB+= (128 * WEBSITE_COUNT) ))
