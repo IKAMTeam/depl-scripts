@@ -49,6 +49,8 @@ test -d "$PROPERTIES_PATH" && (rm -rf "$PROPERTIES_PATH" || exit 1)
 
 "$(dirname "$0")/setup/delete-xml-node.py" "$SERVER_XML_FILE" "$ENGINE_XPATH" "$HOST_XPATH" || exit 1
 
+recalculate_tomcat_metaspace_size || exit 1
+
 if [ "$START_TOMCAT" -eq 1 ]; then
     echo "Starting Tomcat..."
     systemctl start "$TOMCAT_SERVICE" || exit 1

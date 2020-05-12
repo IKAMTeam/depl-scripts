@@ -7,8 +7,8 @@
 require_root_user
 
 chown -LR "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH" || exit 1
-find -L "$TOMCAT_PATH" -type d -exec chmod g-w,g+s,g+x,o-r,o-w,o-x {} + || exit 1
-find -L "$TOMCAT_PATH" -type f -exec chmod g-w,o-r,o-w,o-x {} + || exit 1
+find -L "$TOMCAT_PATH" -type d -exec chmod g+r,g-w,g+s,g+x,o-r,o-w,o-x {} + || exit 1
+find -L "$TOMCAT_PATH" -type f -exec chmod g+r,g-w,o-r,o-w,o-x {} + || exit 1
 find "$TOMCAT_PATH"/* -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 chmod -R g+w "$TOMCAT_PATH/logs" "$TOMCAT_PATH/temp" "$TOMCAT_PATH/work" || exit 1
 
