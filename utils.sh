@@ -477,6 +477,30 @@ function unpack_ps_war() {
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 }
 
+# Uses TOMCAT_PATH variable
+function recalculate_tomcat_metaspace_size() {
+    local MEM_CONF_FILE SERVER_XML_FILE METASPACE_SIZE METASPACE_MAX_SIZE
+    MEM_CONF_FILE="$TOMCAT_PATH/conf/conf.d/setmem.conf"
+    SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
+
+    if [ ! -f "$MEM_CONF_FILE" ]; then
+        echo "Can't recalculate metaspace size! File [$MEM_CONF_FILE] is not exists"
+        return 0
+    fi
+
+    METASPACE_SIZE="384"
+    METASPACE_MAX_SIZE="512"
+
+    WEBSITE_COUNT="$(read_xml_value "$SERVER_XML_FILE" "Service/Engine[@name=\"Catalina\"]/Host" "name" | wc -l)"
+    if [ "$WEBSITE_COUNT" -gt 0 ]; then
+        (( METASPACE_SIZE+= (128 * WEBSITE_COUNT) ))
+        (( METASPACE_MAX_SIZE+= (128 * WEBSITE_COUNT) ))
+    fi
+
+    sed -i "/^METASPACE_SIZE_MB=.*$/ c METASPACE_SIZE_MB=\"$METASPACE_SIZE_MB\"" "$MEM_CONF_FILE" || return 1
+    sed -i "/^METASPACE_MAX_SIZE_MB=.*$/ c METASPACE_MAX_SIZE_MB=\"$METASPACE_MAX_SIZE\"" "$MEM_CONF_FILE" || return 1
+}
+
 function read_xml_value() {
     local IN_FILE XPATH ATTR_NAME
 
