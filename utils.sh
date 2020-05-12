@@ -484,7 +484,7 @@ function recalculate_tomcat_metaspace_size() {
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
 
     if [ ! -f "$MEM_CONF_FILE" ]; then
-        echo "Can't recalculate metaspace size! File [$MEM_CONF_FILE] is not exists"
+        echo "Can't recalculate metaspace size! File [$MEM_CONF_FILE] does not exist"
         return 0
     fi
 
