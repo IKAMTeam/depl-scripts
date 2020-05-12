@@ -81,4 +81,4 @@ fi
 
 recalculate_tomcat_metaspace_size || exit 1
 
-"$(dirname "$0")/update-ov.sh" "tomcat" "$WEBSITE" "$VERSION" || exit 1
+"$(dirname "$0")/update-ov.sh" "$WEBSITE" "tomcat" "$VERSION" || exit 1

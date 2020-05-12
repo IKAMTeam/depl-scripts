@@ -2,13 +2,13 @@
 
 function usage() {
     echo "### Script for update web application or services ###"
-    echo "Usage: $(basename "$0") <artifact> <website> <new version>"
+    echo "Usage: $(basename "$0") <website> <artifact> <new version>"
     echo " "
-    echo "Usage for services: $(basename "$0") services <website> <new version>"
-    echo "Usage for report-scheduler: $(basename "$0") report-scheduler <website> <new version>"
-    echo "Usage for integration-scheduler: $(basename "$0") integration-scheduler <website> <new version>"
-    echo "Usage for syncs3: $(basename "$0") syncs3 <website> <new version>"
-    echo "Usage for update Web Application (Tomcat): $(basename "$0") tomcat <website> <new version>"
+    echo "Usage for services: $(basename "$0") <website> services <new version>"
+    echo "Usage for report-scheduler: $(basename "$0") <website> report-scheduler <new version>"
+    echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler <new version>"
+    echo "Usage for syncs3: $(basename "$0") <website> syncs3 <new version>"
+    echo "Usage for update Web Application (Tomcat): $(basename "$0") <website> tomcat <new version>"
 }
 
 if [ "$#" -ne 3 ]; then
@@ -21,9 +21,9 @@ fi
 
 require_root_user
 
-if [ "$1" == "tomcat" ]; then
+if [ "$2" == "tomcat" ]; then
+    WEBSITE=$1
     ARTIFACT=ps-web
-    WEBSITE=$2
     NEW_VERSION=$3
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
@@ -79,8 +79,8 @@ if [ "$1" == "tomcat" ]; then
         exit 1
     fi
 else
-    MATCH_ARTIFACT=$1
-    MATCH_WEBSITE=$2
+    MATCH_WEBSITE=$1
+    MATCH_ARTIFACT=$2
     NEW_VERSION=$3
 
     export SERVICE_UN="$MATCH_ARTIFACT"
