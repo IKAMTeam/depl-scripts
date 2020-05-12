@@ -148,19 +148,9 @@ EOF
     amazon-cloudwatch-agent-ctl -a start
 }
 
-# Uses AWS_DOMAIN, SCRIPTS_PATH variables
+# Uses SCRIPTS_PATH variables
 function update_motd() {
-    if [ -z "$AWS_DOMAIN" ]; then
-        return 0
-    fi
-
-    if [ "$AWS_DOMAIN" != "ov.internal" ]; then
-        # Ignore 99-warning from match files to copy
-        GLOBIGNORE="$SCRIPTS_PATH/setup/templates/update-motd.d/99-warning"
-    fi
-
     cp -rf "$SCRIPTS_PATH"/setup/templates/update-motd.d/* "/etc/update-motd.d"
-    GLOBIGNORE=''
 }
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
