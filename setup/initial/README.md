@@ -5,7 +5,7 @@ OneVizion web and app instances configuration scripts
 ## Table of contents
 - [Setup Web/App servers](#setup-webapp-servers)
 - [Setup Web/App servers on AWS platform](#setup-webapp-servers-on-aws-platform)
-- [Enable SSL connection to the Oracle db](#enable-ssl-connection-to-the-oracle-db)
+- [Enable SSL connection to the Oracle db](#enable-ssl-connection-to-the-oracle-db-in-aws)
 
 ## Setup Web/App servers
 
@@ -203,4 +203,4 @@ sudo keytool -import -trustcacerts -keystore cacerts -storepass &gt;changeit&lt;
 4. Modify "web.dbSid" parameter in ROOT.xml to:
 '(DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))'
 
-Replace [placeholder for Oracle SID] and [placeholder for Oracle host] with correct values
+5. Replace [placeholder for Oracle SID] and [placeholder for Oracle host] with correct values
