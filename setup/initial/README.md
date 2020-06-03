@@ -192,12 +192,12 @@ This IAM Role should contains next permissions:
 
 ## Enable SSL connection to the Oracle DB in AWS
 1. Make sure SSL is enabled in AWS RDS option group with following settings:
-- Port `2484`
+- Port is `2484`
 - `SSL_VERSION=1.2`
 - `CIPHER_SUITE=SSL_RSA_WITH_AES_256_GCM_SHA384`
 
 2. Use instructions from https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html to generate Java keystore file with AWS certificates:
-    - Download certificate from https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem
+    - Download certificate from https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem, then run:
 
         `openssl x509 -outform der -in rds-ca-2019-root.pem -out rds-ca-2019-root.der`
 
@@ -206,7 +206,9 @@ This IAM Role should contains next permissions:
     `sudo keytool -import -trustcacerts -keystore cacerts -storepass <changeit> -alias Root -file rds-ca-2019-root.der`
 
 4. Modify `web.dbSid` parameter in `ROOT.xml` to:
-
-    `(DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))`
+    
+    ```
+    (DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))
+    ```
 
 5. Replace `[placeholder for Oracle SID]` and `[placeholder for Oracle host]` with correct values.
