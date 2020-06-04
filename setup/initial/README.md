@@ -5,6 +5,7 @@ OneVizion web and app instances configuration scripts
 ## Table of contents
 - [Setup Web/App servers](#setup-webapp-servers)
 - [Setup Web/App servers on AWS platform](#setup-webapp-servers-on-aws-platform)
+- [Enable SSL connection to the Oracle DB in AWS](#enable-ssl-connection-to-the-oracle-db-in-aws)
 
 ## Setup Web/App servers
 
@@ -187,3 +188,27 @@ This IAM Role should contains next permissions:
 - `EC2:DescribeTags` - For read `Name` tag attached to specific instance
 
 **Note**: To prevent setup script to update Route53 record every run - set `AWS_DOMAIN` to empty value for 2+ runs
+
+
+## Enable SSL connection to the Oracle DB in AWS
+1. Make sure SSL is enabled in AWS RDS option group with following settings:
+- Port is `2484`
+- `SSL_VERSION=1.2`
+- `CIPHER_SUITE=SSL_RSA_WITH_AES_256_GCM_SHA384`
+
+2. Use instructions from https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.SSL.html to generate Java keystore file with AWS certificates:
+    - Download certificate from https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem, then run:
+
+        `openssl x509 -outform der -in rds-ca-2019-root.pem -out rds-ca-2019-root.der`
+
+3. Import AWS Certificate into Java trust store (located in `$JAVA_HOME/jre/lib/security/cacerts`, also Tomcat prints out `JAVA_HOME` into logs on startup):
+
+    `sudo keytool -import -trustcacerts -keystore cacerts -storepass <changeit> -alias Root -file rds-ca-2019-root.der`
+
+4. Modify `web.dbSid` parameter in `ROOT.xml` to:
+    
+    ```
+    (DESCRIPTION= (ADDRESS=(PROTOCOL=TCPS)(PORT=2484)(HOST=[placeholder for Oracle host]))(CONNECT_DATA=(SID=[placeholder for Oracle SID]))(SECURITY=(SSL_SERVER_CERT_DN="C=US,ST=Washington,L=Seattle,O=Amazon.com,OU=RDS,CN=%s")))
+    ```
+
+5. Replace `[placeholder for Oracle SID]` and `[placeholder for Oracle host]` with correct values.
