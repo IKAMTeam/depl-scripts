@@ -29,8 +29,10 @@ set -o pipefail
 
 init_credentials
 
-# Update timezone to EST
-ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
+# Update timezone
+if [ -n "$SET_TIMEZONE" ]; then
+    ln -sf "/usr/share/zoneinfo/$SET_TIMEZONE" /etc/localtime
+fi
 
 # Install libsigar - library used in report-scheduler to monitor free RAM
 cp "$SCRIPTS_PATH/setup/libsigar-amd64-linux.so" /usr/lib
