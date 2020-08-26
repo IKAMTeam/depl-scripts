@@ -41,7 +41,7 @@ service iptables save
 # Install yum plugin
 yum install -y yum-plugin-post-transaction-actions
 
-# Create yum post-action for restore permissions after Tomcat package update
+# Create yum post-action for restore permissions after Tomcat package install/update
 (< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/yum/post-actions/tomcat.action") >/dev/null
 
 # Run setup-web-server.sh
