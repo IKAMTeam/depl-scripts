@@ -38,6 +38,9 @@ systemctl enable iptables
 iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
 service iptables save
 
+# Install yum plugin
+yum install -y yum-plugin-post-transaction-actions
+
 # Create yum post-action for restore permissions after Tomcat package update
 (< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/yum/post-actions/tomcat.action") >/dev/null
 
