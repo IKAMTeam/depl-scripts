@@ -6,6 +6,7 @@ OneVizion web and app instances configuration scripts
 - [Setup Web/App servers](#setup-webapp-servers)
 - [Setup Web/App servers on AWS platform](#setup-webapp-servers-on-aws-platform)
 - [Enable SSL connection to the Oracle DB in AWS](#enable-ssl-connection-to-the-oracle-db-in-aws)
+- [Upgrade Tomcat on non-AWS environment](#upgrade-tomcat-on-non-aws-environment)
 
 ## Setup Web/App servers
 
@@ -212,3 +213,6 @@ This IAM Role should contains next permissions:
     ```
 
 5. Replace `[placeholder for Oracle SID]` and `[placeholder for Oracle host]` with correct values.
+
+## Upgrade Tomcat on non-AWS environment
+1. After tomcat upgrade on non-AWS environment run `./config-tomcat-security.sh` for restore Tomcat files and directories correct permissions.
