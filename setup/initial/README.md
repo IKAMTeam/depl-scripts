@@ -215,4 +215,4 @@ This IAM Role should contains next permissions:
 5. Replace `[placeholder for Oracle SID]` and `[placeholder for Oracle host]` with correct values.
 
 ## Upgrade Tomcat on non-AWS environment
-1. After upgrade Tomcat on non-AWS environment run `./config-tomcat-security.sh` for restore Tomcat files and directories correct permissions.
+1. After tomcat upgrade on non-AWS environment run `./config-tomcat-security.sh` for restore Tomcat files and directories correct permissions.
