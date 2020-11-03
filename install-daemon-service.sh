@@ -11,7 +11,10 @@ function usage() {
     echo " "
     echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier>"
     echo " "
+    echo "Usage for mail-service (additional): $(basename "$0") <website> mail-service [--suffix <suffix>] <version> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <service name>"
+    echo " "
     echo "Where *_schema_connect_identifier is Oracle host:port:sid or host:port/service_name"
+    echo "Where 'service name' is name of associated service (can be configured in Admin Center -> System Administration -> Services)"
 }
 
 if [ "$#" -lt 3 ]; then
