@@ -64,6 +64,8 @@ function download_artifact() {
 
     if [ "$ARTIFACT" == "ps-web" ]; then
         DOWNLOAD_SUFFIX=".war"
+    elif [ "$ARTIFACT" == "monitoring" ]; then
+        DOWNLOAD_SUFFIX=".jar"
     else
         DOWNLOAD_SUFFIX="-shaded.jar"
     fi
