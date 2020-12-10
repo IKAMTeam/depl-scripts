@@ -30,6 +30,11 @@ OneVizion web and app instances configuration scripts
 SCRIPTS_PATH="/home/my-user/depl-scripts"
 SCRIPTS_OWNER="my-user:my-user"
 
+# Timezone for map to /etc/localtime, leave blank for omit
+# For list all available timezones, run:
+# cd /usr/share/zoneinfo; find . \( -name posix -o -name right \) -prune -o -type f | awk '{ print substr($0, 3) }'
+SET_TIMEZONE="US/Eastern"
+
 RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."
 REPOSITORY_UN="username"
@@ -114,6 +119,11 @@ AWS_DOMAIN='ov.internal'
 
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"
+
+# Timezone for map to /etc/localtime, leave blank for omit
+# For list all available timezones, run:
+# cd /usr/share/zoneinfo; find . \( -name posix -o -name right \) -prune -o -type f | awk '{ print substr($0, 3) }'
+SET_TIMEZONE="US/Eastern"
 
 RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."

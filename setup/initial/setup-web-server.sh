@@ -29,8 +29,10 @@ set -o pipefail
 
 init_credentials
 
-# Update timezone to EST
-ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime
+# Update timezone
+if [ -n "$SET_TIMEZONE" ]; then
+    ln -sf "/usr/share/zoneinfo/$SET_TIMEZONE" /etc/localtime
+fi
 
 # Setup timeout for Tomcat shutdown process before it will be killed
 if [ -f "$TOMCAT_PATH/conf/tomcat.conf" ]; then

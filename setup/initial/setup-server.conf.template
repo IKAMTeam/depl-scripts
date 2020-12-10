@@ -1,6 +1,11 @@
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"
 
+# Timezone for map to /etc/localtime, leave blank for omit
+# For list all available timezones, run:
+# cd /usr/share/zoneinfo; find . \( -name posix -o -name right \) -prune -o -type f | awk '{ print substr($0, 3) }'
+SET_TIMEZONE="US/Eastern"
+
 RELEASES_REPO_URL="[placeholder]"
 SNAPSHOT_REPO_URL="[placeholder]"
 REPOSITORY_UN="[placeholder]"
