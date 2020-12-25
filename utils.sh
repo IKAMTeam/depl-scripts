@@ -363,7 +363,7 @@ function download_service_artifacts() {
     VERSION="$2"
     PACKAGING=jar
     ARTIFACT_CLASSIFIER="shaded"
-    DOWNLOAD_SUFFIX=".jar"
+    DOWNLOAD_SUFFIX="-shaded.jar"
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
@@ -375,6 +375,7 @@ function download_service_artifacts() {
         download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
     elif [ "$ARTIFACT" == "monitoring" ]; then
         ARTIFACT_CLASSIFIER=""
+        DOWNLOAD_SUFFIX=".jar"
     fi
 
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
