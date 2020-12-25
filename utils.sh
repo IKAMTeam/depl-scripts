@@ -38,15 +38,14 @@ function require_root_user() {
 }
 
 function download_artifact() {
-    local GROUP_ID ARTIFACT_ID VERSION PACKAGING REPOSITORY_URL DOWNLOAD_PATH DOWNLOAD_SUFFIX
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING DOWNLOAD_PATH DOWNLOAD_SUFFIX
 
     GROUP_ID=$1
     ARTIFACT_ID=$2
     VERSION=$3
     PACKAGING=$4
-    REPOSITORY_URL=$5
-    DOWNLOAD_PATH=$6
-    DOWNLOAD_SUFFIX=$7
+    DOWNLOAD_PATH=$5
+    DOWNLOAD_SUFFIX=$6
 
     MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
@@ -58,7 +57,7 @@ function download_artifact() {
     echo "Using Maven cache directory [$MVN_CACHE_DIR]"
 
     if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
-        -DremoteRepositories="$REPOSITORY_URL" -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING"; then
+        -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING"; then
 
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
@@ -364,26 +363,24 @@ function download_service_artifacts() {
     PACKAGING=jar
 
     if [ "$ARTIFACT" == "monitoring" ]; then
-        REPOSITORY_URL="$MONITORING_REPO_URL"
         DOWNLOAD_SUFFIX=".jar"
     else
-        REPOSITORY_URL="$RELEASES_REPO_URL,$SNAPSHOT_REPO_URL"
         DOWNLOAD_SUFFIX="-shaded.jar"
     fi
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$REPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$REPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
 
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$EXPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$EXPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
     fi
 
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
 }
 
 function copy_service_artifacts() {
