@@ -364,12 +364,12 @@ function config_service() {
 
 # Will export next variables: REPORT_EXEC_DOWNLOAD_PATH, EXPORT_EXEC_DOWNLOAD_PATH, DOWNLOAD_PATH
 function download_service_artifacts() {
-    local GROUP_ID ARTIFACT_ID VERSION DOWNLOAD_SUFFIX
+    local GROUP_ID ARTIFACT_ID VERSION
     GROUP_ID=com.onevizion
     ARTIFACT_ID="$1"
     VERSION="$2"
     PACKAGING=jar
-    ARTIFACT_CLASSIFIER="shaded"
+    ARTIFACT_CLASSIFIER=shaded
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
@@ -381,7 +381,6 @@ function download_service_artifacts() {
         download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
     elif [ "$ARTIFACT" == "monitoring" ]; then
         ARTIFACT_CLASSIFIER=""
-        DOWNLOAD_SUFFIX=".jar"
     fi
 
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
