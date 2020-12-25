@@ -357,23 +357,33 @@ function config_service() {
 
 # Will export next variables: REPORT_EXEC_DOWNLOAD_PATH, EXPORT_EXEC_DOWNLOAD_PATH, DOWNLOAD_PATH
 function download_service_artifacts() {
-    local ARTIFACT VERSION
-    ARTIFACT="$1"
+    local GROUP_ID ARTIFACT_ID VERSION DOWNLOAD_SUFFIX
+    GROUP_ID=com.onevizion
+    ARTIFACT_ID="$1"
     VERSION="$2"
+    PACKAGING=jar
+
+    if [ "$ARTIFACT" == "monitoring" ]; then
+        REPOSITORY_URL="$MONITORING_REPO_URL"
+        DOWNLOAD_SUFFIX=".jar"
+    else
+        REPOSITORY_URL="$RELEASES_REPO_URL,$SNAPSHOT_REPO_URL"
+        DOWNLOAD_SUFFIX="-shaded.jar"
+    fi
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "report-exec" "$VERSION" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
+        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$REPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
 
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "export-exec" "$VERSION" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$EXPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
     fi
 
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || return 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$REPOSITORY_URL" "$DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
 }
 
 function copy_service_artifacts() {
