@@ -38,7 +38,7 @@ function require_root_user() {
 }
 
 function download_artifact() {
-    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH DOWNLOAD_SUFFIX
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_GOAL MVN_ARTIFACT MVN_CACHE_DIR
 
     GROUP_ID=$1
     ARTIFACT_ID=$2
@@ -46,7 +46,6 @@ function download_artifact() {
     PACKAGING=$4
     ARTIFACT_CLASSIFIER=$5
     DOWNLOAD_PATH=$6
-    DOWNLOAD_SUFFIX=$7
 
     MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
@@ -63,6 +62,14 @@ function download_artifact() {
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
+        local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
+
+        if [ -n "$ARTIFACT_CLASSIFIER" ]; then
+            DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
+        else
+            DOWNLOAD_SUFFIX=".${PACKAGING}"
+        fi
+
         GROUP_ID_DIR_NAME=$(echo "$GROUP_ID" | tr "." "/")
         ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID_DIR_NAME/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
 
@@ -363,16 +370,15 @@ function download_service_artifacts() {
     VERSION="$2"
     PACKAGING=jar
     ARTIFACT_CLASSIFIER="shaded"
-    DOWNLOAD_SUFFIX="-shaded.jar"
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$REPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
 
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
     elif [ "$ARTIFACT" == "monitoring" ]; then
         ARTIFACT_CLASSIFIER=""
         DOWNLOAD_SUFFIX=".jar"
@@ -380,7 +386,7 @@ function download_service_artifacts() {
 
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || return 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || return 1
 }
 
 function copy_service_artifacts() {

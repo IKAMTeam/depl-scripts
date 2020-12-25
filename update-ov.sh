@@ -29,7 +29,6 @@ if [ "$2" == "tomcat" ]; then
     ARTIFACT_ID=ps-web
     PACKAGING=war
     ARTIFACT_CLASSIFIER=""
-    DOWNLOAD_SUFFIX=.war
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
 
@@ -47,7 +46,7 @@ if [ "$2" == "tomcat" ]; then
     echo "Deploying [$ARTIFACT $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" "$DOWNLOAD_SUFFIX" || exit 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
 
     # Prevent script fail if Tomcat is not running
     echo "Stopping Tomcat..."
