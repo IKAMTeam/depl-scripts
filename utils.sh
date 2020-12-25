@@ -51,8 +51,11 @@ function download_artifact() {
 
     echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-    if ! "$(dirname "$0")/maven/bin/mvn" --quiet $MVN_GOAL -Dtransitive=false -DremoteRepositories=$REPOSITORY_URL \
-        -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING; then
+    MVN_CACHE_DIR="$(mktemp -d)"
+    delete_on_exit "$MVN_CACHE_DIR"
+
+    if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local=\"$MVN_CACHE_DIR\" $MVN_GOAL -Dtransitive=false \
+        -DremoteRepositories=$REPOSITORY_URL -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING; then
 
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
