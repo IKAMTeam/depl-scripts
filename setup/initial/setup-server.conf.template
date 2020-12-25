@@ -11,6 +11,10 @@ SNAPSHOT_REPO_URL="[placeholder]"
 REPOSITORY_UN="[placeholder]"
 REPOSITORY_PWD='[placeholder]'
 
+MONITORING_REPO_URL="[placeholder]"
+MONITORING_REPO_UN="[placeholder]"
+MONITORING_REPO_PWD="[placeholder]"
+
 WEBSITE="[placeholder]"
 VERSION="[placeholder]"
 
