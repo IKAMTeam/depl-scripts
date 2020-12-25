@@ -49,7 +49,7 @@ function download_artifact() {
     MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
-    if ! "$(dirname "$0")/maven/bin/mvn" --quiet $MVN_GOAL -Dtransitive=false -DremoteRepositories=$REPOSITORY_URL \
+    if ! "$(dirname "$0")/maven/bin/mvn" -e --quiet $MVN_GOAL -Dtransitive=false -DremoteRepositories=$REPOSITORY_URL \
         -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING; then
 
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
