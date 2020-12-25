@@ -35,76 +35,29 @@ function require_root_user() {
     fi
 }
 
-function get_depl_env() {
-    local VERSION DEPL_ENV
-    VERSION=$1
-
-    case $VERSION in
-    *-SNAPSHOT)
-        DEPL_ENV="dev"
-        ;;
-    *-RC?)
-        DEPL_ENV="uat"
-        ;;
-    *)
-        DEPL_ENV="prod"
-        ;;
-    esac
-
-    echo $DEPL_ENV
-}
-
 function download_artifact() {
-    local ARTIFACT VERSION DOWNLOAD_PATH DEPL_ENV DOWNLOAD_SUFFIX
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING REPOSITORY_URL DOWNLOAD_PATH DOWNLOAD_SUFFIX
 
-    ARTIFACT=$1
-    VERSION=$2
-    DOWNLOAD_PATH=$3
-    DEPL_ENV="$(get_depl_env "$VERSION")"
+    GROUP_ID=$1
+    ARTIFACT_ID=$2
+    VERSION=$3
+    PACKAGING=$4
+    REPOSITORY_URL=$5
+    DOWNLOAD_PATH=$6
+    DOWNLOAD_SUFFIX=$7
 
-    if [ "$ARTIFACT" == "ps-web" ]; then
-        DOWNLOAD_SUFFIX=".war"
-    elif [ "$ARTIFACT" == "monitoring" ]; then
-        DOWNLOAD_SUFFIX=".jar"
-    else
-        DOWNLOAD_SUFFIX="-shaded.jar"
-    fi
+    MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
+    MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
-    case $DEPL_ENV in
-    dev)
-        DEV_METADATA_LINK="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/maven-metadata.xml"
-        DEV_METADATA_DL_PATH="$(mktemp --suffix="_metadataxml")"
-        delete_on_exit "$DEV_METADATA_DL_PATH"
+    if ! "$(dirname "$0")/maven/bin/mvn $MVN_GOAL -Dtransitive=false -DremoteRepositories=$REPOSITORY_URL \
+        -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING"; then
 
-        if ! wget -q --no-check-certificate --output-document="$DEV_METADATA_DL_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$DEV_METADATA_LINK"; then
-            echo "Can't download metadata for full dev artifact version by link [$DEV_METADATA_LINK]. Wrong artifact or version"
-            return 1
-        else
-            echo "Metadata downloaded successfully"
-        fi
-
-        TIMESTAMP=$(grep '<timestamp' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
-        BUILD_NUMBER=$(grep '<buildNumber' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
-
-        DEV_SNAPSHOT_VERSION="${VERSION//-SNAPSHOT/}"
-        ARTIFACT_DL_URL="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$DEV_SNAPSHOT_VERSION-SNAPSHOT/$ARTIFACT-$DEV_SNAPSHOT_VERSION-$TIMESTAMP-$BUILD_NUMBER$DOWNLOAD_SUFFIX"
-        ;;
-    uat)
-        ARTIFACT_DL_URL="$RELEASES_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/$ARTIFACT-$VERSION$DOWNLOAD_SUFFIX"
-        ;;
-    prod)
-        ARTIFACT_DL_URL="$RELEASES_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/$ARTIFACT-$VERSION$DOWNLOAD_SUFFIX"
-        ;;
-    esac
-
-    echo "Downloading [$ARTIFACT_DL_URL] into [$DOWNLOAD_PATH]..."
-
-    if ! wget -q --no-check-certificate --output-document="$DOWNLOAD_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$ARTIFACT_DL_URL"; then
-        rm -f "$DOWNLOAD_PATH"
-        echo "Can't download artifact by link [$ARTIFACT_DL_URL]"
+        echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
-        echo "[$ARTIFACT:$VERSION] downloaded successfully"
+        rm -f "$DOWNLOAD_PATH"
+
+        echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
     fi
 }
 
