@@ -5,6 +5,7 @@
 
     <localRepository>${maven.home}/cache</localRepository>
     <interactiveMode>false</interactiveMode>
+    <usePluginRegistry>true</usePluginRegistry>
 
     <servers>
         <server>
