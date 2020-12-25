@@ -25,8 +25,10 @@ if [ -z "$CREDENTIALS_CONF" ]; then
     CREDENTIALS_CONF="$(dirname "$0")/credentials.conf"
 fi
 
+set -o allexport
 # shellcheck source=credentials.conf
 . "$CREDENTIALS_CONF"
+set +o allexport
 
 function require_root_user() {
     if [ $EUID -ne 0 ]; then
