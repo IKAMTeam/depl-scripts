@@ -49,10 +49,11 @@ function download_artifact() {
     MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
-    echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
-
     MVN_CACHE_DIR="$(mktemp -d)"
     delete_on_exit "$MVN_CACHE_DIR"
+
+    echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
+    echo "Using Maven cache directory [$MVN_CACHE_DIR]"
 
     if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local=\"$MVN_CACHE_DIR\" $MVN_GOAL -Dtransitive=false \
         -DremoteRepositories=$REPOSITORY_URL -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING; then
