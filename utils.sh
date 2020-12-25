@@ -57,15 +57,18 @@ function download_artifact() {
     echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
     echo "Using Maven cache directory [$MVN_CACHE_DIR]"
 
-    if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local=\"$MVN_CACHE_DIR\" $MVN_GOAL -Dtransitive=false \
+    if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local=$MVN_CACHE_DIR $MVN_GOAL -Dtransitive=false \
         -DremoteRepositories=$REPOSITORY_URL -Dartifact=$MVN_ARTIFACT -Dpackaging=$PACKAGING; then
 
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
-        rm -f "$DOWNLOAD_PATH"
+        ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
 
-        # TODO: move from cache
+        if ! cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
+            echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
+            return 1
+        fi
 
         echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
     fi
