@@ -54,7 +54,6 @@ function download_artifact() {
     delete_on_exit "$MVN_CACHE_DIR"
 
     echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
-    echo "Using Maven cache directory [$MVN_CACHE_DIR]"
 
     if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
         -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER"; then
