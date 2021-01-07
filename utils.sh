@@ -370,7 +370,7 @@ function download_service_artifacts() {
     PACKAGING=jar
     ARTIFACT_CLASSIFIER=shaded
 
-    if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
+    if [ "$ARTIFACT_ID" == "report-scheduler" ] || [ "$ARTIFACT_ID" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
         download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
