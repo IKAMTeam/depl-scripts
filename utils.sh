@@ -371,10 +371,12 @@ function download_service_artifacts() {
     ARTIFACT_CLASSIFIER=shaded
 
     if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
+        export REPORT_EXEC_DOWNLOAD_PATH
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
         download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
 
+        export EXPORT_EXEC_DOWNLOAD_PATH
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
         download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
@@ -382,6 +384,7 @@ function download_service_artifacts() {
         ARTIFACT_CLASSIFIER=""
     fi
 
+    export DOWNLOAD_PATH
     DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
     delete_on_exit "$DOWNLOAD_PATH"
     download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || return 1
