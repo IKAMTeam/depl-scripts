@@ -378,11 +378,11 @@ function download_service_artifacts() {
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
         download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
-    elif [ "$ARTIFACT" == "monitoring" ]; then
+    elif [ "$ARTIFACT_ID" == "monitoring" ]; then
         ARTIFACT_CLASSIFIER=""
     fi
 
-    DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
+    DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT_ID")"
     delete_on_exit "$DOWNLOAD_PATH"
     download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || return 1
 }
