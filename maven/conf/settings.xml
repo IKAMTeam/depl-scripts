@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>${maven.home}/cache</localRepository>
+    <interactiveMode>false</interactiveMode>
+
+    <servers>
+        <server>
+            <id>releases</id>
+            <username>${env.REPOSITORY_UN}</username>
+            <password>${env.REPOSITORY_PWD}</password>
+        </server>
+        <server>
+            <id>snapshots</id>
+            <username>${env.REPOSITORY_UN}</username>
+            <password>${env.REPOSITORY_PWD}</password>
+        </server>
+        <server>
+            <id>monitoring</id>
+            <username>${env.MONITORING_REPO_UN}</username>
+            <password>${env.MONITORING_REPO_PWD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+
+            <repositories>
+                <repository>
+                    <id>releases</id>
+                    <name>releases</name>
+                    <url>${env.RELEASES_REPO_URL}</url>
+                </repository>
+                <repository>
+                    <id>snapshots</id>
+                    <name>snapshots</name>
+                    <url>${env.SNAPSHOT_REPO_URL}</url>
+                </repository>
+                <repository>
+                    <id>monitoring</id>
+                    <name>monitoring</name>
+                    <url>${env.MONITORING_REPO_URL}</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>default</activeProfile>
+    </activeProfiles>
+</settings>

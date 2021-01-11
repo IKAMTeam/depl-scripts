@@ -23,8 +23,12 @@ require_root_user
 
 if [ "$2" == "tomcat" ]; then
     WEBSITE=$1
-    ARTIFACT=ps-web
     NEW_VERSION=$3
+
+    GROUP_ID=com.onevizion
+    ARTIFACT_ID=ps-web
+    PACKAGING=war
+    ARTIFACT_CLASSIFIER=""
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
 
@@ -39,10 +43,10 @@ if [ "$2" == "tomcat" ]; then
     WEBAPP_PATH="$TOMCAT_PATH/$APP_BASE"
     DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
 
-    echo "Deploying [$ARTIFACT $NEW_VERSION] at [$WEBAPP_PATH]..."
+    echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$ARTIFACT" "$NEW_VERSION" "$DOWNLOAD_PATH" || exit 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
 
     # Prevent script fail if Tomcat is not running
     echo "Stopping Tomcat..."

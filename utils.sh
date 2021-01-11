@@ -25,8 +25,10 @@ if [ -z "$CREDENTIALS_CONF" ]; then
     CREDENTIALS_CONF="$(dirname "$0")/credentials.conf"
 fi
 
+set -o allexport
 # shellcheck source=credentials.conf
 . "$CREDENTIALS_CONF"
+set +o allexport
 
 function require_root_user() {
     if [ $EUID -ne 0 ]; then
@@ -35,74 +37,47 @@ function require_root_user() {
     fi
 }
 
-function get_depl_env() {
-    local VERSION DEPL_ENV
-    VERSION=$1
-
-    case $VERSION in
-    *-SNAPSHOT)
-        DEPL_ENV="dev"
-        ;;
-    *-RC?)
-        DEPL_ENV="uat"
-        ;;
-    *)
-        DEPL_ENV="prod"
-        ;;
-    esac
-
-    echo $DEPL_ENV
-}
-
 function download_artifact() {
-    local ARTIFACT VERSION DOWNLOAD_PATH DEPL_ENV DOWNLOAD_SUFFIX
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_GOAL MVN_ARTIFACT MVN_CACHE_DIR
 
-    ARTIFACT=$1
-    VERSION=$2
-    DOWNLOAD_PATH=$3
-    DEPL_ENV="$(get_depl_env "$VERSION")"
+    GROUP_ID=$1
+    ARTIFACT_ID=$2
+    VERSION=$3
+    PACKAGING=$4
+    ARTIFACT_CLASSIFIER=$5
+    DOWNLOAD_PATH=$6
 
-    if [ "$ARTIFACT" == "ps-web" ]; then
-        DOWNLOAD_SUFFIX=".war"
-    else
-        DOWNLOAD_SUFFIX="-shaded.jar"
-    fi
+    MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
+    MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
-    case $DEPL_ENV in
-    dev)
-        DEV_METADATA_LINK="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/maven-metadata.xml"
-        DEV_METADATA_DL_PATH="$(mktemp --suffix="_metadataxml")"
-        delete_on_exit "$DEV_METADATA_DL_PATH"
+    MVN_CACHE_DIR="$(mktemp -d)"
+    delete_on_exit "$MVN_CACHE_DIR"
 
-        if ! wget -q --no-check-certificate --output-document="$DEV_METADATA_DL_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$DEV_METADATA_LINK"; then
-            echo "Can't download metadata for full dev artifact version by link [$DEV_METADATA_LINK]. Wrong artifact or version"
-            return 1
-        else
-            echo "Metadata downloaded successfully"
-        fi
+    echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-        TIMESTAMP=$(grep '<timestamp' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
-        BUILD_NUMBER=$(grep '<buildNumber' "$DEV_METADATA_DL_PATH" | cut -f2 -d">" | cut -f1 -d"<")
+    if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
+        -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER"; then
 
-        DEV_SNAPSHOT_VERSION="${VERSION//-SNAPSHOT/}"
-        ARTIFACT_DL_URL="$SNAPSHOT_REPO_URL/com/onevizion/$ARTIFACT/$DEV_SNAPSHOT_VERSION-SNAPSHOT/$ARTIFACT-$DEV_SNAPSHOT_VERSION-$TIMESTAMP-$BUILD_NUMBER$DOWNLOAD_SUFFIX"
-        ;;
-    uat)
-        ARTIFACT_DL_URL="$RELEASES_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/$ARTIFACT-$VERSION$DOWNLOAD_SUFFIX"
-        ;;
-    prod)
-        ARTIFACT_DL_URL="$RELEASES_REPO_URL/com/onevizion/$ARTIFACT/$VERSION/$ARTIFACT-$VERSION$DOWNLOAD_SUFFIX"
-        ;;
-    esac
-
-    echo "Downloading [$ARTIFACT_DL_URL] into [$DOWNLOAD_PATH]..."
-
-    if ! wget -q --no-check-certificate --output-document="$DOWNLOAD_PATH" --http-user="$REPOSITORY_UN" --http-passwd="$REPOSITORY_PWD" "$ARTIFACT_DL_URL"; then
-        rm -f "$DOWNLOAD_PATH"
-        echo "Can't download artifact by link [$ARTIFACT_DL_URL]"
+        echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
-        echo "[$ARTIFACT:$VERSION] downloaded successfully"
+        local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
+
+        if [ -n "$ARTIFACT_CLASSIFIER" ]; then
+            DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
+        else
+            DOWNLOAD_SUFFIX=".${PACKAGING}"
+        fi
+
+        GROUP_ID_DIR_NAME=$(echo "$GROUP_ID" | tr "." "/")
+        ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID_DIR_NAME/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
+
+        if ! cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
+            echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
+            return 1
+        fi
+
+        echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
     fi
 }
 
@@ -388,23 +363,28 @@ function config_service() {
 
 # Will export next variables: REPORT_EXEC_DOWNLOAD_PATH, EXPORT_EXEC_DOWNLOAD_PATH, DOWNLOAD_PATH
 function download_service_artifacts() {
-    local ARTIFACT VERSION
-    ARTIFACT="$1"
+    local GROUP_ID ARTIFACT_ID VERSION
+    GROUP_ID=com.onevizion
+    ARTIFACT_ID="$1"
     VERSION="$2"
+    PACKAGING=jar
+    ARTIFACT_CLASSIFIER=shaded
 
-    if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
+    if [ "$ARTIFACT_ID" == "report-scheduler" ] || [ "$ARTIFACT_ID" == "services" ]; then
         REPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_report-exec")"
         delete_on_exit "$REPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "report-exec" "$VERSION" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
+        download_artifact "$GROUP_ID" "report-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
 
         EXPORT_EXEC_DOWNLOAD_PATH="$(mktemp --suffix="_export-exec")"
         delete_on_exit "$EXPORT_EXEC_DOWNLOAD_PATH"
-        download_artifact "export-exec" "$VERSION" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        download_artifact "$GROUP_ID" "export-exec" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+    elif [ "$ARTIFACT_ID" == "monitoring" ]; then
+        ARTIFACT_CLASSIFIER=""
     fi
 
-    DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT")"
+    DOWNLOAD_PATH="$(mktemp --suffix="_$ARTIFACT_ID")"
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$ARTIFACT" "$VERSION" "$DOWNLOAD_PATH" || return 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || return 1
 }
 
 function copy_service_artifacts() {
