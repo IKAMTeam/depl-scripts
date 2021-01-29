@@ -32,7 +32,7 @@ set +o allexport
 
 if [ -z "$MONITORING_REPO_URL" ]; then
     export MONITORING_REPO_URL
-    MONITORING_REPO_URL="[URL not set in credentials.conf]"
+    MONITORING_REPO_URL="[MONITORING_REPO_URL not set in credentials.conf]"
 fi
 
 function require_root_user() {
