@@ -20,7 +20,7 @@ require_root_user
 
 config_service_env "" "$ARTIFACT"
 
-if [ ! "$FORCE_UPDATE" -eq 1 ]; then
+if [ "$FORCE_UPDATE" != "1" ]; then
     ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
     ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
 
