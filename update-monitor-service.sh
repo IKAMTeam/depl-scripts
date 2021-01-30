@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "### Script for update monitor service artifacts ###"
     echo "Usage: $(basename "$0") <new version> [-f/--force]"
     exit 1
