@@ -47,7 +47,7 @@ if [ "$2" == "tomcat" ]; then
     WEBAPP_PATH="$TOMCAT_PATH/$APP_BASE"
 
     MANIFEST_PATH="$WEBAPP_PATH/META-INF/MANIFEST.MF"
-    if [ -f "$MANIFEST_PATH" ] && [ ! "$FORCE_UPDATE" -eq 1 ]; then
+    if [ -f "$MANIFEST_PATH" ] && [ "$FORCE_UPDATE" != "1" ]; then
         ARTIFACT_VERSION="$(read_artifact_version "$MANIFEST_PATH")"
 
         if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
@@ -125,7 +125,7 @@ else
             continue
         fi
 
-        if [ ! "$FORCE_UPDATE" -eq 1 ]; then
+        if [ "$FORCE_UPDATE" != "1" ]; then
             SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
             ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
             ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
