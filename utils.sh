@@ -119,7 +119,7 @@ function read_artifact_version() {
     local MANIFEST_PATH
     MANIFEST_PATH=$1
 
-    grep 'Implementation-Version' "$MANIFEST_PATH" | cut -d ' ' -f2
+    grep 'Implementation-Version' "$MANIFEST_PATH" | cut -d ' ' -f2 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, APP_LAUNCHER_IN_ARTIFACT_NAME, APP_LAUNCHER_TEMPLATE_NAME variables
