@@ -98,7 +98,7 @@ function check_service_exists_or_exit() {
     fi
 }
 
-function extract_artifact_version() {
+function extract_and_read_artifact_version() {
     init_cleanup
 
     local ARTIFACT_JAR
@@ -112,7 +112,14 @@ function extract_artifact_version() {
         return 1
     fi
 
-    grep 'Implementation-Version' "$TMP_DIR/MANIFEST.MF" | cut -d ' ' -f2
+    read_artifact_version "$TMP_DIR/MANIFEST.MF"
+}
+
+function read_artifact_version() {
+    local MANIFEST_PATH
+    MANIFEST_PATH=$1
+
+    grep 'Implementation-Version' "$MANIFEST_PATH" | cut -d ' ' -f2
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, APP_LAUNCHER_IN_ARTIFACT_NAME, APP_LAUNCHER_TEMPLATE_NAME variables

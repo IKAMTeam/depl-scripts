@@ -1,11 +1,15 @@
 #!/bin/bash
 if [ "$#" -ne 1 ]; then
     echo "### Script for update monitor service artifacts ###"
-    echo "Usage: $(basename "$0") <new version>"
+    echo "Usage: $(basename "$0") <new version> [-f/--force]"
     exit 1
 fi
 
 NEW_VERSION=$1
+
+if [ -n "$2" ] && { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
+    FORCE_UPDATE="1"
+fi
 
 ARTIFACT="monitoring"
 
@@ -15,6 +19,17 @@ ARTIFACT="monitoring"
 require_root_user
 
 config_service_env "" "$ARTIFACT"
+
+if [ ! "$FORCE_UPDATE" -eq 1 ]; then
+    ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
+    ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
+
+    if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+        # Skip service
+        echo "[$ARTIFACT $NEW_VERSION] is already installed!"
+        exit 0
+    fi
+fi
 
 echo "Updating [$SERVICE_NAME] at [$SERVICE_PATH]..."
 download_service_artifacts "$ARTIFACT" "$NEW_VERSION" || exit 1
