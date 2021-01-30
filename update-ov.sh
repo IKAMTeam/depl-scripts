@@ -11,7 +11,7 @@ function usage() {
     echo "Usage for update Web Application (Tomcat): $(basename "$0") <website> tomcat <new version>"
 }
 
-if [ "$#" -ne 3 ]; then
+if [ "$#" -lt 3 ]; then
     usage
     exit 1
 fi
