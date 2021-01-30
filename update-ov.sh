@@ -126,6 +126,7 @@ else
         fi
 
         if [ "$FORCE_UPDATE" != "1" ]; then
+            # shellcheck disable=SC2153
             SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
             ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
             ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
