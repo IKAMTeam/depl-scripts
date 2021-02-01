@@ -102,7 +102,7 @@ function extract_and_read_artifact_version() {
     init_cleanup
 
     local ARTIFACT_JAR
-    ARTIFACT_JAR=$1
+    ARTIFACT_JAR="$1"
 
     TMP_DIR="$(mktemp -d)"
     delete_on_exit "$TMP_DIR"
@@ -117,9 +117,20 @@ function extract_and_read_artifact_version() {
 
 function read_artifact_version() {
     local MANIFEST_PATH
-    MANIFEST_PATH=$1
+    MANIFEST_PATH="$1"
 
     grep 'Implementation-Version' "$MANIFEST_PATH" | cut -d ' ' -f2 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+function is_snapshot_version() {
+    local VERSION
+    VERSION="$1"
+
+    if [[ "$VERSION" == *-SNAPSHOT ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, APP_LAUNCHER_IN_ARTIFACT_NAME, APP_LAUNCHER_TEMPLATE_NAME variables

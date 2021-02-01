@@ -24,7 +24,7 @@ if [ "$FORCE_UPDATE" != "1" ]; then
     ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
     ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
 
-    if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+    if ! is_snapshot_version "$ARTIFACT_VERSION" && [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
         # Skip service
         echo "[$ARTIFACT $NEW_VERSION] is already installed!"
         exit 0

@@ -50,7 +50,7 @@ if [ "$2" == "tomcat" ]; then
     if [ -f "$MANIFEST_PATH" ] && [ "$FORCE_UPDATE" != "1" ]; then
         ARTIFACT_VERSION="$(read_artifact_version "$MANIFEST_PATH")"
 
-        if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+        if ! is_snapshot_version "$ARTIFACT_VERSION" && [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
             echo "[$ARTIFACT_ID $NEW_VERSION] is already installed at [$WEBAPP_PATH]!"
             exit 0
         fi
@@ -131,7 +131,7 @@ else
             ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
             ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
 
-            if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+            if ! is_snapshot_version "$ARTIFACT_VERSION" && [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
                 # Skip service
                 echo "[$ARTIFACT $NEW_VERSION] is already installed for website [$WEBSITE]!"
                 continue
