@@ -30,6 +30,11 @@ set -o allexport
 . "$CREDENTIALS_CONF"
 set +o allexport
 
+if [ -z "$MONITORING_REPO_URL" ]; then
+    export MONITORING_REPO_URL
+    MONITORING_REPO_URL="[MONITORING_REPO_URL not set in credentials.conf]"
+fi
+
 function require_root_user() {
     if [ $EUID -ne 0 ]; then
         echo "This script must be run as root user"
