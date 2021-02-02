@@ -126,11 +126,7 @@ function is_snapshot_version() {
     local VERSION
     VERSION="$1"
 
-    if [[ "$VERSION" == *-SNAPSHOT ]]; then
-        return 0
-    else
-        return 1
-    fi
+    [[ "$VERSION" == *-SNAPSHOT ]]
 }
 
 # Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP, APP_LAUNCHER_IN_ARTIFACT_NAME, APP_LAUNCHER_TEMPLATE_NAME variables
