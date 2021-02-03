@@ -34,9 +34,6 @@ if [ -n "$SET_TIMEZONE" ]; then
     ln -sf "/usr/share/zoneinfo/$SET_TIMEZONE" /etc/localtime
 fi
 
-# Install libsigar - library used in report-scheduler to monitor free RAM
-cp "$SCRIPTS_PATH/setup/libsigar-amd64-linux.so" /usr/lib
-
 # Add rules for sudo into /etc/sudoers for integration-scheduler:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
 chmod 440 /etc/sudoers.d/integration-scheduler
