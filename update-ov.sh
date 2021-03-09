@@ -147,7 +147,7 @@ else
 
     if [ "${#SERVICE_NAMES_FOR_UPDATE[@]}" -eq 0 ]; then
         echo "No [$MATCH_ARTIFACT] for website [$MATCH_WEBSITE] for update"
-        exit 1
+        exit 0
     fi
 
     echo "Deploying [$MATCH_ARTIFACT $NEW_VERSION] at"
