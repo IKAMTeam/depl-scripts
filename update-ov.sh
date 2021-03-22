@@ -2,7 +2,7 @@
 
 function usage() {
     echo "### Script for update web application or services ###"
-    echo "Usage: $(basename "$0") <website> <artifact> <new version>"
+    echo "Usage: $(basename "$0") <website> <artifact> <new version> [-f/--force]"
     echo " "
     echo "Usage for services: $(basename "$0") <website> services <new version>"
     echo "Usage for report-scheduler: $(basename "$0") <website> report-scheduler <new version>"
@@ -11,7 +11,7 @@ function usage() {
     echo "Usage for update Web Application (Tomcat): $(basename "$0") <website> tomcat <new version>"
 }
 
-if [ "$#" -ne 3 ]; then
+if [ "$#" -lt 3 ]; then
     usage
     exit 1
 fi
@@ -20,6 +20,10 @@ fi
 . "$(dirname "$0")/utils.sh"
 
 require_root_user
+
+if [ -n "$4" ] && { [ "$4" == "-f" ] || [ "$4" == "--force" ]; }; then
+    FORCE_UPDATE="1"
+fi
 
 if [ "$2" == "tomcat" ]; then
     WEBSITE=$1
@@ -41,6 +45,17 @@ if [ "$2" == "tomcat" ]; then
     fi
 
     WEBAPP_PATH="$TOMCAT_PATH/$APP_BASE"
+
+    MANIFEST_PATH="$WEBAPP_PATH/META-INF/MANIFEST.MF"
+    if ! is_snapshot_version "$NEW_VERSION" && [ -f "$MANIFEST_PATH" ] && [ "$FORCE_UPDATE" != "1" ]; then
+        ARTIFACT_VERSION="$(read_artifact_version "$MANIFEST_PATH")"
+
+        if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+            echo "[$ARTIFACT_ID $NEW_VERSION] is already installed at [$WEBAPP_PATH]!"
+            exit 0
+        fi
+    fi
+
     DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
 
     echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
@@ -110,6 +125,19 @@ else
             continue
         fi
 
+        if ! is_snapshot_version "$NEW_VERSION" && [ "$FORCE_UPDATE" != "1" ]; then
+            # shellcheck disable=SC2153
+            SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
+            ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
+            ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
+
+            if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
+                # Skip service
+                echo "[$ARTIFACT $NEW_VERSION] is already installed for website [$WEBSITE]!"
+                continue
+            fi
+        fi
+
         # shellcheck disable=SC2153
         SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
 
@@ -119,7 +147,7 @@ else
 
     if [ "${#SERVICE_NAMES_FOR_UPDATE[@]}" -eq 0 ]; then
         echo "No [$MATCH_ARTIFACT] for website [$MATCH_WEBSITE] for update"
-        exit 1
+        exit 0
     fi
 
     echo "Deploying [$MATCH_ARTIFACT $NEW_VERSION] at"

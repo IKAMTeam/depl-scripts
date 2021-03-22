@@ -21,7 +21,7 @@ find "$SERVICES_PATH" -maxdepth 1 -type d -print0 | while read -r -d '' SERVICE_
     fi
 
     if [ -z "$SHORT_FORMAT" ]; then
-        ARTIFACT_VERSION="$(extract_artifact_version "$SERVICE_DIR/$ARTIFACT_JAR")"
+        ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_DIR/$ARTIFACT_JAR")"
 
         if is_daemon_installed "$SERVICE_NAME"; then
             if is_daemon_running "$SERVICE_NAME"; then
