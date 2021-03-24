@@ -1,2 +1,3 @@
 tomcat*:install:"$SCRIPTS_PATH/config-tomcat-security.sh"
 tomcat*:update:"$SCRIPTS_PATH/config-tomcat-security.sh"
+tomcat*:update:"$SCRIPTS_PATH/setup/tomcat/check-new-files-and-warn.sh"
