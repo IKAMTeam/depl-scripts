@@ -1,8 +1,8 @@
 #!/bin/bash
 ### Script for check Tomcat directory for *.rpmnew files and warn user if exists ###
 
-# shellcheck source=../../utils.sh
-. "$(dirname "$0")/../../utils.sh"
+# shellcheck source=utils.sh
+. "$(dirname "$0")/utils.sh"
 
 require_root_user
 
