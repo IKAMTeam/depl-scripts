@@ -42,7 +42,7 @@ HOST_XPATH="Host[@name=\"$WEBSITE\"]"
 FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
 
 # Override existing installation if one with the same name already exists
-if [ -n "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")" ]; then
+if [ -n "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "name")" ]; then
     "$(dirname "$0")/setup/delete-xml-node.py" "$SERVER_XML_FILE" "$ENGINE_XPATH" "$HOST_XPATH" || exit 1
 fi
 
@@ -68,8 +68,6 @@ mv "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com" "$TOMCAT_PATH/conf/Catali
 "$(dirname "$0")/setup/insert-xml-node.py" "$SERVER_XML_FILE" "$(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME" \
     'Service/Engine[@name="Catalina"]' || exit 1
 
-"$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[last()]' \
-    appBase "$WEBSITE-webapp" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$SERVER_XML_FILE" 'Service/Engine/Host[last()]' \
     name "$WEBSITE" || exit 1
 

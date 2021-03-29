@@ -17,21 +17,28 @@ require_root_user
 
 WEBSITE=$1
 
+CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
+
 SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
-CONTEXT_XML_FILE="$TOMCAT_PATH/conf/Catalina/$WEBSITE/ROOT.xml"
+CONTEXT_XML_FILE="$CONTEXT_PATH/ROOT.xml"
 
 ENGINE_XPATH="Service/Engine[@name=\"Catalina\"]"
 HOST_XPATH="Host[@name=\"$WEBSITE\"]"
 FULL_HOST_XPATH="$ENGINE_XPATH/$HOST_XPATH"
 
-APP_BASE="$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "appBase")"
-if [ -z "$APP_BASE" ]; then
+if [ -z "$(read_xml_value "$SERVER_XML_FILE" "$FULL_HOST_XPATH" "name")" ]; then
     echo "No website with name [$WEBSITE] is available!"
     exit 1
 fi
 
-APP_BASE_PATH="$TOMCAT_PATH/$APP_BASE"
-CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
+DOC_BASE="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
+if [ -z "$DOC_BASE" ]; then
+    echo "No 'docBase' attribute for website with name [$WEBSITE] is defined!"
+    exit 1
+fi
+
+DOC_BASE_PATH="${DOC_BASE/\$\{catalina.base\}/$TOMCAT_PATH}"
+DOC_BASE_PATH="${DOC_BASE/\$\{catalina.home\}/$TOMCAT_PATH}"
 PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
 
 # Stop Tomcat
@@ -43,7 +50,7 @@ if is_daemon_running "$TOMCAT_SERVICE"; then
     START_TOMCAT=1
 fi
 
-test -d "$APP_BASE_PATH" && (rm -rf "$APP_BASE_PATH" || exit 1)
+test -d "$DOC_BASE_PATH" && (rm -rf "$DOC_BASE_PATH" || exit 1)
 test -d "$CONTEXT_PATH" && (rm -rf "$CONTEXT_PATH" || exit 1)
 test -d "$PROPERTIES_PATH" && (rm -rf "$PROPERTIES_PATH" || exit 1)
 
