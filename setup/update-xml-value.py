@@ -4,13 +4,14 @@ import sys
 import xml.etree.ElementTree as ElementTree
 
 if len(sys.argv) < 5:
-    print('Usage: update-xml-value.py <in-out-file> [xpath] [attr-name] <new-value>')
+    print('Usage: update-xml-value.py <in-out-file> <xpath> <attr-name> <new-value> [-d]')
     exit(1)
 
 inFile = sys.argv[1]
 xpath = sys.argv[2]
 attr = sys.argv[3]
 value = sys.argv[4]
+is_del = len(sys.argv) > 5 and sys.argv[5].lower() == '-d'
 
 
 class CommentedTreeBuilder(ElementTree.TreeBuilder):
@@ -21,11 +22,16 @@ class CommentedTreeBuilder(ElementTree.TreeBuilder):
 
 
 def update_value(node0):
-    if len(attr) == 0:
-        node0.text = value
+    if is_del:
+        if len(attr) == 0:
+            raise Exception('Delete operation is not supported without attribute name')
+        else:
+            del node0.attrib[attr]
     else:
-        node0.attrib[attr] = value
-
+        if len(attr) == 0:
+            node0.text = value
+        else:
+            node0.attrib[attr] = value
 
 parser = ElementTree.XMLParser(target=CommentedTreeBuilder())
 tree = ElementTree.parse(inFile, parser)
