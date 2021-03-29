@@ -38,7 +38,7 @@ if [ -z "$DOC_BASE" ]; then
 fi
 
 DOC_BASE_PATH="${DOC_BASE/\$\{catalina.base\}/$TOMCAT_PATH}"
-DOC_BASE_PATH="${DOC_BASE/\$\{catalina.home\}/$TOMCAT_PATH}"
+DOC_BASE_PATH="${DOC_BASE_PATH/\$\{catalina.home\}/$TOMCAT_PATH}"
 PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
 
 # Stop Tomcat

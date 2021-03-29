@@ -51,7 +51,7 @@ if [ "$2" == "tomcat" ]; then
     fi
 
     WEBAPP_PATH="${DOC_BASE/\$\{catalina.base\}/$TOMCAT_PATH}"
-    WEBAPP_PATH="${DOC_BASE/\$\{catalina.home\}/$TOMCAT_PATH}"
+    WEBAPP_PATH="${WEBAPP_PATH/\$\{catalina.home\}/$TOMCAT_PATH}"
 
     MANIFEST_PATH="$WEBAPP_PATH/META-INF/MANIFEST.MF"
     if ! is_snapshot_version "$NEW_VERSION" && [ -f "$MANIFEST_PATH" ] && [ "$FORCE_UPDATE" != "1" ]; then
