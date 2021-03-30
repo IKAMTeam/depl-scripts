@@ -1,4 +1,4 @@
-            <Host name="sitename.onevizion.com" appBase="sitename.onevizion.com" unpackWARs="false" autoDeploy="false">
+            <Host name="sitename.onevizion.com" unpackWARs="false" autoDeploy="false">
                 <!-- CWE ID 209 fix: don't show server information and stacktrace -->
                 <Valve className="org.apache.catalina.valves.ErrorReportValve"
                        showReport="false"
