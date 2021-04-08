@@ -35,16 +35,23 @@ if [ "$2" == "tomcat" ]; then
     ARTIFACT_CLASSIFIER=""
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
+    CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
+    CONTEXT_XML_FILE="$CONTEXT_PATH/ROOT.xml"
 
     HOST_XPATH="Service/Engine[@name=\"Catalina\"]/Host[@name=\"$WEBSITE\"]"
-
-    APP_BASE="$(read_xml_value "$SERVER_XML_FILE" "$HOST_XPATH" "appBase")"
-    if [ -z "$APP_BASE" ]; then
+    if [ -z "$(read_xml_value "$SERVER_XML_FILE" "$HOST_XPATH" "name")" ]; then
         echo "No website with name [$WEBSITE] is available!"
         exit 1
     fi
 
-    WEBAPP_PATH="$TOMCAT_PATH/$APP_BASE"
+    DOC_BASE="$(read_xml_value "$CONTEXT_XML_FILE" "" "docBase")"
+    if [ -z "$DOC_BASE" ]; then
+        echo "No 'docBase' attribute for website with name [$WEBSITE] is defined!"
+        exit 1
+    fi
+
+    WEBAPP_PATH="${DOC_BASE/\$\{catalina.base\}/$TOMCAT_PATH}"
+    WEBAPP_PATH="${WEBAPP_PATH/\$\{catalina.home\}/$TOMCAT_PATH}"
 
     MANIFEST_PATH="$WEBAPP_PATH/META-INF/MANIFEST.MF"
     if ! is_snapshot_version "$NEW_VERSION" && [ -f "$MANIFEST_PATH" ] && [ "$FORCE_UPDATE" != "1" ]; then
