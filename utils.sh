@@ -66,13 +66,13 @@ function download_artifact() {
     if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
         -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
-        grep '[ERROR]' "$MVN_LOG"
+        grep -F '[ERROR]' "$MVN_LOG"
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
         local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
 
-        cat "$MVN_LOG"
+        grep -F 'Downloading from' "$MVN_LOG" | tail -n1
 
         if [ -n "$ARTIFACT_CLASSIFIER" ]; then
             DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
