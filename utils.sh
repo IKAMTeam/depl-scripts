@@ -56,17 +56,23 @@ function download_artifact() {
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
     MVN_CACHE_DIR="$(mktemp -d)"
+    MVN_LOG="$(mktemp --suffix="_mvn_log")"
+
     delete_on_exit "$MVN_CACHE_DIR"
+    delete_on_exit "$MVN_LOG"
 
     echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-    if ! "$(dirname "$0")/maven/bin/mvn" --quiet -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
-        -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER"; then
+    if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
+        -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
+        cat "$MVN_LOG"
         echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         return 1
     else
         local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
+
+        cat "$MVN_LOG"
 
         if [ -n "$ARTIFACT_CLASSIFIER" ]; then
             DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
