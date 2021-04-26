@@ -22,7 +22,9 @@ require_root_user
 CONFIG_FILE="$1"
 CONFIG_DATA="$(cat "$CONFIG_FILE")"
 
+set -o allexport
 eval "$CONFIG_DATA"
+set +o allexport
 
 set -o errexit
 set -o pipefail
