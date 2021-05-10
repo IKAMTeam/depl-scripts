@@ -62,12 +62,12 @@ MONITOR_VERSION="2.0.8"
 MONITOR_DB_USER="monitor"
 MONITOR_DB_PASSWORD='password'
 
-# Use AWS SQS to deliver monitoring statuses, leave blank for omit
+# AWS SQS settings to deliver monitoring events to the queue. Optional.
 MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
 MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
 MONITOR_AWS_SQS_QUEUE_URL="[placeholder]"
 
-# Email addresses to deliver monitoring warnings and errors, leave blank for omit
+# EMail settings to deliver monitoring events via SMTP. Separate mailboxes may be configured for error and warning event types. Optional.
 MONITOR_WARN_MAIL_HOST="[placeholder]"
 MONITOR_WARN_MAIL_PORT="[placeholder]"
 MONITOR_WARN_MAIL_USERNAME="[placeholder]"
@@ -149,12 +149,12 @@ SERVICES_PATH="/opt"
 MONITOR_DB_USER="monitor"
 MONITOR_DB_PASSWORD='password'
 
-# Use AWS SQS to deliver monitoring statuses, leave blank for omit
+# AWS SQS settings to deliver monitoring events to the queue. Optional.
 MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
 MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
 MONITOR_AWS_SQS_QUEUE_URL="[placeholder]"
 
-# Email addresses to deliver monitoring warnings and errors, leave blank for omit
+# EMail settings to deliver monitoring events via SMTP. Separate mailboxes may be configured for error and warning event types. Optional.
 MONITOR_WARN_MAIL_HOST="[placeholder]"
 MONITOR_WARN_MAIL_PORT="[placeholder]"
 MONITOR_WARN_MAIL_USERNAME="[placeholder]"

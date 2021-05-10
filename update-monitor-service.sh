@@ -40,6 +40,7 @@ if is_daemon_running "$SERVICE_NAME"; then
 fi
 
 copy_service_artifacts "$ARTIFACT" || exit 1
+update_monitor_configuration || exit 1
 
 if is_daemon_installed "$SERVICE_NAME"; then
     extract_launcher_script "$ARTIFACT" || exit 1

@@ -48,33 +48,6 @@ chmod 440 /etc/sudoers.d/integration-scheduler
 
 if [ -n "$MONITOR_VERSION" ]; then
     "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITOR_VERSION" "$DB_OWNER_USER" "$MONITOR_DB_USER" "$MONITOR_DB_PASSWORD" "$DB_URL" "$AES_PASSWORD"
-
-    config_service_env "" "monitoring"
-    MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
-
-    if [ -n "$MONITOR_AWS_SQS_ACCESS_KEY" ] && [ -n "$MONITOR_AWS_SQS_SECRET_KEY" ] && [ -n "$MONITOR_AWS_SQS_QUEUE_URL" ]; then
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL"
-    fi
-    if [ -n "$MONITOR_ERROR_MAIL_HOST" ] && [ -n "$MONITOR_ERROR_MAIL_PORT" ] && [ -n "$MONITOR_ERROR_MAIL_USERNAME" ] && \
-        [ -n "$MONITOR_ERROR_MAIL_PASSWORD" ] && [ -n "$MONITOR_ERROR_MAIL_FROM" ] && [ -n "$MONITOR_ERROR_MAIL_TO" ]; then
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' "$MONITOR_ERROR_MAIL_HOST"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' "$MONITOR_ERROR_MAIL_PORT"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' "$MONITOR_ERROR_MAIL_USERNAME"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' "$MONITOR_ERROR_MAIL_PASSWORD"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' "$MONITOR_ERROR_MAIL_FROM"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' "$MONITOR_ERROR_MAIL_TO"
-    fi
-    if [ -n "$MONITOR_WARN_MAIL_HOST" ] && [ -n "$MONITOR_WARN_MAIL_PORT" ] && [ -n "$MONITOR_WARN_MAIL_USERNAME" ] && \
-        [ -n "$MONITOR_WARN_MAIL_PASSWORD" ] && [ -n "$MONITOR_WARN_MAIL_FROM" ] && [ -n "$MONITOR_WARN_MAIL_TO" ]; then
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' "$MONITOR_WARN_MAIL_HOST"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' "$MONITOR_WARN_MAIL_PORT"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' "$MONITOR_WARN_MAIL_USERNAME"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' "$MONITOR_WARN_MAIL_PASSWORD"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' "$MONITOR_WARN_MAIL_FROM"
-        "$SCRIPTS_PATH/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' "$MONITOR_WARN_MAIL_TO"
-    fi
 fi
 
 # Start up services
