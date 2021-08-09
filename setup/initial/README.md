@@ -14,7 +14,7 @@ OneVizion web and app instances configuration scripts
 - Install Git
 - Install Python 2.7
 - Install Java 11 (Oracle or OpenJDK)
-- Install Tomcat 8.5 (if you want to configure server as web instance)
+- Install Tomcat 9 (if you want to configure server as web instance)
 
 2. Clone deployment scripts: `git clone -b stable https://github.com/IKAMTeam/depl-scripts.git`
 3. Create and fill configuration file (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
