@@ -422,6 +422,62 @@ function copy_service_artifacts() {
     fi
 }
 
+# Uses SERVICE_PATH variable
+function update_monitor_configuration() {
+    local MONITOR_XML
+    MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
+
+    if [ -n "$MONITOR_AWS_SQS_ACCESS_KEY" ] && [ -n "$MONITOR_AWS_SQS_SECRET_KEY" ] && [ -n "$MONITOR_AWS_SQS_QUEUE_URL" ]; then
+        echo "Setting up AWS SQS configuration..."
+
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL" || return 1
+    else
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' '' || return 1
+    fi
+
+    if [ -n "$MONITOR_ERROR_MAIL_HOST" ] && [ -n "$MONITOR_ERROR_MAIL_PORT" ] && [ -n "$MONITOR_ERROR_MAIL_USERNAME" ] && \
+        [ -n "$MONITOR_ERROR_MAIL_PASSWORD" ] && [ -n "$MONITOR_ERROR_MAIL_FROM" ] && [ -n "$MONITOR_ERROR_MAIL_TO" ]; then
+        echo "Setting up Error Mail configuration..."
+
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' "$MONITOR_ERROR_MAIL_HOST" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' "$MONITOR_ERROR_MAIL_PORT" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' "$MONITOR_ERROR_MAIL_USERNAME" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' "$MONITOR_ERROR_MAIL_PASSWORD" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' "$MONITOR_ERROR_MAIL_FROM" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' "$MONITOR_ERROR_MAIL_TO" || return 1
+    else
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' '' || return 1
+    fi
+
+    if [ -n "$MONITOR_WARN_MAIL_HOST" ] && [ -n "$MONITOR_WARN_MAIL_PORT" ] && [ -n "$MONITOR_WARN_MAIL_USERNAME" ] && \
+        [ -n "$MONITOR_WARN_MAIL_PASSWORD" ] && [ -n "$MONITOR_WARN_MAIL_FROM" ] && [ -n "$MONITOR_WARN_MAIL_TO" ]; then
+        echo "Setting up Warning Mail configuration..."
+
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' "$MONITOR_WARN_MAIL_HOST" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' "$MONITOR_WARN_MAIL_PORT" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' "$MONITOR_WARN_MAIL_USERNAME" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' "$MONITOR_WARN_MAIL_PASSWORD" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' "$MONITOR_WARN_MAIL_FROM" || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' "$MONITOR_WARN_MAIL_TO" || return 1
+    else
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' '' || return 1
+        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' '' || return 1
+    fi
+}
+
 function wait_log() {
     local LOG_FILE_PATH SUCCESS_STRING FAILED_STRING TIMEOUT FIFO_PATH OUT_PATH
 

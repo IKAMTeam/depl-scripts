@@ -31,7 +31,7 @@ set -o pipefail
 init_ec2_instance
 
 # Install Tomcat (includes Java 11 (Correto))
-amazon-linux-extras install -y tomcat8.5
+amazon-linux-extras install -y tomcat9
 
 # Temporary workaround to support legacy AWS ELB Health Check configuration
 yum install -y iptables-services

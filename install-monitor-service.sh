@@ -77,6 +77,8 @@ echo "Adding new schema to configuration [$MONITOR_XML]..."
 "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/url' '' "$DB_URL" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/aes-password' '' "$AES_PASSWORD" || exit 1
 
+update_monitor_configuration || exit 1
+
 if is_daemon_running "$SERVICE_NAME"; then
     echo "Done. [$SERVICE_NAME] already started"
 else
