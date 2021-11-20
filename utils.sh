@@ -63,7 +63,8 @@ function download_artifact() {
 
     echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-    if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
+    if ! "$(dirname "$0")/maven/bin/mvn" -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=3128 \
+        -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
         -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
         grep -F '[ERROR]' "$MVN_LOG"
