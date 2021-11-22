@@ -121,52 +121,54 @@ function init_ec2_instance() {
 
 function install_cloudwatch_agent() {
     local CONF_FILE
-    CONF_FILE="/opt/aws/amazon-cloudwatch-agent/bin/config.json"
+    CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    rpm -U --force "https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
+    amazon-linux-extras install -y collectd
+    yum install -y amazon-cloudwatch-agent
+
     tee "$CONF_FILE" <<'EOF'
 {
-	"agent": {
-		"metrics_collection_interval": 60,
-		"run_as_user": "root"
-	},
-	"metrics": {
-		"append_dimensions": {
-			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
-			"ImageId": "${aws:ImageId}",
-			"InstanceId": "${aws:InstanceId}",
-			"InstanceType": "${aws:InstanceType}"
-		},
-		"metrics_collected": {
-			"collectd": {
-				"metrics_aggregation_interval": 60
-			},
-			"disk": {
-				"measurement": [
-					"used_percent"
-				],
-				"metrics_collection_interval": 60,
-				"resources": [
-					"*"
-				]
-			},
-			"mem": {
-				"measurement": [
-					"mem_used_percent"
-				],
-				"metrics_collection_interval": 60
-			},
-			"statsd": {
-				"metrics_aggregation_interval": 60,
-				"metrics_collection_interval": 10,
-				"service_address": ":8125"
-			}
-		}
-	}
+  "agent": {
+    "metrics_collection_interval": 60,
+    "run_as_user": "cwagent"
+  },
+  "metrics": {
+    "append_dimensions": {
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+      "ImageId": "${aws:ImageId}",
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}"
+    },
+    "metrics_collected": {
+      "collectd": {
+        "metrics_aggregation_interval": 60
+      },
+      "disk": {
+        "measurement": [
+          "used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "*"
+        ]
+      },
+      "mem": {
+        "measurement": [
+          "mem_used_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "statsd": {
+        "metrics_aggregation_interval": 60,
+        "metrics_collection_interval": 10,
+        "service_address": ":8125"
+      }
+    }
+  }
 }
 EOF
     chown "$(whoami)" "$CONF_FILE"
-    amazon-cloudwatch-agent-ctl -a start
+    systemctl start amazon-cloudwatch-agent
 }
 
 # Uses SCRIPTS_PATH variables
