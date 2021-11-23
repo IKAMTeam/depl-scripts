@@ -33,13 +33,16 @@ init_ec2_instance
 # Install Java 11 (Correto)
 amazon-linux-extras install -y java-openjdk11
 
-yum install -y python3
+# python3-devel, Development Tools and wheel packages are needed to build wheels including C/C++ code
+yum install -y python3 python3-devel
+yum group install -y "Development Tools"
 
 # Sometimes these libraries are missing from default install
 function install_python_dependency() {
     python3 -m pip install "$1" || true
 }
 
+install_python_dependency wheel
 install_python_dependency argparse
 install_python_dependency oauth
 install_python_dependency PrettyTable
