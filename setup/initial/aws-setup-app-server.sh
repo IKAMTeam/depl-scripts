@@ -34,6 +34,8 @@ init_ec2_instance
 amazon-linux-extras install -y java-openjdk11
 
 # Sometimes these libraries are missing from default install
+yum install -y python3
+
 function install_python_dependency() {
     python3 -m pip install "$1" || true
 }
@@ -43,7 +45,7 @@ echo "Detected processor architecture: $ARCH"
 
 if [[ "$ARCH" == arm* ]] || [[ "$ARCH" == aarch* ]]; then
     # python3-devel, Development Tools packages are needed to build wheels including C/C++ code
-    yum install -y python3 python3-devel
+    yum install -y python3-devel
     yum group install -y "Development Tools"
 
     install_python_dependency wheel
