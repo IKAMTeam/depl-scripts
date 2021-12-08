@@ -30,8 +30,8 @@ set -o pipefail
 
 init_ec2_instance
 
-# Install Java 11 (Correto)
-amazon-linux-extras install -y java-openjdk11
+# Install Java 17 (Correto)
+install_java_17
 
 # Sometimes these libraries are missing from default install
 yum install -y python3

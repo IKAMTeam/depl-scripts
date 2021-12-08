@@ -171,6 +171,14 @@ EOF
     systemctl start amazon-cloudwatch-agent
 }
 
+function install_java_17() {
+  # Install Java 17 (Correto)
+  rpm --import https://yum.corretto.aws/corretto.key
+  curl -s -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
+
+  yum install -y java-17-amazon-corretto-devel
+}
+
 # Uses SCRIPTS_PATH variables
 function update_motd() {
     cp -rf "$SCRIPTS_PATH"/setup/templates/update-motd.d/* "/etc/update-motd.d"
