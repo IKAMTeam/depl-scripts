@@ -30,15 +30,26 @@ set -o pipefail
 
 init_ec2_instance
 
-# Install Java 11 (Correto)
-amazon-linux-extras install -y java-openjdk11
-
-yum install -y python3
+# Install Java 17 (Correto)
+install_java_17
 
 # Sometimes these libraries are missing from default install
+yum install -y python3
+
 function install_python_dependency() {
     python3 -m pip install "$1" || true
 }
+
+ARCH=$(uname -m)
+echo "Detected processor architecture: $ARCH"
+
+if [[ "$ARCH" == arm* ]] || [[ "$ARCH" == aarch* ]]; then
+    # python3-devel, Development Tools packages are needed to build wheels including C/C++ code
+    yum install -y python3-devel
+    yum group install -y "Development Tools"
+
+    install_python_dependency wheel
+fi
 
 install_python_dependency argparse
 install_python_dependency oauth
