@@ -26,7 +26,7 @@ OneVizion web and app instances configuration scripts
 **Note**: You can run setup scripts multiple times to install multiple websites or services on single server
 
 **Sample of `setup-server.conf`**:
-```
+```bash
 SCRIPTS_PATH="/home/my-user/depl-scripts"
 SCRIPTS_OWNER="my-user:my-user"
 
@@ -102,7 +102,7 @@ Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-da
 Use `aws-setup-app-server.sh` on the line `10` to setup application server.
 
 
-```
+```bash
 #!/bin/bash
 
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
