@@ -64,7 +64,7 @@ if [ "$2" == "tomcat" ]; then
         fi
     fi
 
-    DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
+    DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
     echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
 
