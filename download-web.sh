@@ -18,7 +18,7 @@ require_root_user
 
 GROUP_ID=com.onevizion
 ARTIFACT_ID=web
-ARTIFACT_ID_OLD=ps-web
+ARTIFACT_ID_LEGACY=ps-web
 PACKAGING=war
 ARTIFACT_CLASSIFIER=""
 
@@ -30,8 +30,8 @@ DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
 delete_on_exit "$DOWNLOAD_PATH"
 if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
-    echo "Fallback to download artifact using old name [$ARTIFACT_ID_OLD]"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID_OLD" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+    echo "Fallback to download artifact using legacy name [$ARTIFACT_ID_LEGACY]"
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID_LEGACY" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
 fi
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
