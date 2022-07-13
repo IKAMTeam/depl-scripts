@@ -70,6 +70,7 @@ if [ "$2" == "tomcat" ]; then
 
     delete_on_exit "$DOWNLOAD_PATH"
     if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
+        echo "Fallback to download artifact using old name [$ARTIFACT_ID_OLD]"
         download_artifact "$GROUP_ID" "$ARTIFACT_ID_OLD" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
     fi
 
