@@ -516,7 +516,7 @@ function wait_log() {
 }
 
 # Uses TOMCAT_UN, TOMCAT_GROUP variables
-function unpack_ps_war() {
+function extract_war_contents() {
     local WEBAPP_PATH DOWNLOAD_PATH
 
     WEBAPP_PATH=$1

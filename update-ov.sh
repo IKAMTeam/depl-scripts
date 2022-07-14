@@ -30,7 +30,8 @@ if [ "$2" == "tomcat" ]; then
     NEW_VERSION=$3
 
     GROUP_ID=com.onevizion
-    ARTIFACT_ID=ps-web
+    ARTIFACT_ID=web
+    ARTIFACT_ID_LEGACY=ps-web
     PACKAGING=war
     ARTIFACT_CLASSIFIER=""
 
@@ -63,19 +64,22 @@ if [ "$2" == "tomcat" ]; then
         fi
     fi
 
-    DOWNLOAD_PATH="$(mktemp --suffix="_ps-web")"
+    DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
     echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+    if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
+        echo "Fallback to download artifact using legacy name [$ARTIFACT_ID_LEGACY]"
+        download_artifact "$GROUP_ID" "$ARTIFACT_ID_LEGACY" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+    fi
 
     # Prevent script fail if Tomcat is not running
     echo "Stopping Tomcat..."
     systemctl stop "$TOMCAT_SERVICE" || exit 1
 
     echo "Deploying WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
-    unpack_ps_war "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
+    extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
     cleanup_tomcat "$TOMCAT_PATH"
 
     sleep 5s
