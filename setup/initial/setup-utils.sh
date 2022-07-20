@@ -89,7 +89,7 @@ function config_ec2_env() {
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 }
 
-# Uses EC2_URL_INTERNAL, EC2_IPV4 variables
+# Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
     install_cloudwatch_agent
     update_motd
@@ -117,6 +117,10 @@ function init_ec2_instance() {
 
     echo "Updating Route 53..."
     update_route53
+
+    # To fix error when run "git pull" from not repository owning user:
+    # fatal: unsafe repository ('...' is owned by someone else)
+    git config --global --add safe.directory "$SCRIPTS_PATH" || true
 }
 
 function install_cloudwatch_agent() {
