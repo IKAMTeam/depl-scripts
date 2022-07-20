@@ -89,10 +89,15 @@ function config_ec2_env() {
     EC2_IPV4="$(ec2-metadata --local-ipv4 | cut -d ' ' -f2)"
 }
 
-# Uses EC2_URL_INTERNAL, EC2_IPV4 variables
+# Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
     install_cloudwatch_agent
     update_motd
+
+    # To bypass CVE-2022-24765 fix because we are using multi-user configuration (run "git clone" as ec2-user,
+    # run "git pull" as root)
+    # https://github.blog/2022-04-12-git-security-vulnerability-announced/#cve-2022-24765
+    git config --global --add safe.directory "$SCRIPTS_PATH" || true
 
     if [ -z "$AWS_DOMAIN" ]; then
         echo "Update hostname and route 53 is cancelled"
