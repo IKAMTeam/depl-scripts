@@ -94,8 +94,8 @@ function init_ec2_instance() {
     install_cloudwatch_agent
     update_motd
 
-    # To fix error when run "git pull" from not repository owning user:
-    # fatal: unsafe repository ('...' is owned by someone else)
+    # To fix CVE-2022-24765
+    # https://github.blog/2022-04-12-git-security-vulnerability-announced/#cve-2022-24765
     git config --global --add safe.directory "$SCRIPTS_PATH" || true
 
     if [ -z "$AWS_DOMAIN" ]; then
