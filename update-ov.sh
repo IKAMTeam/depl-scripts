@@ -69,9 +69,9 @@ if [ "$2" == "tomcat" ]; then
     echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
+    if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
         echo "Fallback to download artifact using legacy name [$ARTIFACT_ID_LEGACY]"
-        download_artifact "$GROUP_ID" "$ARTIFACT_ID_LEGACY" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+        download_artifact "$GROUP_ID" "$ARTIFACT_ID_LEGACY" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
     fi
 
     # Prevent script fail if Tomcat is not running
