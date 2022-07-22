@@ -26,7 +26,7 @@ OneVizion web and app instances configuration scripts
 **Note**: You can run setup scripts multiple times to install multiple websites or services on single server
 
 **Sample of `setup-server.conf`**:
-```
+```bash
 SCRIPTS_PATH="/home/my-user/depl-scripts"
 SCRIPTS_OWNER="my-user:my-user"
 
@@ -57,8 +57,7 @@ AES_PASSWORD=''
 SERVICES_PATH="/opt"
 
 # Leave empty to omit monitoring setup
-MONITOR_VERSION="2.0.8"
-
+MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_DB_USER="monitor"
 MONITOR_DB_PASSWORD='password'
 
@@ -100,10 +99,10 @@ Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-da
 
 **Example snippet for Web Server setup**:
 
-Use `aws-setup-app-server.sh` to setup application server.
+Use `aws-setup-app-server.sh` on the line `10` to setup application server.
 
 
-```
+```bash
 #!/bin/bash
 
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
@@ -146,9 +145,6 @@ AES_PASSWORD=''
 # App specific
 SERVICES_PATH="/opt"
 
-MONITOR_DB_USER="monitor"
-MONITOR_DB_PASSWORD='password'
-
 # AWS SQS settings to deliver monitoring events to the queue. Optional.
 MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
 MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
@@ -170,7 +166,9 @@ MONITOR_ERROR_MAIL_FROM="[placeholder]"
 MONITOR_ERROR_MAIL_TO="[placeholder]"
 
 # Leave empty to omit monitoring setup
-MONITOR_VERSION="2.0.8"
+MONITOR_VERSION="1.0-SNAPSHOT"
+MONITOR_DB_USER="monitor"
+MONITOR_DB_PASSWORD='password'
 
 # Web specific
 TOMCAT_PATH="/usr/share/tomcat"
