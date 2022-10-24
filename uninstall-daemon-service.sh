@@ -33,5 +33,7 @@ systemctl disable "$SERVICE_NAME"
 # shellcheck disable=SC2153
 SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
 
+# TODO: remove config-build.py cron job in case of monitoring service
+
 echo "Removing service data [$SERVICE_NAME]..."
 rm -rf "/usr/lib/systemd/system/${SERVICE_NAME}.service" "$SERVICE_PATH"

@@ -48,6 +48,9 @@ if ! is_daemon_installed "$SERVICE_NAME"; then
 
     (< "$SYSTEMD_SERVICE_EXTRACT_PATH" envsubst | tee "/usr/lib/systemd/system/${SERVICE_NAME}.service") >/dev/null || exit 1
 
+    # TODO: Install config-build.py cronjob
+    # TODO: run config-build.py before start monitoring service to receive credentials first time
+
     # Replace $ -> \\$ for prevent eat it on launch stage
     export JAR_OPTS=${JAR_OPTS//$/\\\\$}
     (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
