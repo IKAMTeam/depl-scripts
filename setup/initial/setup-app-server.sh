@@ -50,9 +50,6 @@ if [ -n "$MONITOR_VERSION" ]; then
     "$SCRIPTS_PATH/install-monitor-service.sh" "$MONITOR_VERSION" "$DB_OWNER_USER" "$MONITOR_DB_USER" "$MONITOR_DB_PASSWORD" "$DB_URL" "$AES_PASSWORD"
 
     if [ "$MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT" == "1" ]; then
-      yum install -y python3
-      pip3 install -r "$SCRIPTS_PATH/setup/monitoring/python-requirements.txt" --upgrade
-
       "$SCRIPTS_PATH/install-cron-service.sh" monitoring-refresh-config
     fi
 fi
