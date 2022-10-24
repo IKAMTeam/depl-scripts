@@ -15,13 +15,18 @@ fi
 find "$SERVICES_PATH" -maxdepth 1 -type d -print0 | while read -r -d '' SERVICE_DIR; do
     SERVICE_NAME="$(basename "$SERVICE_DIR")"
     ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
+    ARTIFACT_PY="$(get_artifact_name "$SERVICE_NAME").py"
 
-    if [ ! -f "$SERVICE_DIR/$ARTIFACT_JAR" ]; then
+    if [ ! -f "$SERVICE_DIR/$ARTIFACT_JAR" ] && [ ! -f "$SERVICE_DIR/$ARTIFACT_PY" ]; then
         continue
     fi
 
     if [ -z "$SHORT_FORMAT" ]; then
-        ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_DIR/$ARTIFACT_JAR")"
+        if [ -f "$SERVICE_DIR/$ARTIFACT_JAR" ]; then
+          ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_DIR/$ARTIFACT_JAR")"
+        else
+          ARTIFACT_VERSION="[version is undefined]"
+        fi
 
         if is_daemon_installed "$SERVICE_NAME"; then
             if is_daemon_running "$SERVICE_NAME"; then
