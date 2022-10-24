@@ -1,10 +1,8 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for install monitoring service as daemon and add new schema for monitoring ###"
-    echo "Usage: $(basename "$0") <version> <owner_schema_username> <monitor_schema_username> <monitor_schema_password> <monitor_schema_connect_identifier> [aes_password]"
-    echo " "
-    echo "Where *_schema_connect_identifier is Oracle host:port:sid or host:port/service_name"
+    echo "### Script for install monitoring service as daemon ###"
+    echo "Usage: $(basename "$0") <version>"
 }
 
 if [ "$#" -lt 5 ]; then
@@ -13,13 +11,6 @@ if [ "$#" -lt 5 ]; then
 fi
 
 VERSION=$1
-
-export DB_OWNER_USER=$2
-export DB_USER=$3
-export DB_PASSWORD=$4
-export DB_URL=$5
-export AES_PASSWORD=$6
-
 ARTIFACT="monitoring"
 
 # shellcheck source=utils.sh
@@ -63,24 +54,11 @@ fi
 MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
 
 if [ ! -f "$MONITOR_XML" ]; then
-    echo "Copying initial configuration [$MONITOR_XML]..."
+    echo "Copying initial empty configuration to [$MONITOR_XML]..."
 
     cp "$(dirname "$0")/$MONITOR_XML_TEMPLATE_NAME" "$MONITOR_XML" || exit 1
     chown "$SERVICE_UN:$SERVICE_GROUP" "$MONITOR_XML" || exit 1
 fi
-
-echo "Adding new schema to configuration [$MONITOR_XML]..."
-
-"$(dirname "$0")/setup/insert-xml-node.py" "$MONITOR_XML" "$(dirname "$0")/$MONITOR_XML_SCHEMA_TEMPLATE_NAME" \
-    'schemas' || exit 1
-
-"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/main-user' '' "$DB_OWNER_USER" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/monitor-user' '' "$DB_USER" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/monitor-password' '' "$DB_PASSWORD" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/url' '' "$DB_URL" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'schemas/schema[last()]/aes-password' '' "$AES_PASSWORD" || exit 1
-
-update_monitor_configuration || exit 1
 
 if is_daemon_running "$SERVICE_NAME"; then
     echo "Done. [$SERVICE_NAME] already started"
