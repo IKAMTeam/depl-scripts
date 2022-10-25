@@ -1,10 +1,10 @@
 #!/bin/bash
 
-########################################
-######## OneVizion Cron Launcher (Python) #######
+################################################
+####### OneVizion Cron Launcher (Python) #######
 ## Configuration environment variables:
 # SERVICE_OUT - path to standard output log file
-########################################
+################################################
 
 ROOT_DIR="$(dirname "$0")"
 SERVICE_NAME="$(basename "$ROOT_DIR")"

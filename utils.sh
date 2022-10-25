@@ -5,6 +5,7 @@ export APP_LAUNCHER_TEMPLATE_NAME="setup/templates/app-launcher.template"
 export APP_LAUNCHER_IN_ARTIFACT_NAME="templates/app-launcher.sh"
 
 export CRON_LAUNCHER_TEMPLATE_NAME="setup/templates/cron-launcher.template"
+export CRON_LAUNCHER_PYTHON_TEMPLATE_NAME="setup/templates/cron-launcher-python.template"
 export CRON_LAUNCHER_IN_ARTIFACT_NAME="templates/cron-launcher.sh"
 
 export ENV_CONF_TEMPLATE_NAME="setup/templates/environment.template"
@@ -16,6 +17,8 @@ export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
 
 export SERVER_XML_HOST_TEMPLATE_NAME="setup/templates/tomcat-host.template"
+
+export PYTHON_SERVICE_NAMES=("monitoring-refresh-config")
 
 export CLEANUP_TMP_FILES=""
 
@@ -96,6 +99,7 @@ function check_service_exists_or_exit() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
+    # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH/$SERVICE_NAME" ]; then
         echo "No OneVizion service with name [$SERVICE_NAME] is available!"
         bash "$(dirname "$0")/list-services.sh"
@@ -248,6 +252,37 @@ function copy_service_jar() {
     chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
 }
 
+# Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
+function copy_python_service_files() {
+    local ARTIFACT SETUP_PATH
+    ARTIFACT="$1"
+
+    SETUP_PATH="$(get_python_service_setup_directory "$ARTIFACT")"
+
+    echo "Copying files from [$SETUP_PATH] to [$SERVICE_PATH]..."
+    cp -rf "$SETUP_PATH"/* "$SERVICE_PATH"
+    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+}
+
+# Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
+# Will export CRON_LAUNCHER_SCRIPT_PATH variable
+function copy_python_cron_launcher_script() {
+    local ARTIFACT OUTPUT_FILE
+    ARTIFACT="$1"
+
+    # shellcheck disable=SC2153
+    OUTPUT_FILE="$SERVICE_PATH/cron-launcher.sh"
+
+    echo "Copying cron launcher script..."
+
+    cp "$(dirname "$0")/$CRON_LAUNCHER_PYTHON_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
+
+    export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
+}
+
 function is_daemon_installed() {
     local SERVICE_NAME
     SERVICE_NAME=$1
@@ -285,6 +320,17 @@ function is_cron_installed() {
     fi
 }
 
+# Uses PYTHON_SERVICE_NAMES variable
+function is_python_service() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    # shellcheck disable=SC2076
+    if [[ ! " ${PYTHON_SERVICE_NAMES[*]} " =~ " ${ARTIFACT_NAME} " ]]; then
+        return 1
+    fi
+}
+
 function get_artifact_name() {
     local SERVICE_NAME
     SERVICE_NAME=$1
@@ -297,6 +343,31 @@ function get_website_name() {
     SERVICE_NAME=$1
 
     cut -d '_' -f1 <<<"$SERVICE_NAME"
+}
+
+function get_python_service_requirements_file() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    echo "$(get_python_service_setup_directory "$ARTIFACT_NAME")/python-requirements.txt"
+}
+
+function get_python_service_setup_directory() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    echo "$(dirname "$0")/setup/templates/python-services/$ARTIFACT_NAME"
+}
+
+function get_service_conf_file() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    if is_python_service "$ARTIFACT_NAME"; then
+        echo "$SERVICE_PATH/${SERVICE_NAME}.conf"
+    else
+        echo "$SERVICE_PATH/${JAR_NAME}.conf"
+    fi
 }
 
 function generate_service_name() {
@@ -413,12 +484,38 @@ function copy_service_artifacts() {
     local ARTIFACT
     ARTIFACT="$1"
 
-    copy_service_jar "$ARTIFACT" "$DOWNLOAD_PATH" || return 1
+    if is_python_service "$ARTIFACT"; then
+        copy_python_service_files "$ARTIFACT" || return 1
+    else
+        copy_service_jar "$ARTIFACT" "$DOWNLOAD_PATH" || return 1
 
-    if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
-        copy_service_jar "report-exec" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
-        copy_service_jar "export-exec" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
+            copy_service_jar "report-exec" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
+            copy_service_jar "export-exec" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        fi
     fi
+}
+
+function prepare_java_environment_conf() {
+    local ARTIFACT ENV_CONF_EXTRACT_PATH
+    ARTIFACT=$1
+
+    ENV_CONF_EXTRACT_PATH="$(mktemp --suffix="_env_$ARTIFACT")"
+    delete_on_exit "$ENV_CONF_EXTRACT_PATH"
+    extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || return 1
+
+    (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$(get_service_conf_file "$ARTIFACT")") >/dev/null || return 1
+}
+
+function prepare_python_environment_conf() {
+    local ARTIFACT SETUP_PATH ENV_CONF_FILE
+    ARTIFACT=$1
+
+    SETUP_PATH="$(get_python_service_setup_directory "$ARTIFACT")"
+    ENV_CONF_FILE="$(get_service_conf_file "$ARTIFACT")"
+
+    (< "$SETUP_PATH" envsubst | tee "$ENV_CONF_FILE") >/dev/null || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$ENV_CONF_FILE" || return 1
 }
 
 function wait_log() {
