@@ -460,7 +460,8 @@ function config_service() {
         mkdir -p "$SERVICE_PATH/logs" || return 1
     fi
     chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    find "$SERVICE_PATH" -type d -exec chmod g+s {} + || return 1
+    find "$SERVICE_PATH" -type d -exec chmod g+s,g+w {} + || return 1
+    find "$SERVICE_PATH" -type f -exec chmod g+w {} + || return 1
     setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m o::--- "$SERVICE_PATH" || return 1
