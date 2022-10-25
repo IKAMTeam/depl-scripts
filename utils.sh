@@ -356,17 +356,28 @@ function get_python_service_setup_directory() {
     local ARTIFACT_NAME
     ARTIFACT_NAME="$1"
 
-    echo "$(dirname "$0")/setup/templates/python-services/$ARTIFACT_NAME"
+    echo "$(get_python_services_setup_directory)/$ARTIFACT_NAME"
+}
+
+function get_python_services_setup_directory() {
+    echo "$(dirname "$0")/setup/templates/python-services"
 }
 
 function get_service_conf_file() {
     local ARTIFACT_NAME
     ARTIFACT_NAME="$1"
 
+    get_service_conf_filename "$ARTIFACT_NAME"
+}
+
+function get_service_conf_filename() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
     if is_python_service "$ARTIFACT_NAME"; then
-        echo "$SERVICE_PATH/${SERVICE_NAME}.conf"
+        echo "${SERVICE_NAME}.conf"
     else
-        echo "$SERVICE_PATH/${JAR_NAME}.conf"
+        echo "${JAR_NAME}.conf"
     fi
 }
 
@@ -508,12 +519,12 @@ function prepare_java_environment_conf() {
 }
 
 function prepare_python_environment_conf() {
-    export ARTIFACT SETUP_PATH ENV_CONF_FILE
+    local ARTIFACT ENV_CONF_FILE
     ARTIFACT=$1
-    SETUP_PATH="$(get_python_service_setup_directory "$ARTIFACT")"
     ENV_CONF_FILE="$(get_service_conf_file "$ARTIFACT")"
+    ENV_CONF_TEMPLATE_FILE="$(get_python_services_setup_directory)/$(get_service_conf_filename "$ARTIFACT").template"
 
-    (< "$SETUP_PATH" envsubst | tee "$ENV_CONF_FILE") >/dev/null || return 1
+    (< "$ENV_CONF_TEMPLATE_FILE" envsubst | tee "$ENV_CONF_FILE") >/dev/null || return 1
     chown "$SERVICE_UN:$SERVICE_GROUP" "$ENV_CONF_FILE" || return 1
 }
 
