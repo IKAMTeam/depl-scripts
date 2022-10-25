@@ -5,7 +5,7 @@ function usage() {
     echo "Usage: $(basename "$0") <version>"
 }
 
-if [ "$#" -lt 5 ]; then
+if [ "$#" -lt 1 ]; then
     usage
     exit 1
 fi

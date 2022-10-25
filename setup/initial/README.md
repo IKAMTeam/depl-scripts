@@ -59,7 +59,7 @@ SERVICES_PATH="/opt"
 # Leave empty to omit monitoring setup
 MONITOR_VERSION="1.0-SNAPSHOT"
 
-# Install monitoring-refresh-config.py to load configuration from trackor.onevizion.com (requires AWS SSM)
+# Install monitoring-refresh-config.py to refresh configuration from trackor.onevizion.com (requires AWS SSM)
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="0"
 
 # Web specific
@@ -129,7 +129,7 @@ SERVICES_PATH="/opt"
 # Leave empty to omit monitoring setup
 MONITOR_VERSION="1.0-SNAPSHOT"
 
-# Install monitoring-refresh-config.py to load configuration from trackor.onevizion.com (requires AWS SSM)
+# Install monitoring-refresh-config.py to refresh configuration from trackor.onevizion.com (requires AWS SSM)
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific

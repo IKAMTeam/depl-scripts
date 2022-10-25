@@ -7,7 +7,7 @@
 ################################################
 
 ROOT_DIR="$(dirname "$0")"
-SERVICE_NAME="$(basename "$ROOT_DIR")"
+SERVICE_NAME="$(basename "$(realpath "$ROOT_DIR")")"
 ENV_CONF_FILE="$ROOT_DIR/${SERVICE_NAME}.conf"
 PYTHON_SCRIPT_PATH="$ROOT_DIR/${SERVICE_NAME}.py"
 
@@ -15,6 +15,8 @@ if [ ! -f "$ENV_CONF_FILE" ]; then
     echo "No environment configuration [$ENV_CONF_FILE] found"
     exit 1
 fi
+
+set -o allexport
 
 # shellcheck disable=SC1090
 . "$ENV_CONF_FILE"

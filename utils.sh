@@ -14,11 +14,14 @@ export ENV_CONF_IN_ARTIFACT_NAME="templates/environment.conf"
 export SYSTEMD_CONF_TEMPLATE_NAME="setup/templates/service.template"
 export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 
-export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
-
 export SERVER_XML_HOST_TEMPLATE_NAME="setup/templates/tomcat-host.template"
 
-export PYTHON_SERVICE_NAMES=("monitoring-refresh-config")
+export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
+export MONITOR_REFRESH_CONFIG_ARTIFACT_NAME="monitoring-refresh-config"
+export MONITOR_REFRESH_CONFIG_UN="$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME"
+export MONITOR_GROUP="monitoring"
+
+export PYTHON_SERVICE_NAMES=("$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME")
 
 export CLEANUP_TMP_FILES=""
 
@@ -367,7 +370,7 @@ function get_service_conf_file() {
     local ARTIFACT_NAME
     ARTIFACT_NAME="$1"
 
-    get_service_conf_filename "$ARTIFACT_NAME"
+    echo "$SERVICE_PATH/$(get_service_conf_filename "$ARTIFACT_NAME")"
 }
 
 function get_service_conf_filename() {
@@ -453,7 +456,9 @@ function config_service() {
     fi
 
     mkdir -p "$SERVICE_PATH" || return 1
-    mkdir -p "$SERVICE_PATH/logs" || return 1
+    if ! is_python_service "$ARTIFACT"; then
+        mkdir -p "$SERVICE_PATH/logs" || return 1
+    fi
     chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
     find "$SERVICE_PATH" -type d -exec chmod g+s {} + || return 1
     setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
@@ -465,6 +470,15 @@ function config_service() {
 
     # shellcheck disable=SC2034
     export JAR_PATH="$SERVICE_PATH/${JAR_NAME}.jar"
+
+    if [ "$ARTIFACT" == "$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME" ]; then
+        echo "Grant access to monitoring service"
+        if ! getent group "$MONITOR_GROUP" >/dev/null; then
+            groupadd -r "$MONITOR_GROUP" || return 1
+            echo "[$MONITOR_GROUP] group added"
+        fi
+        usermod --append --groups "$MONITOR_GROUP" "$MONITOR_REFRESH_CONFIG_UN" || return 1
+    fi
 }
 
 # Will export next variables: REPORT_EXEC_DOWNLOAD_PATH, EXPORT_EXEC_DOWNLOAD_PATH, DOWNLOAD_PATH

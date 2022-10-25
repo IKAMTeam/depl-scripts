@@ -1,0 +1,2 @@
+MONITOR_CONFIG_FILE="${SERVICES_PATH}/monitoring/db-schemas.xml"
+SERVICE_OUT="${SERVICE_PATH}/run.out"
