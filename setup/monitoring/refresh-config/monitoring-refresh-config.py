@@ -1,0 +1,441 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import shutil
+import urllib.request
+from xml.etree import ElementTree
+
+import boto3
+import onevizion
+from onevizion import Message
+
+import xmlhelper
+
+
+class Settings:
+    AWS_SSM_REGION = 'us-east-1'
+    AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
+    MONITOR_CONFIG_FILE = '/opt/monitoring/db-schemas.xml'
+    TRACKOR_HOSTNAME = 'trackor.onevizion.com'
+    TRACKOR_TYPE_WEBSITE = 'Website'
+    TRACKOR_TYPE_CONFIG_ATTRIB = 'ConfigAttrib'
+    TRACKOR_TO_XML_TRANSLATION_DICT = {
+        'Database.DB_CONNECTION_STRING': 'url',
+        'TRACKOR_ID': 'trackor-id',
+        'TRACKOR_KEY': 'website',
+        'VQS_WEB_DBSCHEMA': 'main-user',
+        'WEB_MONITOR_USER': 'monitor-user',
+        'WEB_MONITOR_PASSWORD': 'monitor-password',
+        'WEB_MONITORING_ENABLED': 'enabled',
+        'WEB_MONITORS_DISABLED': 'disable-monitors',
+        'WEB_ENCRYPTION_KEY': 'aes-password'
+    }
+    REPORT_CHECK_ATTRIBUTE_EQUALITY_NAMES = [
+        'enabled',
+        'disable-monitors',
+        'url',
+        'main-user',
+        'monitor-user',
+        'monitor-password'
+    ]
+    REPORT_HIDE_ATTRIBUTE_VALUE_NAMES = ['monitor-user', 'monitor-password']
+    DEFAULT_DB_SCHEMAS_XML_CONTENT: """<?xml version="1.0" ?>
+        <root>
+            <schemas>
+            </schemas>
+            <aws-sqs>
+            </aws-sqs>
+            <error-email>
+            </error-email>
+            <warning-email>
+            </warning-email>
+            <suspend>false</suspend>
+            <disable-monitors></disable-monitors>
+        </root>
+        """
+
+
+class JsonData:
+    def __init__(self,
+                 error_mail_json,
+                 warning_mail_json,
+                 aws_sqs_json,
+                 aws_sqs_trackor_integration_json,
+                 root_config_json,
+                 schemas_json):
+        self.error_mail_json = error_mail_json
+        self.warning_mail_json = warning_mail_json
+        self.aws_sqs_json = aws_sqs_json
+        self.aws_sqs_trackor_integration_json = aws_sqs_trackor_integration_json
+        self.root_config_json = root_config_json
+        self.schemas_json = schemas_json
+
+
+class XmlData:
+    def __init__(self,
+                 schemas_xml,
+                 aws_sqs_xml,
+                 error_mail_xml,
+                 warning_mail_xml,
+                 suspend_xml,
+                 disable_monitoring_xml):
+        self.schemas_xml = schemas_xml
+        self.aws_sqs_xml = aws_sqs_xml
+        self.error_mail_xml = error_mail_xml
+        self.warning_mail_xml = warning_mail_xml
+        self.suspend_xml = suspend_xml
+        self.disable_monitoring_xml = disable_monitoring_xml
+
+
+class XmlElementDto:
+    def __init__(self, old_xml_element, new_xml_element):
+        self.old_xml_element = old_xml_element
+        self.new_xml_element = new_xml_element
+
+
+class ConfigChanges:
+    def __init__(self,
+                 new_websites,
+                 removed_websites,
+                 updated_websites,
+                 updated_website_elements):
+        self.new_websites = new_websites
+        self.removed_websites = removed_websites
+        self.updated_websites = updated_websites
+        self.updated_website_elements = updated_website_elements
+
+    def is_config_changed(self):
+        return len(self.new_websites) + len(self.removed_websites) + len(self.updated_websites) > 0
+
+    def generate_report(self):
+        report_message = 'Changes have been made to Monitoring Configuration.'
+
+        if len(self.new_websites) > 0:
+            report_message += '\n\nNew Websites added to Monitoring:'
+            for website in self.new_websites:
+                report_message += "\n" + website
+        if len(self.removed_websites) > 0:
+            report_message += '\n\nWebsites removed from Monitoring:'
+            for website in self.removed_websites:
+                report_message += "\n" + website
+        if len(self.updated_websites) > 0:
+            report_message += '\n\nWebsites that have Monitoring Configuration changes:'
+            for updated_website_element in self.updated_website_elements:
+                report_message += ConfigChanges.generate_updated_website_report(updated_website_element)
+
+        return report_message
+
+    @staticmethod
+    def generate_updated_website_report(updated_website_element):
+        old_xml_element = updated_website_element.old_xml_element
+        new_xml_element = updated_website_element.new_xml_element
+        website = new_xml_element.find('website').text
+
+        def attr_not_equals(attr_name):
+            old_text = old_xml_element.find(attr_name).text
+            new_text = new_xml_element.find(attr_name).text
+            return new_text != old_text or not (new_text in [None, ''] and old_text in [None, ''])
+
+        def value_of(attr_name):
+            if attr_name in Settings.REPORT_HIDE_ATTRIBUTE_VALUE_NAMES:
+                return '\n-->{attr_name} changed'.format(attr_name=attr_name)
+            else:
+                return "\n-->{attr_name} changed from '{old_text}'' to '{new_text}'".format(
+                    attr_name=attr_name,
+                    old_text=old_xml_element.find(attr_name).text,
+                    new_text=new_xml_element.find(attr_name).text
+                )
+
+        website_report_message = '\n' + website
+
+        for attribute_name in Settings.REPORT_CHECK_ATTRIBUTE_EQUALITY_NAMES:
+            if attr_not_equals(attribute_name):
+                website_report_message += value_of(attribute_name)
+
+        return website_report_message
+
+
+# region AWS
+def fetch_onevizion_configuration_from_ssm():
+    aws_client = boto3.client('ssm', region_name=Settings.AWS_SSM_REGION)
+    parameters = aws_client.get_parameters(Names=[Settings.AWS_SSM_PARAMETER_NAME])
+    onevizion_conf_json = \
+        next(item for item in parameters['Parameters'] if item['Name'] == Settings.AWS_SSM_PARAMETER_NAME)['Value']
+
+    return json.loads(onevizion_conf_json)
+
+
+# endregion
+
+
+# region Help functions
+def convert_json_data_to_xml(json_data):
+    schemas_xml = xmlhelper.rows_to_xml_elements(json_data.schemas_json, 'schemas', 'schema')
+    aws_sqs_xml = ElementTree.Element('aws-sqs')
+    aws_sqs_xml.extend((xmlhelper.dict_to_xml_element(json_data.aws_sqs_json[0], 'sqs'),
+                        xmlhelper.dict_to_xml_element(json_data.aws_sqs_trackor_integration_json[0], 'sqs')))
+    error_mail_xml = xmlhelper.dict_to_xml_element(json_data.error_mail_json, 'error-email')
+    warning_mail_xml = xmlhelper.dict_to_xml_element(json_data.warning_mail_json, 'warning-email')
+    suspend_xml = xmlhelper.dict_to_xml_element({}, 'suspend')
+    suspend_xml.text = json_data.root_config_json['suspend']
+    disable_monitoring_xml = xmlhelper.dict_to_xml_element({}, 'disable-monitors')
+    disable_monitoring_xml.text = json_data.root_config_json['disable-monitors']
+
+    return XmlData(schemas_xml=schemas_xml,
+                   aws_sqs_xml=aws_sqs_xml,
+                   error_mail_xml=error_mail_xml,
+                   warning_mail_xml=warning_mail_xml,
+                   suspend_xml=suspend_xml,
+                   disable_monitoring_xml=disable_monitoring_xml)
+
+
+def compare_xml_elements(a, b):
+    """ Compares 2 Elements to make sure they are Logically Equivalent
+    by afaulconbridge
+    https://stackoverflow.com/questions/7905380/testing-equivalence-of-xml-etree-elementtree"""
+
+    if a.tag < b.tag:
+        return -1
+    elif a.tag > b.tag:
+        return 1
+
+    # compare attributes
+    a_items = a.attrib.items()
+    a_items.sort()
+    b_items = b.attrib.items()
+    b_items.sort()
+    if a_items < b_items:
+        return -1
+    elif a_items > b_items:
+        return 1
+
+    # compare child nodes
+    a_children = list(a)
+    a_children.sort(cmp=compare_xml_elements)
+    b_children = list(b)
+    b_children.sort(cmp=compare_xml_elements)
+    if len(a_children) < len(b_children):
+        return -1
+    elif len(a_children) > len(b_children):
+        return 1
+
+    # If this is leaf node, compare text
+    a_text = None
+
+    if len(a_children) == 0:
+        if a.text is None:
+            a_text = ''
+    else:
+        a_text = a.text
+    if b.text is None:
+        b_text = ''
+    else:
+        b_text = b.text
+    if a_text != b_text:
+        Message("Tag='{tag}' A='{a}' B='{b}'".format(tag=a.tag, a=a.text, b=b.text), 1)
+        return -1
+
+    # with the ordered list of children, recursively check on each
+    cmp_val = None
+    for a_child, b_child in zip(a_children, b_children):
+        cmp_val = compare_xml_elements(a_child, b_child)
+
+    if cmp_val < 0:
+        return -1
+    elif cmp_val > 0:
+        return 1
+
+    # if it made it this far, must be equal
+    return 0
+
+
+def translate_trackor_to_xml_field_names(rows=None, translation_dictionary=None):
+    def convert_value(input_value):
+        if input_value == '1':
+            output_value = 'true'
+        elif input_value == '0':
+            output_value = 'false'
+        elif input_value is None:
+            output_value = ''
+        else:
+            output_value = str(input_value)
+        return output_value
+
+    if rows is None:
+        rows = []
+    if translation_dictionary is None:
+        translation_dictionary = {}
+
+    for row in rows:
+        child_dict = {}
+        for key, value in row.items():
+            child_dict[translation_dictionary[key]] = convert_value(value)
+        rows.append(child_dict)
+    return rows
+
+
+def trace_json(json_object):
+    Message(json.dumps(json_object, indent=2), 1)
+
+
+def trace_xml(xml_element):
+    Message(xmlhelper.prettify_xml(xml_element), 1)
+
+
+def find_config_changes(new_xml_root_element, old_xml_root_element):
+    new_websites = []
+    removed_websites = []
+    updated_websites = []
+    updated_website_elements = []
+
+    for new_xml_schema in new_xml_root_element.findall('./schemas/schema'):
+        new_website = new_xml_schema.find('website').text
+        old_websites = old_xml_root_element.findall("./schemas/schema[website='{website}']".format(website=new_website))
+
+        if len(old_websites) == 0:
+            new_websites.append(new_website)
+        elif compare_xml_elements(new_xml_schema, old_websites[0]) != 0:
+            updated_websites.append(new_website)
+            updated_website_elements.append(XmlElementDto(new_xml_element=new_xml_schema,
+                                                          old_xml_element=old_websites[0]))
+
+    for old_xml_schema in old_xml_root_element.findall('./schemas/schema'):
+        old_website = old_xml_schema.find('website').text
+        new_websites = new_xml_root_element.findall("./schemas/schema[website='{website}']".format(website=old_website))
+        if len(new_websites) == 0:
+            removed_websites.append(old_website)
+
+    return ConfigChanges(new_websites=new_websites,
+                         removed_websites=removed_websites,
+                         updated_websites=updated_websites,
+                         updated_website_elements=updated_website_elements)
+
+
+# endregion
+
+# region Fetch functions
+def fetch_required_configs():
+    websites = fetch_websites_for_current_instance()
+    if len(websites.errors) > 0:
+        raise Exception(f'Problem Getting Website List: {websites.errors}')
+    elif len(websites.jsonData) == 0:
+        raise Exception('No Websites found!')
+
+    error_mail_json = fetch_config('error-email')
+    warning_mail_json = fetch_config('warning-email')
+    aws_sqs_json = [fetch_config('aws-sqs')]
+    aws_sqs_trackor_integration_json = [fetch_config('aws-sqs-trackor-integration')]
+    root_config_json = fetch_config('monitoring')
+
+    schemas_json = translate_trackor_to_xml_field_names(websites.jsonData, Settings.TRACKOR_TO_XML_TRANSLATION_DICT)
+    trace_json(schemas_json)
+
+    return JsonData(error_mail_json=error_mail_json,
+                    warning_mail_json=warning_mail_json,
+                    aws_sqs_json=aws_sqs_json,
+                    aws_sqs_trackor_integration_json=aws_sqs_trackor_integration_json,
+                    root_config_json=root_config_json,
+                    schemas_json=schemas_json)
+
+
+def fetch_websites_for_current_instance():
+    websites = onevizion.Trackor(
+        trackorType=Settings.TRACKOR_TYPE_WEBSITE,
+        paramToken=Settings.TRACKOR_HOSTNAME
+    )
+    websites.read(
+        filters={
+            'VQS_WEB_ACTIVE': 1,
+            'Server.EC2_INSTANCE_ID': fetch_ec2_instance_id()
+        },
+        fields=[
+            'Database.DB_CONNECTION_STRING',
+            'TRACKOR_KEY',
+            'VQS_WEB_DBSCHEMA',
+            'WEB_MONITOR_USER',
+            'WEB_MONITOR_PASSWORD',
+            'WEB_MONITORING_ENABLED',
+            'WEB_MONITORS_DISABLED',
+            'WEB_ENCRYPTION_KEY'
+        ]
+    )
+    return websites
+
+
+def fetch_config(config_key):
+    config_attrib = onevizion.Trackor(
+        trackorType=Settings.TRACKOR_TYPE_CONFIG_ATTRIB,
+        paramToken=Settings.TRACKOR_HOSTNAME
+    )
+    config_attrib.read(
+        filters={
+            'Config.TRACKOR_KEY': '"{config_key}"'.format(config_key=config_key)
+        },
+        fields=[
+            'TRACKOR_KEY',
+            'CONFATTRIB_VALUE'
+        ]
+    )
+
+    if len(config_attrib.errors) > 0:
+        raise Exception(f'Problem finding Config {config_key}')
+    elif len(config_attrib.jsonData) == 0:
+        raise Exception(f'Config for {config_key} not found.')
+    else:
+        config = {}
+        for row in config_attrib.jsonData:
+            config[row['TRACKOR_KEY']] = row['CONFATTRIB_VALUE']
+        trace_json(config)
+        return config
+
+
+def fetch_ec2_instance_id():
+    return urllib.request.urlopen('http://169.254.169.254/latest/meta-data/instance-id').read().decode()
+
+
+# endregion
+
+
+def load_existing_monitoring_configuration_as_xml_tree():
+    # Write default configuration
+    if not os.path.exists(Settings.MONITOR_CONFIG_FILE):
+        f = open(Settings.MONITOR_CONFIG_FILE, 'w+')
+        f.write(Settings.DEFAULT_DB_SCHEMAS_XML_CONTENT)
+        f.close()
+
+    return ElementTree.parse(Settings.MONITOR_CONFIG_FILE)
+
+
+def main():
+    onevizion.Config['Verbosity'] = 0
+    Message('Started')
+
+    onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
+
+    json_data = fetch_required_configs()
+    xml_data = convert_json_data_to_xml(json_data)
+
+    old_xml_root_element = load_existing_monitoring_configuration_as_xml_tree()
+
+    # Create new db-schemas.xml
+    new_xml_root_element = ElementTree.Element('root')
+    new_xml_root_element.extend((xml_data.schemas_xml,
+                                 xml_data.aws_sqs_xml,
+                                 xml_data.error_mail_xml,
+                                 xml_data.warning_mail_xml,
+                                 xml_data.suspend_xml,
+                                 xml_data.disable_monitoring_xml))
+    trace_xml(new_xml_root_element)
+
+    config_changes = find_config_changes(new_xml_root_element, old_xml_root_element)
+    if config_changes.is_config_changed():
+        Message(config_changes.generate_report(), 1)
+
+        with open(Settings.MONITOR_CONFIG_FILE + '.new', 'w') as f:
+            f.write(xmlhelper.prettify_xml(new_xml_root_element))
+        shutil.move(Settings.MONITOR_CONFIG_FILE + '.new', Settings.MONITOR_CONFIG_FILE)
+
+
+if __name__ == '__main__':
+    main()
