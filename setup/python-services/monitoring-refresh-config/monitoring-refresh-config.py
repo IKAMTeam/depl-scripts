@@ -16,7 +16,7 @@ import xmlhelper
 class Settings:
     AWS_SSM_REGION = 'us-east-1'
     AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
-    MONITOR_CONFIG_FILE = '/opt/monitoring/db-schemas.xml'
+    MONITOR_CONFIG_FILE = os.getenv('MONITOR_CONFIG_FILE')
     TRACKOR_HOSTNAME = 'trackor.onevizion.com'
     TRACKOR_TYPE_WEBSITE = 'Website'
     TRACKOR_TYPE_CONFIG_ATTRIB = 'ConfigAttrib'
@@ -408,6 +408,10 @@ def load_existing_monitoring_configuration_as_xml_tree():
 
 
 def main():
+    if Settings.MONITOR_CONFIG_FILE is None or len(Settings.MONITOR_CONFIG_FILE) == 0:
+        Message('MONITOR_CONFIG_FILE environment variable is empty')
+        quit(1)
+
     onevizion.Config['Verbosity'] = 0
     Message('Started')
 
