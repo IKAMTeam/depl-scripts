@@ -497,10 +497,10 @@ function copy_service_artifacts() {
 }
 
 function prepare_java_environment_conf() {
-    local ARTIFACT ENV_CONF_EXTRACT_PATH
+    export ARTIFACT ENV_CONF_EXTRACT_PATH
     ARTIFACT=$1
-
     ENV_CONF_EXTRACT_PATH="$(mktemp --suffix="_env_$ARTIFACT")"
+
     delete_on_exit "$ENV_CONF_EXTRACT_PATH"
     extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || return 1
 
@@ -508,9 +508,8 @@ function prepare_java_environment_conf() {
 }
 
 function prepare_python_environment_conf() {
-    local ARTIFACT SETUP_PATH ENV_CONF_FILE
+    export ARTIFACT SETUP_PATH ENV_CONF_FILE
     ARTIFACT=$1
-
     SETUP_PATH="$(get_python_service_setup_directory "$ARTIFACT")"
     ENV_CONF_FILE="$(get_service_conf_file "$ARTIFACT")"
 
