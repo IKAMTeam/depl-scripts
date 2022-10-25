@@ -411,8 +411,6 @@ def main():
         quit(1)
 
     onevizion.Config['Verbosity'] = 0
-    Message('Started')
-
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
 
     json_data = fetch_required_configs()

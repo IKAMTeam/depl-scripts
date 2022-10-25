@@ -29,4 +29,5 @@ fi
 touch "$SERVICE_OUT"
 cd "$ROOT_DIR" || exit 1
 
-python3 "$PYTHON_SCRIPT_PATH" >"$SERVICE_OUT" 2>&1
+echo "[$(date)] Started" >> "$SERVICE_OUT"
+python3 "$PYTHON_SCRIPT_PATH" >>"$SERVICE_OUT" 2>&1
