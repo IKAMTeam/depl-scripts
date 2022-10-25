@@ -128,6 +128,11 @@ function install_python_service() {
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
+if [ "$#" -eq 0 ]; then
+    usage
+    exit 1
+fi
+
 if is_python_service "$1"; then
     install_python_service "$@" || exit 1
 else
