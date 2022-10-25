@@ -12,9 +12,10 @@ function usage() {
 }
 
 function schedule_cron_job() {
-    local ARTIFACT SCHEDULE
+    local ARTIFACT
     ARTIFACT=$1
-    SCHEDULE=$2
+
+    export SCHEDULE=$2
 
     echo "Scheduling cron job for [$SERVICE_NAME] for run at [$SCHEDULE]..."
 
