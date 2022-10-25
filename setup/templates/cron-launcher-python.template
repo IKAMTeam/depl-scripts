@@ -32,7 +32,7 @@ cd "$ROOT_DIR" || exit 1
 if [ -n "$SERVICE_OUT_CLEAR_SIZE_MB" ] && [ -f "$SERVICE_OUT" ]; then
     SERVICE_OUT_FILESIZE=$(du -m "$SERVICE_OUT" | awk '{print $1}')
     if [ "$SERVICE_OUT_FILESIZE" -gt "$SERVICE_OUT_CLEAR_SIZE_MB" ]; then
-        echo "[$(date)] Log cleared after reach ${SERVICE_OUT_CLEAR_SIZE_MB}mb limit" > "$SERVICE_OUT"
+        echo "[$(date)] Log cleared after reach ${SERVICE_OUT_CLEAR_SIZE_MB}MB limit" > "$SERVICE_OUT"
     fi
 fi
 
