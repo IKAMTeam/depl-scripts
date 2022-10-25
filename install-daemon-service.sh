@@ -74,11 +74,13 @@ extract_systemd_service "$ARTIFACT" "$SYSTEMD_SERVICE_EXTRACT_PATH" || exit 1
 
 (< "$SYSTEMD_SERVICE_EXTRACT_PATH" envsubst | tee "/usr/lib/systemd/system/${SERVICE_NAME}.service") >/dev/null || exit 1
 
+ENV_CONF_FILE="$(get_service_conf_file "$ARTIFACT")"
+
 # Replace $ -> \\$ for prevent eat it on launch stage
 export JAR_OPTS=${JAR_OPTS//$/\\\\$}
-(< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$SERVICE_PATH/${JAR_NAME}.conf") >/dev/null || exit 1
+(< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$ENV_CONF_FILE") >/dev/null || exit 1
 
-chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH/${JAR_NAME}.conf" || exit 1
+chown "$SERVICE_UN:$SERVICE_GROUP" "$ENV_CONF_FILE" || exit 1
 
 # Set AES password if specified
 if [ -n "$AES_PASSWORD" ]; then
