@@ -420,7 +420,14 @@ def main():
         quit(1)
 
     onevizion.Config['Verbosity'] = 0
-    onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
+    #onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
+    onevizion.Config['ParameterData'] = {
+        Settings.TRACKOR_HOSTNAME: {
+            'url': Settings.TRACKOR_HOSTNAME,
+            'UserName': 'monitoring-test_admin',
+            'Password': '1'
+        }
+    }
 
     json_data = fetch_required_configs()
     xml_data = convert_json_data_to_xml(json_data)
