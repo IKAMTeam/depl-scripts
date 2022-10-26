@@ -9,6 +9,7 @@ import onevizion
 from onevizion import Message
 
 import xmlhelper
+import functools
 
 
 class Settings:
@@ -38,7 +39,7 @@ class Settings:
         'monitor-password'
     ]
     REPORT_HIDE_ATTRIBUTE_VALUE_NAMES = ['monitor-user', 'monitor-password']
-    DEFAULT_DB_SCHEMAS_XML_CONTENT: """<?xml version="1.0" ?>
+    DEFAULT_DB_SCHEMAS_XML_CONTENT = """<?xml version="1.0"?>
         <root>
             <schemas>
             </schemas>
@@ -77,13 +78,13 @@ class XmlData:
                  error_mail_xml,
                  warning_mail_xml,
                  suspend_xml,
-                 disable_monitoring_xml):
+                 disable_monitors_xml):
         self.schemas_xml = schemas_xml
         self.aws_sqs_xml = aws_sqs_xml
         self.error_mail_xml = error_mail_xml
         self.warning_mail_xml = warning_mail_xml
         self.suspend_xml = suspend_xml
-        self.disable_monitoring_xml = disable_monitoring_xml
+        self.disable_monitors_xml = disable_monitors_xml
 
 
 class XmlElementDto:
@@ -107,20 +108,19 @@ class ConfigChanges:
         return len(self.new_websites) + len(self.removed_websites) + len(self.updated_websites) > 0
 
     def generate_report(self):
-        report_message = 'Changes have been made to Monitoring Configuration.'
+        if self.is_config_changed():
+            report_message = 'Changes have been made to Monitoring Configuration.'
 
-        if len(self.new_websites) > 0:
-            report_message += '\n\nNew Websites added to Monitoring:'
-            for website in self.new_websites:
-                report_message += "\n" + website
-        if len(self.removed_websites) > 0:
-            report_message += '\n\nWebsites removed from Monitoring:'
-            for website in self.removed_websites:
-                report_message += "\n" + website
-        if len(self.updated_websites) > 0:
-            report_message += '\n\nWebsites that have Monitoring Configuration changes:'
-            for updated_website_element in self.updated_website_elements:
-                report_message += ConfigChanges.generate_updated_website_report(updated_website_element)
+            if len(self.new_websites) > 0:
+                report_message += '\n\nNew Websites added to Monitoring:\n' + '\n'.join(self.new_websites)
+            if len(self.removed_websites) > 0:
+                report_message += '\n\nWebsites removed from Monitoring:\n' + '\n'.join(self.removed_websites)
+            if len(self.updated_websites) > 0:
+                report_message += '\n\nWebsites that have Monitoring Configuration changes:'
+                for updated_website_element in self.updated_website_elements:
+                    report_message += ConfigChanges.generate_updated_website_report(updated_website_element)
+        else:
+            report_message = 'No changes in Monitoring Configuration'
 
         return report_message
 
@@ -133,13 +133,18 @@ class ConfigChanges:
         def attr_not_equals(attr_name):
             old_text = old_xml_element.find(attr_name).text
             new_text = new_xml_element.find(attr_name).text
-            return new_text != old_text or not (new_text in [None, ''] and old_text in [None, ''])
+            if old_text is None:
+                old_text = ''
+            if new_text is None:
+                new_text = ''
+
+            return new_text != old_text
 
         def value_of(attr_name):
             if attr_name in Settings.REPORT_HIDE_ATTRIBUTE_VALUE_NAMES:
                 return '\n-->{attr_name} changed'.format(attr_name=attr_name)
             else:
-                return "\n-->{attr_name} changed from '{old_text}'' to '{new_text}'".format(
+                return "\n-->{attr_name} changed from '{old_text}' to '{new_text}'".format(
                     attr_name=attr_name,
                     old_text=old_xml_element.find(attr_name).text,
                     new_text=new_xml_element.find(attr_name).text
@@ -175,17 +180,23 @@ def convert_json_data_to_xml(json_data):
                         xmlhelper.dict_to_xml_element(json_data.aws_sqs_trackor_integration_json[0], 'sqs')))
     error_mail_xml = xmlhelper.dict_to_xml_element(json_data.error_mail_json, 'error-email')
     warning_mail_xml = xmlhelper.dict_to_xml_element(json_data.warning_mail_json, 'warning-email')
-    suspend_xml = xmlhelper.dict_to_xml_element({}, 'suspend')
+
+    if 'suspend' not in json_data.root_config_json:
+        raise Exception('No "suspend" found in config attributes')
+    if 'disable-monitors' not in json_data.root_config_json:
+        raise Exception('No "disable-monitors" found in config attributes')
+
+    suspend_xml = ElementTree.Element('suspend')
     suspend_xml.text = json_data.root_config_json['suspend']
-    disable_monitoring_xml = xmlhelper.dict_to_xml_element({}, 'disable-monitors')
-    disable_monitoring_xml.text = json_data.root_config_json['disable-monitors']
+    disable_monitors_xml = ElementTree.Element('disable-monitors')
+    disable_monitors_xml.text = json_data.root_config_json['disable-monitors']
 
     return XmlData(schemas_xml=schemas_xml,
                    aws_sqs_xml=aws_sqs_xml,
                    error_mail_xml=error_mail_xml,
                    warning_mail_xml=warning_mail_xml,
                    suspend_xml=suspend_xml,
-                   disable_monitoring_xml=disable_monitoring_xml)
+                   disable_monitors_xml=disable_monitors_xml)
 
 
 def compare_xml_elements(a, b):
@@ -199,45 +210,39 @@ def compare_xml_elements(a, b):
         return 1
 
     # compare attributes
-    a_items = a.attrib.items()
-    a_items.sort()
-    b_items = b.attrib.items()
-    b_items.sort()
-    if a_items < b_items:
+    a_attributes = sorted(a.attrib.items())
+    b_attributes = sorted(b.attrib.items())
+    if a_attributes < b_attributes:
         return -1
-    elif a_items > b_items:
+    elif a_attributes > b_attributes:
         return 1
 
     # compare child nodes
-    a_children = list(a)
-    a_children.sort(cmp=compare_xml_elements)
-    b_children = list(b)
-    b_children.sort(cmp=compare_xml_elements)
-    if len(a_children) < len(b_children):
+    a_children_elements = list(a)
+    a_children_elements.sort(key=functools.cmp_to_key(compare_xml_elements))
+    b_children_elements = list(b)
+    b_children_elements.sort(key=functools.cmp_to_key(compare_xml_elements))
+    if len(a_children_elements) < len(b_children_elements):
         return -1
-    elif len(a_children) > len(b_children):
+    elif len(a_children_elements) > len(b_children_elements):
         return 1
 
-    # If this is leaf node, compare text
-    a_text = None
+    a_text = a.text
+    if a_text is None:
+        a_text = ''
 
-    if len(a_children) == 0:
-        if a.text is None:
-            a_text = ''
-    else:
-        a_text = a.text
-    if b.text is None:
+    b_text = b.text
+    if b_text is None:
         b_text = ''
-    else:
-        b_text = b.text
-    if a_text != b_text:
-        Message("Tag='{tag}' A='{a}' B='{b}'".format(tag=a.tag, a=a.text, b=b.text), 1)
+
+    if a_text.strip() != b_text.strip():
+        Message(f"Tag='{a.tag}' A='{a.text}' B='{b.text}'", 1)
         return -1
 
     # with the ordered list of children, recursively check on each
-    cmp_val = None
-    for a_child, b_child in zip(a_children, b_children):
-        cmp_val = compare_xml_elements(a_child, b_child)
+    cmp_val = 0
+    for a_child_element, b_child_element in zip(a_children_elements, b_children_elements):
+        cmp_val = compare_xml_elements(a_child_element, b_child_element)
 
     if cmp_val < 0:
         return -1
@@ -248,7 +253,7 @@ def compare_xml_elements(a, b):
     return 0
 
 
-def translate_trackor_to_xml_field_names(rows=None, translation_dictionary=None):
+def translate_trackor_to_xml_field_names(source_rows=None, translation_dictionary=None):
     def convert_value(input_value):
         if input_value == '1':
             output_value = 'true'
@@ -260,14 +265,18 @@ def translate_trackor_to_xml_field_names(rows=None, translation_dictionary=None)
             output_value = str(input_value)
         return output_value
 
-    if rows is None:
-        rows = []
+    if source_rows is None:
+        source_rows = []
     if translation_dictionary is None:
         translation_dictionary = {}
 
-    for row in rows:
+    rows = []
+    for row in source_rows:
         child_dict = {}
         for key, value in row.items():
+            if key not in translation_dictionary:
+                raise Exception(f'Unable to translate key {key}. Row: {row}. Translations: {translation_dictionary}')
+
             child_dict[translation_dictionary[key]] = convert_value(value)
         rows.append(child_dict)
     return rows
@@ -288,21 +297,22 @@ def find_config_changes(new_xml_root_element, old_xml_root_element):
     updated_website_elements = []
 
     for new_xml_schema in new_xml_root_element.findall('./schemas/schema'):
-        new_website = new_xml_schema.find('website').text
-        old_websites = old_xml_root_element.findall("./schemas/schema[website='{website}']".format(website=new_website))
+        new_xml_website = new_xml_schema.find('website').text
+        old_xml_websites = old_xml_root_element.findall(f"./schemas/schema[website='{new_xml_website}']")
 
-        if len(old_websites) == 0:
-            new_websites.append(new_website)
-        elif compare_xml_elements(new_xml_schema, old_websites[0]) != 0:
-            updated_websites.append(new_website)
+        if len(old_xml_websites) == 0:
+            new_websites.append(new_xml_website)
+        elif compare_xml_elements(new_xml_schema, old_xml_websites[0]) != 0:
+            updated_websites.append(new_xml_website)
             updated_website_elements.append(XmlElementDto(new_xml_element=new_xml_schema,
-                                                          old_xml_element=old_websites[0]))
+                                                          old_xml_element=old_xml_websites[0]))
 
     for old_xml_schema in old_xml_root_element.findall('./schemas/schema'):
-        old_website = old_xml_schema.find('website').text
-        new_websites = new_xml_root_element.findall("./schemas/schema[website='{website}']".format(website=old_website))
-        if len(new_websites) == 0:
-            removed_websites.append(old_website)
+        old_xml_website = old_xml_schema.find('website').text
+        new_xml_website = new_xml_root_element.findall(f"./schemas/schema[website='{old_xml_website}']")
+
+        if len(new_xml_website) == 0:
+            removed_websites.append(old_xml_website)
 
     return ConfigChanges(new_websites=new_websites,
                          removed_websites=removed_websites,
@@ -320,11 +330,11 @@ def fetch_required_configs():
     elif len(websites.jsonData) == 0:
         raise Exception('No Websites found!')
 
-    error_mail_json = fetch_config('error-email')
-    warning_mail_json = fetch_config('warning-email')
-    aws_sqs_json = [fetch_config('aws-sqs')]
-    aws_sqs_trackor_integration_json = [fetch_config('aws-sqs-trackor-integration')]
-    root_config_json = fetch_config('monitoring')
+    error_mail_json = fetch_config_attributes('error-email')
+    warning_mail_json = fetch_config_attributes('warning-email')
+    aws_sqs_json = [fetch_config_attributes('aws-sqs')]
+    aws_sqs_trackor_integration_json = [fetch_config_attributes('aws-sqs-trackor-integration')]
+    root_config_json = fetch_config_attributes('monitoring')
 
     schemas_json = translate_trackor_to_xml_field_names(websites.jsonData, Settings.TRACKOR_TO_XML_TRANSLATION_DICT)
     trace_json(schemas_json)
@@ -361,14 +371,14 @@ def fetch_websites_for_current_instance():
     return websites
 
 
-def fetch_config(config_key):
+def fetch_config_attributes(config_key):
     config_attrib = onevizion.Trackor(
         trackorType=Settings.TRACKOR_TYPE_CONFIG_ATTRIB,
         paramToken=Settings.TRACKOR_HOSTNAME
     )
     config_attrib.read(
         filters={
-            'Config.TRACKOR_KEY': '"{config_key}"'.format(config_key=config_key)
+            'Config.TRACKOR_KEY': f'"{config_key}"'
         },
         fields=[
             'TRACKOR_KEY',
@@ -377,9 +387,9 @@ def fetch_config(config_key):
     )
 
     if len(config_attrib.errors) > 0:
-        raise Exception(f'Problem finding Config {config_key}')
+        raise Exception(f'Unable to find config attributes {config_key}')
     elif len(config_attrib.jsonData) == 0:
-        raise Exception(f'Config for {config_key} not found.')
+        raise Exception(f'Config attributes for {config_key} are not found.')
     else:
         config = {}
         for row in config_attrib.jsonData:
@@ -398,9 +408,8 @@ def fetch_ec2_instance_id():
 def load_existing_monitoring_configuration_as_xml_tree():
     # Write default configuration
     if not os.path.exists(Settings.MONITOR_CONFIG_FILE):
-        f = open(Settings.MONITOR_CONFIG_FILE, 'w+')
-        f.write(Settings.DEFAULT_DB_SCHEMAS_XML_CONTENT)
-        f.close()
+        with open(Settings.MONITOR_CONFIG_FILE, 'w+') as f:
+            f.write(Settings.DEFAULT_DB_SCHEMAS_XML_CONTENT)
 
     return ElementTree.parse(Settings.MONITOR_CONFIG_FILE)
 
@@ -425,13 +434,13 @@ def main():
                                  xml_data.error_mail_xml,
                                  xml_data.warning_mail_xml,
                                  xml_data.suspend_xml,
-                                 xml_data.disable_monitoring_xml))
+                                 xml_data.disable_monitors_xml))
     trace_xml(new_xml_root_element)
 
     config_changes = find_config_changes(new_xml_root_element, old_xml_root_element)
-    if config_changes.is_config_changed():
-        Message(config_changes.generate_report(), 1)
+    Message(config_changes.generate_report(), 1)
 
+    if config_changes.is_config_changed():
         with open(Settings.MONITOR_CONFIG_FILE + '.new', 'w') as f:
             f.write(xmlhelper.prettify_xml(new_xml_root_element))
         shutil.move(Settings.MONITOR_CONFIG_FILE + '.new', Settings.MONITOR_CONFIG_FILE)
