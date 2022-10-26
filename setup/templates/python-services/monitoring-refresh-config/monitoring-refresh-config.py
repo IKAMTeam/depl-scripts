@@ -131,8 +131,12 @@ class ConfigChanges:
         website = new_xml_element.find('website').text
 
         def attr_not_equals(attr_name):
-            old_text = old_xml_element.find(attr_name).text
-            new_text = new_xml_element.find(attr_name).text
+            old_attr = old_xml_element.find(attr_name)
+            new_attr = new_xml_element.find(attr_name)
+
+            old_text = old_attr.text if old_attr is not None else None
+            new_text = new_attr.text if new_attr is not None else None
+
             if old_text is None:
                 old_text = ''
             if new_text is None:
@@ -144,10 +148,12 @@ class ConfigChanges:
             if attr_name in Settings.REPORT_HIDE_ATTRIBUTE_VALUE_NAMES:
                 return '\n-->{attr_name} changed'.format(attr_name=attr_name)
             else:
+                old_xml_attr = old_xml_element.find(attr_name)
+                new_xml_attr = new_xml_element.find(attr_name)
                 return "\n-->{attr_name} changed from '{old_text}' to '{new_text}'".format(
                     attr_name=attr_name,
-                    old_text=old_xml_element.find(attr_name).text,
-                    new_text=new_xml_element.find(attr_name).text
+                    old_text=old_xml_attr.text if old_xml_attr is not None else '',
+                    new_text=new_xml_attr.text if old_xml_attr is not None else ''
                 )
 
         website_report_message = '\n' + website
@@ -308,7 +314,11 @@ def find_config_changes(new_xml_root_element, old_xml_root_element):
                                                           old_xml_element=old_xml_websites[0]))
 
     for old_xml_schema in old_xml_root_element.findall('./schemas/schema'):
-        old_xml_website = old_xml_schema.find('website').text
+        old_xml_website_element = old_xml_schema.find('website')
+        if old_xml_website_element is None:
+            continue
+
+        old_xml_website = old_xml_website_element.text
         new_xml_website = new_xml_root_element.findall(f"./schemas/schema[website='{old_xml_website}']")
 
         if len(new_xml_website) == 0:
