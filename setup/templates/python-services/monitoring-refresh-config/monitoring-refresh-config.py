@@ -429,6 +429,8 @@ def main():
         Message('MONITOR_CONFIG_FILE environment variable is empty')
         quit(1)
 
+    # Uncomment this line to enable debug messages
+    # onevizion.Config['Verbosity'] = 1
     onevizion.Config['Verbosity'] = 0
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
 
