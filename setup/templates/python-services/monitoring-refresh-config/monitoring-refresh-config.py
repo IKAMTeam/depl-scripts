@@ -5,8 +5,8 @@ import urllib.request
 from xml.etree import ElementTree
 
 import boto3
-import onevizion
-from onevizion import Message
+import onevizion_http as onevizion
+from onevizion_http import Message
 
 import xmlhelper
 import functools
@@ -16,7 +16,7 @@ class Settings:
     AWS_SSM_REGION = 'us-east-1'
     AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
     MONITOR_CONFIG_FILE = os.getenv('MONITOR_CONFIG_FILE')
-    TRACKOR_HOSTNAME = 'trackor.onevizion.com'
+    TRACKOR_HOSTNAME = 'localhost:8090'
     TRACKOR_TYPE_WEBSITE = 'Website'
     TRACKOR_TYPE_CONFIG_ATTRIB = 'ConfigAttrib'
     TRACKOR_TO_XML_TRANSLATION_DICT = {
