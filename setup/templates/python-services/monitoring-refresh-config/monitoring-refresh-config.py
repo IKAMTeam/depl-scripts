@@ -205,60 +205,6 @@ def convert_json_data_to_xml(json_data):
                    disable_monitors_xml=disable_monitors_xml)
 
 
-def compare_xml_elements(a, b):
-    """ Compares 2 Elements to make sure they are Logically Equivalent
-    by afaulconbridge
-    https://stackoverflow.com/questions/7905380/testing-equivalence-of-xml-etree-elementtree"""
-
-    if a.tag < b.tag:
-        return -1
-    elif a.tag > b.tag:
-        return 1
-
-    # compare attributes
-    a_attributes = sorted(a.attrib.items())
-    b_attributes = sorted(b.attrib.items())
-    if a_attributes < b_attributes:
-        return -1
-    elif a_attributes > b_attributes:
-        return 1
-
-    # compare child nodes
-    a_children_elements = list(a)
-    a_children_elements.sort(key=functools.cmp_to_key(compare_xml_elements))
-    b_children_elements = list(b)
-    b_children_elements.sort(key=functools.cmp_to_key(compare_xml_elements))
-    if len(a_children_elements) < len(b_children_elements):
-        return -1
-    elif len(a_children_elements) > len(b_children_elements):
-        return 1
-
-    a_text = a.text
-    if a_text is None:
-        a_text = ''
-
-    b_text = b.text
-    if b_text is None:
-        b_text = ''
-
-    if a_text.strip() != b_text.strip():
-        Message(f"Tag='{a.tag}' A='{a.text}' B='{b.text}'", 1)
-        return -1
-
-    # with the ordered list of children, recursively check on each
-    cmp_val = 0
-    for a_child_element, b_child_element in zip(a_children_elements, b_children_elements):
-        cmp_val = compare_xml_elements(a_child_element, b_child_element)
-
-    if cmp_val < 0:
-        return -1
-    elif cmp_val > 0:
-        return 1
-
-    # if it made it this far, must be equal
-    return 0
-
-
 def translate_trackor_to_xml_field_names(source_rows=None, translation_dictionary=None):
     def convert_value(input_value):
         if input_value == '1':
@@ -308,7 +254,7 @@ def find_config_changes(new_xml_root_element, old_xml_root_element):
 
         if len(old_xml_websites) == 0:
             new_websites.append(new_xml_website)
-        elif compare_xml_elements(new_xml_schema, old_xml_websites[0]) != 0:
+        elif xmlhelper.compare_xml_elements(new_xml_schema, old_xml_websites[0]) != 0:
             updated_websites.append(new_xml_website)
             updated_website_elements.append(XmlElementDto(new_xml_element=new_xml_schema,
                                                           old_xml_element=old_xml_websites[0]))
