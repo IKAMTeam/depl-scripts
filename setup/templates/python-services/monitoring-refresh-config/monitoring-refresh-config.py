@@ -394,7 +394,7 @@ def main():
     trace_xml(new_xml_root_element)
 
     config_changes = find_config_changes(new_xml_root_element, old_xml_root_element)
-    Message(config_changes.generate_report(), 1)
+    Message(config_changes.generate_report())
 
     if config_changes.is_config_changed():
         with open(Settings.MONITOR_CONFIG_FILE + '.new', 'w') as f:
