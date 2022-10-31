@@ -92,11 +92,10 @@ def compare_xml_elements(a, b):
     cmp_val = 0
     for a_child_element, b_child_element in zip(a_children_elements, b_children_elements):
         cmp_val = compare_xml_elements(a_child_element, b_child_element)
-
-    if cmp_val < 0:
-        return -1
-    elif cmp_val > 0:
-        return 1
+        if cmp_val < 0:
+            return -1
+        elif cmp_val > 0:
+            return 1
 
     # if it made it this far, must be equal
     return 0
