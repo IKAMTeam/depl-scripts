@@ -1,6 +1,7 @@
 from xml.dom import minidom
 from xml.etree import ElementTree
 from onevizion import Message
+import functools
 
 
 def prettify_xml(elem):

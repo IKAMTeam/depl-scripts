@@ -9,7 +9,6 @@ import onevizion
 from onevizion import Message
 
 import xmlhelper
-import functools
 
 
 class Settings:
