@@ -37,7 +37,7 @@ class Settings:
         'monitor-user',
         'monitor-password'
     ]
-    REPORT_HIDE_ATTRIBUTE_VALUE_NAMES = ['monitor-user', 'monitor-password']
+    REPORT_HIDE_ATTRIBUTE_VALUE_NAMES = ['password', 'aes-password', 'monitor-password']
     DEFAULT_DB_SCHEMAS_XML_CONTENT = """<?xml version="1.0"?>
         <root>
             <schemas>
