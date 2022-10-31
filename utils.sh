@@ -349,10 +349,7 @@ function get_website_name() {
 }
 
 function get_python_service_requirements_file() {
-    local ARTIFACT_NAME
-    ARTIFACT_NAME="$1"
-
-    echo "$(get_python_service_setup_directory "$ARTIFACT_NAME")/python-requirements.txt"
+    echo "${SERVICE_PATH}/python-requirements.txt"
 }
 
 function get_python_service_setup_directory() {

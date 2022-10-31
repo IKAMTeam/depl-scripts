@@ -93,16 +93,12 @@ function install_java_service() {
 }
 
 function install_python_and_dependencies() {
-    local ARTIFACT
-    ARTIFACT=$1
-
     echo "Installing Python..."
     yum install -y python3 || return 1
 
-    PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file "$ARTIFACT")"
+    PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file)"
     if [ -f "$PYTHON_REQUIREMENTS_FILE" ]; then
         echo "Installing Python dependencies (to service user)..."
-        chmod +r "$PYTHON_REQUIREMENTS_FILE"
         sudo -u "$SERVICE_UN" python3 -m pip install -r "$PYTHON_REQUIREMENTS_FILE" --upgrade --user || return 1
     fi
 }
@@ -121,7 +117,7 @@ function install_python_service() {
     config_service "" "$ARTIFACT" || return 1
 
     copy_service_artifacts "$ARTIFACT" || return 1
-    install_python_and_dependencies "$ARTIFACT" || return 1
+    install_python_and_dependencies || return 1
     prepare_python_environment_conf "$ARTIFACT" || return 1
     schedule_cron_job "$ARTIFACT" "$SCHEDULE" || return 1
 }
