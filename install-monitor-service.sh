@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for install monitoring service as daemon ###"
+    echo "### Script to install monitoring service as daemon ###"
     echo "Usage: $(basename "$0") <version>"
 }
 

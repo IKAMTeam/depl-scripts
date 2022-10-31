@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for install new service as daemon ###"
+    echo "### Script to install new service as daemon ###"
     echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <jar launch args>"
     echo " "
     echo "Usage for services: $(basename "$0") <website> services [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name] [services_to_run]"
