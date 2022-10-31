@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for install new service for periodically run ###"
+    echo "### Script to install new service to run on schedule ###"
     echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <schedule> <jar launch args>"
     echo " "
     echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
