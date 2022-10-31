@@ -102,7 +102,7 @@ function install_python_and_dependencies() {
     PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file "$ARTIFACT")"
     if [ -f "$PYTHON_REQUIREMENTS_FILE" ]; then
         echo "Installing Python dependencies (to service user)..."
-        sudo -u "$SERVICE_UN" pip3 install -r "$PYTHON_REQUIREMENTS_FILE" --upgrade --user || return 1
+        sudo -u "$SERVICE_UN" python3 -m pip install -r "$PYTHON_REQUIREMENTS_FILE" --upgrade --user || return 1
     fi
 }
 
