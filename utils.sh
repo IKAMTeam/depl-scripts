@@ -349,10 +349,7 @@ function get_website_name() {
 }
 
 function get_python_service_requirements_file() {
-    local ARTIFACT_NAME
-    ARTIFACT_NAME="$1"
-
-    echo "$(get_python_service_setup_directory "$ARTIFACT_NAME")/python-requirements.txt"
+    echo "${SERVICE_PATH}/python-requirements.txt"
 }
 
 function get_python_service_setup_directory() {
@@ -447,15 +444,16 @@ function config_service() {
         echo "[$SERVICE_GROUP] group added"
     fi
 
+    mkdir -p "$SERVICE_PATH" || return 1
+
     # Check user existence
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICE_PATH" "$SERVICE_UN"
         echo "[$SERVICE_UN] user added"
     fi
 
-    mkdir -p "$SERVICE_PATH" || return 1
     if ! is_python_service "$ARTIFACT"; then
         mkdir -p "$SERVICE_PATH/logs" || return 1
     fi

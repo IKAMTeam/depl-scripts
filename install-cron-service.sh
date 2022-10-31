@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-    echo "### Script for install new service for periodically run ###"
+    echo "### Script to install new service to run on schedule ###"
     echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <schedule> <jar launch args>"
     echo " "
     echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
@@ -93,16 +93,13 @@ function install_java_service() {
 }
 
 function install_python_and_dependencies() {
-    local ARTIFACT
-    ARTIFACT=$1
-
     echo "Installing Python..."
     yum install -y python3 || return 1
 
-    PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file "$ARTIFACT")"
+    PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file)"
     if [ -f "$PYTHON_REQUIREMENTS_FILE" ]; then
-        echo "Installing Python dependencies..."
-        pip3 install -r "$PYTHON_REQUIREMENTS_FILE" --upgrade || return 1
+        echo "Installing Python dependencies (to service user)..."
+        sudo -u "$SERVICE_UN" python3 -m pip install -r "$PYTHON_REQUIREMENTS_FILE" --upgrade --user || return 1
     fi
 }
 
@@ -120,7 +117,7 @@ function install_python_service() {
     config_service "" "$ARTIFACT" || return 1
 
     copy_service_artifacts "$ARTIFACT" || return 1
-    install_python_and_dependencies "$ARTIFACT" || return 1
+    install_python_and_dependencies || return 1
     prepare_python_environment_conf "$ARTIFACT" || return 1
     schedule_cron_job "$ARTIFACT" "$SCHEDULE" || return 1
 }
