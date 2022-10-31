@@ -2,16 +2,17 @@ import json
 import os
 import shutil
 import urllib.request
-from xml.etree import ElementTree
-
 import boto3
 import onevizion
-from onevizion import Message
-
 import xmlhelper
 
+from onevizion import Message
+from xml.etree import ElementTree
+from random import SystemRandom
+from time import sleep
 
 class Settings:
+    SPREAD_LOAD_MAX_SLEEP_MINUTES = 4
     AWS_SSM_REGION = 'us-east-1'
     AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
     MONITOR_CONFIG_FILE = os.getenv('MONITOR_CONFIG_FILE')
@@ -369,6 +370,15 @@ def load_existing_monitoring_configuration_as_xml_tree():
     return ElementTree.parse(Settings.MONITOR_CONFIG_FILE)
 
 
+def sleep_to_spread_load():
+    """Sleep to random time from 0 to SPREAD_LOAD_MAX_SLEEP_MINUTES minutes to spread load to website because this
+       script will run at the same time from many installations
+    """
+
+    sleep_time_seconds = SystemRandom().randint(1, Settings.SPREAD_LOAD_MAX_SLEEP_MINUTES * 60)
+    sleep(sleep_time_seconds)
+
+
 def main():
     if Settings.MONITOR_CONFIG_FILE is None or len(Settings.MONITOR_CONFIG_FILE) == 0:
         Message('MONITOR_CONFIG_FILE environment variable is empty')
@@ -377,6 +387,8 @@ def main():
     # Uncomment this line to enable debug messages. Pay attention - passwords will be exposed to standard output
     # onevizion.Config['Verbosity'] = 1
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
+
+    sleep_to_spread_load()
 
     json_data = fetch_required_configs()
     xml_data = convert_json_data_to_xml(json_data)
