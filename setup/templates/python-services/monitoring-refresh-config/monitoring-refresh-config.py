@@ -371,7 +371,7 @@ def load_existing_monitoring_configuration_as_xml_tree():
 
 
 def sleep_to_spread_load():
-    """Sleep to random time from 0 to SPREAD_LOAD_MAX_SLEEP_MINUTES minutes to spread load to website because this
+    """Sleep random time from 0 to SPREAD_LOAD_MAX_SLEEP_MINUTES minutes to spread load to website because this
        script will run at the same time from many installations
     """
 
