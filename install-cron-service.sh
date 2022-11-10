@@ -2,8 +2,6 @@
 
 function usage() {
     echo "### Script to install new service to run on schedule ###"
-    echo "Usage: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes password>] <schedule> <jar launch args>"
-    echo " "
     echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
     echo "Usage for monitoring-refresh-config: $(basename "$0") monitoring-refresh-config <schedule>"
     echo " "
