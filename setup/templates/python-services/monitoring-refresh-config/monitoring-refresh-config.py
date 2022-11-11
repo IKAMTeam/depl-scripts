@@ -379,7 +379,7 @@ def sleep_to_spread_load():
     sleep(sleep_time_seconds)
 
 
-def check_monitoring_service_exists_or_quit():
+def check_monitoring_config_exists_and_writeable_or_quit():
     service_dir = os.path.dirname(Settings.MONITOR_CONFIG_FILE)
 
     if not os.path.isfile(Settings.MONITOR_CONFIG_FILE) and not os.path.isdir(service_dir):
@@ -401,7 +401,7 @@ def main():
     # Uncomment this line to enable debug messages. Pay attention - passwords will be exposed to standard output
     # onevizion.Config['Verbosity'] = 1
 
-    check_monitoring_service_exists_or_quit()
+    check_monitoring_config_exists_and_writeable_or_quit()
 
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
 
