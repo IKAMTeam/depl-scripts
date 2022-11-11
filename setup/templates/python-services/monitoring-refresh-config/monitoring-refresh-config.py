@@ -382,7 +382,7 @@ def sleep_to_spread_load():
 def check_monitoring_service_exists_or_quit():
     service_dir = os.path.dirname(Settings.MONITOR_CONFIG_FILE)
 
-    if not os.path.isfile(Settings.MONITOR_CONFIG_FILE) and not os.path.is_dir(service_dir):
+    if not os.path.isfile(Settings.MONITOR_CONFIG_FILE) and not os.path.isdir(service_dir):
         Message(f'No {Settings.MONITOR_CONFIG_FILE} file exists and parent directory is not found', 1)
         quit(2)
     if not os.access(Settings.MONITOR_CONFIG_FILE, os.W_OK):
