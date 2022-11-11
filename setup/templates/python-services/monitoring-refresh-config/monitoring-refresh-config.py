@@ -383,10 +383,13 @@ def check_monitoring_service_exists_or_quit():
     service_dir = os.path.dirname(Settings.MONITOR_CONFIG_FILE)
 
     if not os.path.isfile(Settings.MONITOR_CONFIG_FILE) and not os.path.isdir(service_dir):
-        Message(f'No {Settings.MONITOR_CONFIG_FILE} file exists and parent directory is not found', 1)
+        Message(f'{Settings.MONITOR_CONFIG_FILE} file is not exists and parent directory is not found', 1)
         quit(2)
     if not os.access(Settings.MONITOR_CONFIG_FILE, os.W_OK):
         Message(f'{Settings.MONITOR_CONFIG_FILE} file is not writable', 1)
+        quit(3)
+    if not os.access(service_dir, os.W_OK):
+        Message(f'{service_dir} directory is not writable', 1)
         quit(3)
 
 
