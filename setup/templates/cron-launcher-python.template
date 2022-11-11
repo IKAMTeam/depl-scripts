@@ -39,3 +39,8 @@ fi
 
 echo "[$(date)] Started" >> "$SERVICE_OUT"
 python3 "$PYTHON_SCRIPT_PATH" >>"$SERVICE_OUT" 2>&1
+
+EXIT_CODE="$?"
+if [ "$EXIT_CODE" -gt 0 ]; then
+    echo "[$(date)] Failed with exit code $EXIT_CODE" >> "$SERVICE_OUT"
+fi
