@@ -379,6 +379,17 @@ def sleep_to_spread_load():
     sleep(sleep_time_seconds)
 
 
+def check_monitoring_service_exists_or_quit():
+    service_dir = os.path.dirname(Settings.MONITOR_CONFIG_FILE)
+
+    if not os.path.isfile(Settings.MONITOR_CONFIG_FILE) and not os.path.is_dir(service_dir):
+        Message(f'No {Settings.MONITOR_CONFIG_FILE} file exists and parent directory is not found', 1)
+        quit(2)
+    if not os.access(Settings.MONITOR_CONFIG_FILE, os.W_OK):
+        Message(f'{Settings.MONITOR_CONFIG_FILE} file is not writable', 1)
+        quit(3)
+
+
 def main():
     if Settings.MONITOR_CONFIG_FILE is None or len(Settings.MONITOR_CONFIG_FILE) == 0:
         Message('MONITOR_CONFIG_FILE environment variable is empty')
@@ -386,6 +397,9 @@ def main():
 
     # Uncomment this line to enable debug messages. Pay attention - passwords will be exposed to standard output
     # onevizion.Config['Verbosity'] = 1
+
+    check_monitoring_service_exists_or_quit()
+
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
 
     sleep_to_spread_load()
