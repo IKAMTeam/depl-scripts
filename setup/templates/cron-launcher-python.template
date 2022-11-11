@@ -44,3 +44,4 @@ EXIT_CODE="$?"
 if [ "$EXIT_CODE" -gt 0 ]; then
     echo "[$(date)] Failed with exit code $EXIT_CODE" >> "$SERVICE_OUT"
 fi
+exit "$EXIT_CODE"
