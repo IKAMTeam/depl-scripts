@@ -311,6 +311,7 @@ def fetch_websites_for_current_instance():
     websites.read(
         filters={
             'VQS_WEB_ACTIVE': 1,
+            'WEB_CENTRALIZED_MONITORING': 0,
             'Server.EC2_INSTANCE_ID': fetch_ec2_instance_id()
         },
         fields=[
