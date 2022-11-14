@@ -57,6 +57,9 @@ if [ ! -f "$MONITOR_XML" ]; then
 
     cp "$(dirname "$0")/$MONITOR_XML_TEMPLATE_NAME" "$MONITOR_XML" || exit 1
     chown "$SERVICE_UN:$SERVICE_GROUP" "$MONITOR_XML" || exit 1
+
+    # To allow group write access for monitoring-refresh-config service
+    chmod 660 "$MONITOR_XML" || exit 1
 fi
 
 if is_daemon_running "$SERVICE_NAME"; then
