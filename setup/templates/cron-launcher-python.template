@@ -1,0 +1,47 @@
+#!/bin/bash
+
+##############################################################################################################
+###################################### OneVizion Cron Launcher (Python) ######################################
+## Configuration environment variables:
+# SERVICE_OUT - path to standard output log file
+# SERVICE_OUT_CLEAR_SIZE_MB - if set: will clear log file when reached <value>MB size before run Python script
+##############################################################################################################
+
+ROOT_DIR="$(dirname "$0")"
+SERVICE_NAME="$(basename "$(realpath "$ROOT_DIR")")"
+ENV_CONF_FILE="$ROOT_DIR/${SERVICE_NAME}.conf"
+PYTHON_SCRIPT_PATH="$ROOT_DIR/${SERVICE_NAME}.py"
+
+if [ ! -f "$ENV_CONF_FILE" ]; then
+    echo "No environment configuration [$ENV_CONF_FILE] found"
+    exit 1
+fi
+
+set -o allexport
+
+# shellcheck disable=SC1090
+. "$ENV_CONF_FILE"
+
+if [ -z "$SERVICE_OUT" ]; then
+    echo "SERVICE_OUT is not set"
+    exit 1
+fi
+
+touch "$SERVICE_OUT"
+cd "$ROOT_DIR" || exit 1
+
+if [ -n "$SERVICE_OUT_CLEAR_SIZE_MB" ] && [ -f "$SERVICE_OUT" ]; then
+    SERVICE_OUT_FILESIZE=$(du -m "$SERVICE_OUT" | awk '{print $1}')
+    if [ "$SERVICE_OUT_FILESIZE" -gt "$SERVICE_OUT_CLEAR_SIZE_MB" ]; then
+        echo "[$(date)] Log cleared after reach ${SERVICE_OUT_CLEAR_SIZE_MB}MB limit" > "$SERVICE_OUT"
+    fi
+fi
+
+echo "[$(date)] Started" >> "$SERVICE_OUT"
+python3 "$PYTHON_SCRIPT_PATH" >>"$SERVICE_OUT" 2>&1
+
+EXIT_CODE="$?"
+if [ "$EXIT_CODE" -gt 0 ]; then
+    echo "[$(date)] Failed with exit code $EXIT_CODE" >> "$SERVICE_OUT"
+fi
+exit "$EXIT_CODE"

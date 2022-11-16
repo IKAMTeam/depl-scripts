@@ -58,28 +58,9 @@ SERVICES_PATH="/opt"
 
 # Leave empty to omit monitoring setup
 MONITOR_VERSION="1.0-SNAPSHOT"
-MONITOR_DB_USER="monitor"
-MONITOR_DB_PASSWORD='password'
 
-# AWS SQS settings to deliver monitoring events to the queue. Optional.
-MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
-MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
-MONITOR_AWS_SQS_QUEUE_URL="[placeholder]"
-
-# EMail settings to deliver monitoring events via SMTP. Separate mailboxes may be configured for error and warning event types. Optional.
-MONITOR_WARN_MAIL_HOST="[placeholder]"
-MONITOR_WARN_MAIL_PORT="[placeholder]"
-MONITOR_WARN_MAIL_USERNAME="[placeholder]"
-MONITOR_WARN_MAIL_PASSWORD='[placeholder]'
-MONITOR_WARN_MAIL_FROM="[placeholder]"
-MONITOR_WARN_MAIL_TO="[placeholder]"
-
-MONITOR_ERROR_MAIL_HOST="[placeholder]"
-MONITOR_ERROR_MAIL_PORT="[placeholder]"
-MONITOR_ERROR_MAIL_USERNAME="[placeholder]"
-MONITOR_ERROR_MAIL_PASSWORD='[placeholder]'
-MONITOR_ERROR_MAIL_FROM="[placeholder]"
-MONITOR_ERROR_MAIL_TO="[placeholder]"
+# Install monitoring-refresh-config.py to refresh configuration from trackor.onevizion.com (requires AWS SSM)
+MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="0"
 
 # Web specific
 TOMCAT_PATH="/usr/share/tomcat"
@@ -145,30 +126,11 @@ AES_PASSWORD=''
 # App specific
 SERVICES_PATH="/opt"
 
-# AWS SQS settings to deliver monitoring events to the queue. Optional.
-MONITOR_AWS_SQS_ACCESS_KEY="[placeholder]"
-MONITOR_AWS_SQS_SECRET_KEY="[placeholder]"
-MONITOR_AWS_SQS_QUEUE_URL="[placeholder]"
-
-# EMail settings to deliver monitoring events via SMTP. Separate mailboxes may be configured for error and warning event types. Optional.
-MONITOR_WARN_MAIL_HOST="[placeholder]"
-MONITOR_WARN_MAIL_PORT="[placeholder]"
-MONITOR_WARN_MAIL_USERNAME="[placeholder]"
-MONITOR_WARN_MAIL_PASSWORD='[placeholder]'
-MONITOR_WARN_MAIL_FROM="[placeholder]"
-MONITOR_WARN_MAIL_TO="[placeholder]"
-
-MONITOR_ERROR_MAIL_HOST="[placeholder]"
-MONITOR_ERROR_MAIL_PORT="[placeholder]"
-MONITOR_ERROR_MAIL_USERNAME="[placeholder]"
-MONITOR_ERROR_MAIL_PASSWORD='[placeholder]'
-MONITOR_ERROR_MAIL_FROM="[placeholder]"
-MONITOR_ERROR_MAIL_TO="[placeholder]"
-
 # Leave empty to omit monitoring setup
 MONITOR_VERSION="1.0-SNAPSHOT"
-MONITOR_DB_USER="monitor"
-MONITOR_DB_PASSWORD='password'
+
+# Install monitoring-refresh-config.py to refresh configuration from trackor.onevizion.com (requires AWS SSM)
+MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific
 TOMCAT_PATH="/usr/share/tomcat"

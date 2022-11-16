@@ -1,6 +1,38 @@
 <?xml version="1.0"?>
 <root>
     <schemas>
+        <schema>
+            <!-- OneVizion Installation owner schema -->
+            <main-user></main-user>
+
+            <monitor-user></monitor-user>
+            <monitor-password></monitor-password>
+            <url></url>
+
+            <!-- Set this property if sensitive data encryption feature enabled for this installation. -->
+            <!-- It should be aesPassword value from ov.properties file. If the property is not set for encrypted installs, certain monitors (mail-service, trackor-mail, sso-certificate-chains) won't be able to run checks, since required credentials will be encrypted -->
+            <aes-password></aes-password>
+
+            <enabled>false</enabled>
+
+            <!-- Uncomment to disable certain monitors for this install. Use comma separated list of monitors
+            <disable-monitors>db job,db index,tomcat,report-scheduler,mail-service,trackor-mail,long-wait-sessions,syncs3,imp,rule-service,open-cursors</disable-monitors>
+            -->
+
+            <!-- Uncomment and set list of SFTP servers to monitor
+            <sftp-servers>
+                <sftp>
+                    <host></host>
+                    <port></port>
+                    <finger-print></finger-print>
+                    <username></username>
+                    <password></password>
+                    <private-key></private-key>
+                    <private-key-pass-phrase></private-key-pass-phrase>
+                </sftp>
+            </sftp-servers>
+            -->
+        </schema>
     </schemas>
 
     <!-- Setup AWS SQS to deliver monitoring statuses, multiple queries may be configured -->

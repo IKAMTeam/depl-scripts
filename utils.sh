@@ -5,6 +5,7 @@ export APP_LAUNCHER_TEMPLATE_NAME="setup/templates/app-launcher.template"
 export APP_LAUNCHER_IN_ARTIFACT_NAME="templates/app-launcher.sh"
 
 export CRON_LAUNCHER_TEMPLATE_NAME="setup/templates/cron-launcher.template"
+export CRON_LAUNCHER_PYTHON_TEMPLATE_NAME="setup/templates/cron-launcher-python.template"
 export CRON_LAUNCHER_IN_ARTIFACT_NAME="templates/cron-launcher.sh"
 
 export ENV_CONF_TEMPLATE_NAME="setup/templates/environment.template"
@@ -13,10 +14,14 @@ export ENV_CONF_IN_ARTIFACT_NAME="templates/environment.conf"
 export SYSTEMD_CONF_TEMPLATE_NAME="setup/templates/service.template"
 export SYSTEMD_CONF_IN_ARTIFACT_NAME="templates/systemd.service"
 
-export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
-export MONITOR_XML_SCHEMA_TEMPLATE_NAME="setup/templates/monitor-db-schema.template"
-
 export SERVER_XML_HOST_TEMPLATE_NAME="setup/templates/tomcat-host.template"
+
+export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
+export MONITOR_REFRESH_CONFIG_ARTIFACT_NAME="monitoring-refresh-config"
+export MONITOR_REFRESH_CONFIG_UN="$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME"
+export MONITOR_GROUP="monitoring"
+
+export PYTHON_SERVICE_NAMES=("$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME")
 
 export CLEANUP_TMP_FILES=""
 
@@ -97,6 +102,7 @@ function check_service_exists_or_exit() {
     local SERVICE_NAME
     SERVICE_NAME=$1
 
+    # shellcheck disable=SC2153
     if [ ! -d "$SERVICES_PATH/$SERVICE_NAME" ]; then
         echo "No OneVizion service with name [$SERVICE_NAME] is available!"
         bash "$(dirname "$0")/list-services.sh"
@@ -249,6 +255,37 @@ function copy_service_jar() {
     chown "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_JAR" || return 1
 }
 
+# Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
+function copy_python_service_files() {
+    local ARTIFACT SETUP_PATH
+    ARTIFACT="$1"
+
+    SETUP_PATH="$(get_python_service_setup_directory "$ARTIFACT")"
+
+    echo "Copying files from [$SETUP_PATH] to [$SERVICE_PATH]..."
+    cp -rf "$SETUP_PATH"/* "$SERVICE_PATH"
+    chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
+}
+
+# Uses SERVICE_PATH, SERVICE_UN, SERVICE_GROUP variables
+# Will export CRON_LAUNCHER_SCRIPT_PATH variable
+function copy_python_cron_launcher_script() {
+    local ARTIFACT OUTPUT_FILE
+    ARTIFACT="$1"
+
+    # shellcheck disable=SC2153
+    OUTPUT_FILE="$SERVICE_PATH/cron-launcher.sh"
+
+    echo "Copying cron launcher script..."
+
+    cp "$(dirname "$0")/$CRON_LAUNCHER_PYTHON_TEMPLATE_NAME" "$OUTPUT_FILE" || return 1
+
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$OUTPUT_FILE" || return 1
+    chmod u+x,g+x "$OUTPUT_FILE" || return 1
+
+    export CRON_LAUNCHER_SCRIPT_PATH="$OUTPUT_FILE"
+}
+
 function is_daemon_installed() {
     local SERVICE_NAME
     SERVICE_NAME=$1
@@ -286,6 +323,17 @@ function is_cron_installed() {
     fi
 }
 
+# Uses PYTHON_SERVICE_NAMES variable
+function is_python_service() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    # shellcheck disable=SC2076
+    if [[ ! " ${PYTHON_SERVICE_NAMES[*]} " =~ " ${ARTIFACT_NAME} " ]]; then
+        return 1
+    fi
+}
+
 function get_artifact_name() {
     local SERVICE_NAME
     SERVICE_NAME=$1
@@ -298,6 +346,39 @@ function get_website_name() {
     SERVICE_NAME=$1
 
     cut -d '_' -f1 <<<"$SERVICE_NAME"
+}
+
+function get_python_service_requirements_file() {
+    echo "${SERVICE_PATH}/python-requirements.txt"
+}
+
+function get_python_service_setup_directory() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    echo "$(get_python_services_setup_directory)/$ARTIFACT_NAME"
+}
+
+function get_python_services_setup_directory() {
+    echo "$(dirname "$0")/setup/templates/python-services"
+}
+
+function get_service_conf_file() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    echo "$SERVICE_PATH/$(get_service_conf_filename "$ARTIFACT_NAME")"
+}
+
+function get_service_conf_filename() {
+    local ARTIFACT_NAME
+    ARTIFACT_NAME="$1"
+
+    if is_python_service "$ARTIFACT_NAME"; then
+        echo "${SERVICE_NAME}.conf"
+    else
+        echo "${JAR_NAME}.conf"
+    fi
 }
 
 function generate_service_name() {
@@ -363,18 +444,22 @@ function config_service() {
         echo "[$SERVICE_GROUP] group added"
     fi
 
+    mkdir -p "$SERVICE_PATH" || return 1
+
     # Check user existence
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH" "$SERVICE_UN"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICE_PATH" "$SERVICE_UN"
         echo "[$SERVICE_UN] user added"
     fi
 
-    mkdir -p "$SERVICE_PATH" || return 1
-    mkdir -p "$SERVICE_PATH/logs" || return 1
+    if ! is_python_service "$ARTIFACT"; then
+        mkdir -p "$SERVICE_PATH/logs" || return 1
+    fi
     chown -R "$SERVICE_UN:$SERVICE_GROUP" "$SERVICE_PATH" || return 1
-    find "$SERVICE_PATH" -type d -exec chmod g+s {} + || return 1
+    find "$SERVICE_PATH" -type d -exec chmod g+s,g+w {} + || return 1
+    find "$SERVICE_PATH" -type f -exec chmod g+w {} + || return 1
     setfacl -d -m u::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m g::rwx "$SERVICE_PATH" || return 1
     setfacl -d -m o::--- "$SERVICE_PATH" || return 1
@@ -384,6 +469,15 @@ function config_service() {
 
     # shellcheck disable=SC2034
     export JAR_PATH="$SERVICE_PATH/${JAR_NAME}.jar"
+
+    if [ "$ARTIFACT" == "$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME" ]; then
+        echo "Grant access to monitoring service"
+        if ! getent group "$MONITOR_GROUP" >/dev/null; then
+            groupadd -r "$MONITOR_GROUP" || return 1
+            echo "[$MONITOR_GROUP] group added"
+        fi
+        usermod --append --groups "$MONITOR_GROUP" "$MONITOR_REFRESH_CONFIG_UN" || return 1
+    fi
 }
 
 # Will export next variables: REPORT_EXEC_DOWNLOAD_PATH, EXPORT_EXEC_DOWNLOAD_PATH, DOWNLOAD_PATH
@@ -414,68 +508,38 @@ function copy_service_artifacts() {
     local ARTIFACT
     ARTIFACT="$1"
 
-    copy_service_jar "$ARTIFACT" "$DOWNLOAD_PATH" || return 1
+    if is_python_service "$ARTIFACT"; then
+        copy_python_service_files "$ARTIFACT" || return 1
+    else
+        copy_service_jar "$ARTIFACT" "$DOWNLOAD_PATH" || return 1
 
-    if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
-        copy_service_jar "report-exec" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
-        copy_service_jar "export-exec" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        if [ "$ARTIFACT" == "report-scheduler" ] || [ "$ARTIFACT" == "services" ]; then
+            copy_service_jar "report-exec" "$REPORT_EXEC_DOWNLOAD_PATH" || return 1
+            copy_service_jar "export-exec" "$EXPORT_EXEC_DOWNLOAD_PATH" || return 1
+        fi
     fi
 }
 
-# Uses SERVICE_PATH variable
-function update_monitor_configuration() {
-    local MONITOR_XML
-    MONITOR_XML="$SERVICE_PATH/db-schemas.xml"
+function prepare_java_environment_conf() {
+    local ARTIFACT ENV_CONF_EXTRACT_PATH
+    ARTIFACT=$1
 
-    if [ -n "$MONITOR_AWS_SQS_ACCESS_KEY" ] && [ -n "$MONITOR_AWS_SQS_SECRET_KEY" ] && [ -n "$MONITOR_AWS_SQS_QUEUE_URL" ]; then
-        echo "Setting up AWS SQS configuration..."
+    ENV_CONF_EXTRACT_PATH="$(mktemp --suffix="_env_$ARTIFACT")"
+    delete_on_exit "$ENV_CONF_EXTRACT_PATH"
+    extract_environment_conf "$ARTIFACT" "$ENV_CONF_EXTRACT_PATH" || return 1
 
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' "$MONITOR_AWS_SQS_ACCESS_KEY" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' "$MONITOR_AWS_SQS_SECRET_KEY" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' "$MONITOR_AWS_SQS_QUEUE_URL" || return 1
-    else
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/access-key' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/secret-key' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'aws-sqs/sqs/queue-url' '' '' || return 1
-    fi
+    (< "$ENV_CONF_EXTRACT_PATH" envsubst | tee "$(get_service_conf_file "$ARTIFACT")") >/dev/null || return 1
+}
 
-    if [ -n "$MONITOR_ERROR_MAIL_HOST" ] && [ -n "$MONITOR_ERROR_MAIL_PORT" ] && [ -n "$MONITOR_ERROR_MAIL_USERNAME" ] && \
-        [ -n "$MONITOR_ERROR_MAIL_PASSWORD" ] && [ -n "$MONITOR_ERROR_MAIL_FROM" ] && [ -n "$MONITOR_ERROR_MAIL_TO" ]; then
-        echo "Setting up Error Mail configuration..."
+function prepare_python_environment_conf() {
+    local ARTIFACT ENV_CONF_FILE ENV_CONF_TEMPLATE_FILE
+    ARTIFACT=$1
 
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' "$MONITOR_ERROR_MAIL_HOST" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' "$MONITOR_ERROR_MAIL_PORT" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' "$MONITOR_ERROR_MAIL_USERNAME" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' "$MONITOR_ERROR_MAIL_PASSWORD" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' "$MONITOR_ERROR_MAIL_FROM" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' "$MONITOR_ERROR_MAIL_TO" || return 1
-    else
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/host' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/port' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/username' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/password' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/from' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'error-email/to' '' '' || return 1
-    fi
+    ENV_CONF_FILE="$(get_service_conf_file "$ARTIFACT")"
+    ENV_CONF_TEMPLATE_FILE="$(get_python_services_setup_directory)/$(get_service_conf_filename "$ARTIFACT").template"
 
-    if [ -n "$MONITOR_WARN_MAIL_HOST" ] && [ -n "$MONITOR_WARN_MAIL_PORT" ] && [ -n "$MONITOR_WARN_MAIL_USERNAME" ] && \
-        [ -n "$MONITOR_WARN_MAIL_PASSWORD" ] && [ -n "$MONITOR_WARN_MAIL_FROM" ] && [ -n "$MONITOR_WARN_MAIL_TO" ]; then
-        echo "Setting up Warning Mail configuration..."
-
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' "$MONITOR_WARN_MAIL_HOST" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' "$MONITOR_WARN_MAIL_PORT" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' "$MONITOR_WARN_MAIL_USERNAME" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' "$MONITOR_WARN_MAIL_PASSWORD" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' "$MONITOR_WARN_MAIL_FROM" || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' "$MONITOR_WARN_MAIL_TO" || return 1
-    else
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/host' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/port' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/username' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/password' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/from' '' '' || return 1
-        "$(dirname "$0")/setup/update-xml-value.py" "$MONITOR_XML" 'warning-email/to' '' '' || return 1
-    fi
+    (< "$ENV_CONF_TEMPLATE_FILE" envsubst | tee "$ENV_CONF_FILE") >/dev/null || return 1
+    chown "$SERVICE_UN:$SERVICE_GROUP" "$ENV_CONF_FILE" || return 1
 }
 
 function wait_log() {
