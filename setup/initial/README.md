@@ -13,7 +13,7 @@ OneVizion web and app instances configuration scripts
 1. Prepare instance
 - Install Git
 - Install Python 2.7
-- Install Java 11 (Oracle or OpenJDK)
+- Install Java 17 (Oracle, OpenJDK, Amazon Corretto)
 - Install Tomcat 9 (if you want to configure server as web instance)
 
 2. Clone deployment scripts: `git clone -b stable https://github.com/IKAMTeam/depl-scripts.git`
