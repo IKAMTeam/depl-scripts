@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$#" -lt 1 ]; then
-    echo "### Script for complete uninstall service scheduled to periodically run ###"
+    echo "### Script to complete uninstall service scheduled to periodically run ###"
     echo "Usage: $(basename "$0") <service name> [--force/-f]"
     exit 1
 fi
