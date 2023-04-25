@@ -9,7 +9,7 @@ function usage() {
     echo " "
     echo "Usage for report-scheduler: $(basename "$0") <website> report-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <rpt_schema_username>/<rpt_schema_password>@<rpt_schema_connect_identifier> [report_scheduler_name]"
     echo " "
-    echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <pkg_schema_username>/<pkg_schema_password>@<pkg_schema_connect_identifier>"
+    echo "Usage for integration-scheduler: $(basename "$0") <website> integration-scheduler [--suffix <suffix>] <version> [--aes-password <aes_password>] <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier> <pkg_schema_username>/<pkg_schema_password>@<pkg_schema_connect_identifier>"
     echo " "
     echo "Usage for mail-service (additional): $(basename "$0") <website> mail-service [--suffix <suffix>] <version> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <service name>"
     echo " "
