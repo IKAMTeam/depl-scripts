@@ -2,6 +2,11 @@
 Description=${SERVICE_NAME} APP
 After=network.target
 
+# Should be used instead of same values inside Service section in systemd v230+
+# Amazon Linux 2 have systemd v219
+# StartLimitIntervalSec=400
+# StartLimitBurst=5
+
 [Service]
 Type=forking
 User=${SERVICE_UN}
@@ -13,9 +18,6 @@ PIDFile=${SERVICE_PATH}/run.pid
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=60
-
-# StartLimitIntervalSec introduced in new systemd version, but Amazon Linux 2 using old version with StartLimitInterval property
-# StartLimitIntervalSec=400
 StartLimitInterval=400
 StartLimitBurst=5
 
