@@ -1,6 +1,8 @@
 [Unit]
 Description=${SERVICE_NAME} APP
 After=network.target
+StartLimitIntervalSec=400
+StartLimitBurst=5
 
 [Service]
 Type=forking
@@ -12,7 +14,7 @@ StandardOutput=${SERVICE_PATH}/run.out
 PIDFile=${SERVICE_PATH}/run.pid
 SuccessExitStatus=143
 Restart=on-failure
-RestartSec=5s
+RestartSec=60
 
 [Install]
 WantedBy=multi-user.target
