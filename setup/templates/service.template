@@ -1,7 +1,10 @@
 [Unit]
 Description=${SERVICE_NAME} APP
 After=network.target
+
+# StartLimitIntervalSec introduced in new systemd version, but Amazon Linux 2 using old version with StartLimitInterval property
 StartLimitIntervalSec=400
+StartLimitInterval=400
 StartLimitBurst=5
 
 [Service]
