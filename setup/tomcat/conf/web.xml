@@ -4711,7 +4711,17 @@
         <mime-type>application/vnd.handheld-entertainment+xml</mime-type>
     </mime-mapping>
 
-  <!-- ==================== Default Welcome File List ===================== -->
+    <!-- PDFTron mappings: https://docs.apryse.com/documentation/web/faq/mime-types/#pdf-and-office -->
+    <mime-mapping>
+        <extension>wasm</extension>
+        <mime-type>application/wasm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mem</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+
+    <!-- ==================== Default Welcome File List ===================== -->
   <!-- When a request URI refers to a directory, the default servlet looks  -->
   <!-- for a "welcome file" within that directory and, if present, to the   -->
   <!-- corresponding resource URI for display.                              -->
