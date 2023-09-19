@@ -30,7 +30,7 @@ DB_URL=$7
 PLATFORM_EDITION=$8
 AES_PASSWORD=$9
 
-# Workaround to set enterprise edition if passed "true" as argument for old script version
+# Workaround to set enterprise edition if passed "true" as argument or nothing for old script version
 shopt -s nocasematch
 if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
     PLATFORM_EDITION="enterprise"
