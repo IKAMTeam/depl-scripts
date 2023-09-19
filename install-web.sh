@@ -34,6 +34,8 @@ AES_PASSWORD=$9
 shopt -s nocasematch
 if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
     PLATFORM_EDITION="enterprise"
+elif [[ "$PLATFORM_EDITION" =~ ^false$ ]]; then
+    PLATFORM_EDITION="standard"
 fi
 
 # Compatibility code for old versions without Sec-223444
