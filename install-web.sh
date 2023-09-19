@@ -37,7 +37,7 @@ if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
 fi
 
 # Compatibility code for old versions without Sec-223444
-if [[ "$PLATFORM_EDITION" =~ ^enterprise$ ]]; then
+if [[ "$PLATFORM_EDITION" =~ ^enterprise$ ]] || [[ "$PLATFORM_EDITION" =~ ^ultimate$ ]]; then
   ENTERPRISE_EDITION="true"
 else
   ENTERPRISE_EDITION="false"
