@@ -68,7 +68,7 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-ENTERPRISE_EDITION="true"
+PLATFORM_EDITION="ENTERPRISE"
 ```
 
 ## Setup Web/App servers on AWS platform
@@ -138,7 +138,7 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-ENTERPRISE_EDITION="true"
+PLATFORM_EDITION="ENTERPRISE"
 
 EOF
 ```

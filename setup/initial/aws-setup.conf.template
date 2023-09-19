@@ -49,4 +49,4 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-ENTERPRISE_EDITION="[placeholder]"
+PLATFORM_EDITION="[placeholder]"

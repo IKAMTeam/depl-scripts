@@ -2,10 +2,10 @@
 
 function usage() {
     echo "### Script for install new website into Tomcat ###"
-    echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [enterprise_edition] [aes_password]"
+    echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [platform_edition] [aes_password]"
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
-    echo "Where enterprise_edition is true or false - defaults to true"
+    echo "Where platform_edition is one of STANDARD/ENTERPRISE/ULTIMATE - defaults to ENTERPRISE"
     echo " "
     echo "If installation with the same name already exists, it will be updated with new settings"
 }
@@ -27,11 +27,11 @@ DB_OWNER_PASSWORD=$4
 DB_USER_PASSWORD=$5
 DB_PKG_PASSWORD=$6
 DB_URL=$7
-ENTERPRISE_EDITION=$8
+PLATFORM_EDITION="$(echo "$8" | tr '[:lower:]' '[:upper:]')"
 AES_PASSWORD=$9
 
-if [ -z "$ENTERPRISE_EDITION" ]; then
-    ENTERPRISE_EDITION="true"
+if [ -z "$PLATFORM_EDITION" ]; then
+    PLATFORM_EDITION="ENTERPRISE"
 fi
 
 SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
@@ -63,7 +63,7 @@ mv "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com" "$TOMCAT_PATH/conf/Catali
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkg"]' value "${DB_OWNER_USER}_pkg" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE" || exit 1
-"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION" || exit 1
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.platformEdition"]' value "$PLATFORM_EDITION" || exit 1
 
 "$(dirname "$0")/setup/insert-xml-node.py" "$SERVER_XML_FILE" "$(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME" \
     'Service/Engine[@name="Catalina"]' || exit 1
