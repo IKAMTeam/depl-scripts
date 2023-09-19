@@ -30,7 +30,8 @@ DB_URL=$7
 PLATFORM_EDITION=$8
 AES_PASSWORD=$9
 
-if [ -z "$PLATFORM_EDITION" ]; then
+# Workaround to set enterprise edition if passed "true" as argument for old script version
+if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" == "true" ]]; then
     PLATFORM_EDITION="enterprise"
 fi
 
