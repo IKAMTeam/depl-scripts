@@ -5,7 +5,7 @@ function usage() {
     echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [platform_edition] [aes_password]"
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
-    echo "Where platform_edition is one of STANDARD/ENTERPRISE/ULTIMATE - defaults to ENTERPRISE"
+    echo "Where platform_edition is one of standard/enterprise/ultimate - defaults to enterprise"
     echo " "
     echo "If installation with the same name already exists, it will be updated with new settings"
 }
@@ -27,11 +27,11 @@ DB_OWNER_PASSWORD=$4
 DB_USER_PASSWORD=$5
 DB_PKG_PASSWORD=$6
 DB_URL=$7
-PLATFORM_EDITION="$(echo "$8" | tr '[:lower:]' '[:upper:]')"
+PLATFORM_EDITION=$8
 AES_PASSWORD=$9
 
 if [ -z "$PLATFORM_EDITION" ]; then
-    PLATFORM_EDITION="ENTERPRISE"
+    PLATFORM_EDITION="enterprise"
 fi
 
 SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"

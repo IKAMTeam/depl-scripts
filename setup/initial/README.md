@@ -68,8 +68,8 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-# One of STANDARD/ENTERPRISE/ULTIMATE
-PLATFORM_EDITION="ENTERPRISE"
+# One of standard/enterprise/ultimate
+PLATFORM_EDITION="enterprise"
 ```
 
 ## Setup Web/App servers on AWS platform
@@ -139,8 +139,8 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-# One of STANDARD/ENTERPRISE/ULTIMATE
-PLATFORM_EDITION="ENTERPRISE"
+# One of standard/enterprise/ultimate
+PLATFORM_EDITION="enterprise"
 
 EOF
 ```
