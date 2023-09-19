@@ -5,7 +5,7 @@ function usage() {
     echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [platform_edition] [aes_password]"
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
-    echo "Where platform_edition is one of standard/enterprise/ultimate - defaults to enterprise"
+    echo "Where platform_edition is one of STANDARD/ENTERPRISE/ULTIMATE - defaults to ENTERPRISE"
     echo " "
     echo "If installation with the same name already exists, it will be updated with new settings"
 }
@@ -27,17 +27,17 @@ DB_OWNER_PASSWORD=$4
 DB_USER_PASSWORD=$5
 DB_PKG_PASSWORD=$6
 DB_URL=$7
-PLATFORM_EDITION=$8
+PLATFORM_EDITION="$(echo "$8" | tr '[:lower:]' '[:upper:]')"
 AES_PASSWORD=$9
 
-# Workaround to set enterprise edition if passed "true" as argument or nothing for old script version
+# Workaround to set ENTERPRISE edition if passed "true" as argument or nothing for old script version
 shopt -s nocasematch
 if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
-    PLATFORM_EDITION="enterprise"
+    PLATFORM_EDITION="ENTERPRISE"
 fi
 
 # Compatibility code for old versions without Sec-223444
-if [[ "$PLATFORM_EDITION" =~ ^enterprise$ ]] || [[ "$PLATFORM_EDITION" =~ ^ultimate$ ]]; then
+if [[ "$PLATFORM_EDITION" =~ ^ENTERPRISE$ ]] || [[ "$PLATFORM_EDITION" =~ ^ULTIMATE$ ]]; then
   ENTERPRISE_EDITION="true"
 else
   ENTERPRISE_EDITION="false"

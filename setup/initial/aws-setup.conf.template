@@ -49,5 +49,5 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-# One of standard/enterprise/ultimate
+# One of STANDARD/ENTERPRISE/ULTIMATE
 PLATFORM_EDITION="[placeholder]"
