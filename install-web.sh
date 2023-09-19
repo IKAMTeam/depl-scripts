@@ -31,9 +31,18 @@ PLATFORM_EDITION=$8
 AES_PASSWORD=$9
 
 # Workaround to set enterprise edition if passed "true" as argument for old script version
-if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" == "true" ]]; then
+shopt -s nocasematch
+if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
     PLATFORM_EDITION="enterprise"
 fi
+
+# Compatibility code for old versions without Sec-223444
+if [[ "$PLATFORM_EDITION" =~ ^enterprise$ ]]; then
+  ENTERPRISE_EDITION="true"
+else
+  ENTERPRISE_EDITION="false"
+fi
+shopt -u nocasematch
 
 SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
 CONTEXT_XML_FILE="$TOMCAT_PATH/conf/Catalina/$WEBSITE/ROOT.xml"
@@ -65,6 +74,9 @@ mv "$TOMCAT_PATH/conf/Catalina/sitename.onevizion.com" "$TOMCAT_PATH/conf/Catali
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.dbPkgPassword"]' value "$DB_PKG_PASSWORD" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="app.serverUrl"]' value "https://$WEBSITE" || exit 1
 "$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.platformEdition"]' value "$PLATFORM_EDITION" || exit 1
+
+# Compatibility code for old versions without Sec-223444
+"$(dirname "$0")/setup/update-xml-value.py" "$CONTEXT_XML_FILE" 'Parameter[@name="web.enterpriseEdition"]' value "$ENTERPRISE_EDITION" || exit 1
 
 "$(dirname "$0")/setup/insert-xml-node.py" "$SERVER_XML_FILE" "$(dirname "$0")/$SERVER_XML_HOST_TEMPLATE_NAME" \
     'Service/Engine[@name="Catalina"]' || exit 1
