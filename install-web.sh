@@ -5,7 +5,7 @@ function usage() {
     echo "Usage: $(basename "$0") <website> <version> <owner_schema_username> <owner_schema_password> <user_schema_password> <pkg_schema_password> <connect_identifier> [platform_edition] [aes_password]"
     echo " "
     echo "Where connect_identifier is Oracle host:port:sid or host:port/service_name"
-    echo "Where platform_edition is one of STANDARD/ENTERPRISE/ULTIMATE - defaults to ENTERPRISE"
+    echo "Where platform_edition is one of STANDARD/ENTERPRISE/PREMIUM - defaults to STANDARD"
     echo " "
     echo "If installation with the same name already exists, it will be updated with new settings"
 }
@@ -37,7 +37,7 @@ if [ -z "$PLATFORM_EDITION" ] || [[ "$PLATFORM_EDITION" =~ ^true$ ]]; then
 fi
 
 # Compatibility code for old versions without Sec-223444
-if [[ "$PLATFORM_EDITION" =~ ^ENTERPRISE$ ]] || [[ "$PLATFORM_EDITION" =~ ^ULTIMATE$ ]]; then
+if [[ "$PLATFORM_EDITION" =~ ^ENTERPRISE$ ]] || [[ "$PLATFORM_EDITION" =~ ^PREMIUM$ ]]; then
   ENTERPRISE_EDITION="true"
 else
   ENTERPRISE_EDITION="false"
