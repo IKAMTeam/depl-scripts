@@ -35,7 +35,7 @@ install_java_17
 
 # Install Tomcat (includes Java 11 (Correto))
 # Correto 11 can't be removed because Tomcat package depends on it
-amazon-linux-extras install -y tomcat9
+yum install -y tomcat9
 
 # Temporary workaround to support legacy AWS ELB Health Check configuration
 yum install -y iptables-services

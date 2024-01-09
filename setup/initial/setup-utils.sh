@@ -110,8 +110,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    amazon-linux-extras install -y collectd
-    yum install -y amazon-cloudwatch-agent
+    yum install -y collectd amazon-cloudwatch-agent
 
     tee "$CONF_FILE" <<'EOF'
 {
