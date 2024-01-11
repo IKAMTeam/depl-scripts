@@ -42,8 +42,8 @@ if [ -f "$TOMCAT_PATH/conf/tomcat.conf" ]; then
 fi
 
 # Configure Auto-Restart for Tomcat if it will be crashed
-grep 'Restart=' /usr/lib/systemd/system/tomcat.service &>/dev/null ||
-    sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
+grep 'Restart=' /usr/lib/systemd/system/"$TOMCAT_SERVICE".service &>/dev/null ||
+    sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/"$TOMCAT_SERVICE".service
 systemctl daemon-reload
 
 # Enable Tomcat service to start at boot time
