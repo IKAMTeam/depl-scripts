@@ -34,7 +34,7 @@ init_ec2_instance
 install_java_17
 
 # Sometimes these libraries are missing from default install
-yum install -y python3
+yum install -y python3 python3-pip
 
 function install_python_dependency() {
     python3 -m pip install "$1" || true
