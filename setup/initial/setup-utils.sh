@@ -73,6 +73,7 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
+    install_crond
     install_cloudwatch_agent
     update_motd
 
@@ -155,6 +156,13 @@ function install_cloudwatch_agent() {
 EOF
     chown "$(whoami)" "$CONF_FILE"
     systemctl start amazon-cloudwatch-agent
+}
+
+function install_crond() {
+    yum install -y cronie
+
+    systemctl enable crond
+    systemctl start crond
 }
 
 function install_java_17() {
