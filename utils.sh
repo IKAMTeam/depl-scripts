@@ -75,7 +75,7 @@ function download_artifact() {
         if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
             -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
-            grep -F '[ERROR]' "$MVN_LOG" || cat "$MVN_LOG"
+            cat "$MVN_LOG"
             echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         else
             local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
