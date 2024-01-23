@@ -48,7 +48,7 @@ function require_root_user() {
 }
 
 function download_artifact() {
-    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_GOAL MVN_ARTIFACT MVN_CACHE_DIR
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_GOAL MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
 
     GROUP_ID=$1
     ARTIFACT_ID=$2
@@ -56,6 +56,8 @@ function download_artifact() {
     PACKAGING=$4
     ARTIFACT_CLASSIFIER=$5
     DOWNLOAD_PATH=$6
+
+    RETRY_INTERVAL=30s
 
     MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
@@ -66,35 +68,46 @@ function download_artifact() {
     delete_on_exit "$MVN_CACHE_DIR"
     delete_on_exit "$MVN_LOG"
 
-    echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
+    RETRIES="1"
+    while [ "$RETRIES" -ge 0 ]; do
+        echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-    if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
-        -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
+        if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
+            -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
-        grep -F '[ERROR]' "$MVN_LOG"
-        echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
-        return 1
-    else
-        local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
-
-        grep -F 'Downloading from' "$MVN_LOG" | tail -n1
-
-        if [ -n "$ARTIFACT_CLASSIFIER" ]; then
-            DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
+            grep -F '[ERROR]' "$MVN_LOG" || cat "$MVN_LOG"
+            echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
         else
-            DOWNLOAD_SUFFIX=".${PACKAGING}"
+            local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
+
+            grep -F 'Downloading from' "$MVN_LOG" | tail -n1
+
+            if [ -n "$ARTIFACT_CLASSIFIER" ]; then
+                DOWNLOAD_SUFFIX="-${ARTIFACT_CLASSIFIER}.${PACKAGING}"
+            else
+                DOWNLOAD_SUFFIX=".${PACKAGING}"
+            fi
+
+            GROUP_ID_DIR_NAME=$(echo "$GROUP_ID" | tr "." "/")
+            ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID_DIR_NAME/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
+
+            if cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
+                echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
+                return 0
+            else
+                echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
+            fi
         fi
 
-        GROUP_ID_DIR_NAME=$(echo "$GROUP_ID" | tr "." "/")
-        ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID_DIR_NAME/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
-
-        if ! cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
-            echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
-            return 1
+        if [ "$RETRIES" -gt 0 ]; then
+            echo "Waiting for the next try ($RETRY_INTERVAL)"
+            sleep "$RETRY_INTERVAL"
         fi
 
-        echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
-    fi
+        (( RETRIES-- ))
+    done
+
+    return 1
 }
 
 # Uses SERVICES_PATH variable
