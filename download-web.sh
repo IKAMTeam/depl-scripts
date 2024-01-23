@@ -18,7 +18,6 @@ require_root_user
 
 GROUP_ID=com.onevizion
 ARTIFACT_ID=web
-ARTIFACT_ID_LEGACY=ps-web
 PACKAGING=war
 ARTIFACT_CLASSIFIER=""
 
@@ -29,10 +28,7 @@ WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
 DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
 delete_on_exit "$DOWNLOAD_PATH"
-if ! download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"; then
-    echo "Fallback to download artifact using legacy name [$ARTIFACT_ID_LEGACY]"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID_LEGACY" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
-fi
+download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
 extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
