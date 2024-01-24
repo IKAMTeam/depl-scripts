@@ -28,7 +28,7 @@ WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
 DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
 delete_on_exit "$DOWNLOAD_PATH"
-download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"
+download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
 extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
