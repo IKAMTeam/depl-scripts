@@ -49,4 +49,5 @@ TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
-ENTERPRISE_EDITION="[placeholder]"
+# One of STANDARD/ENTERPRISE/PREMIUM
+PLATFORM_EDITION="[placeholder]"

@@ -8,6 +8,8 @@
     <Parameter name="web.dbOwnerPassword" value="[placeholder for OWNER schema password]"/>
     <Parameter name="web.dbPkg" value="[placeholder username for PKG schema]"/>
     <Parameter name="web.dbPkgPassword" value="[placeholder for PKG schema password]"/>
+    <Parameter name="web.platformEdition" value="[placeholder for Platform Edition (STANDARD/ENTERPRISE/PREMIUM)]"/>
+    <!-- Compatibility for old versions without Sec-223444 -->
     <Parameter name="web.enterpriseEdition" value="true"/>
     <Parameter name="web.whiteLabeled" value="false"/>
     <Parameter name="app.serverUrl" value="https://sitename.onevizion.com"/>
