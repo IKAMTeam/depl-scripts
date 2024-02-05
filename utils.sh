@@ -80,7 +80,7 @@ function download_artifact() {
             -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
             echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]:"
-            grep '[ERROR]' "$MVN_LOG" || (
+            grep -F '[ERROR]' "$MVN_LOG" || (
                 echo "====== Start of Maven full log ======"
                 cat "$MVN_LOG"
                 echo "====== End of Maven full log ======"
