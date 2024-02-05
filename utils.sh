@@ -48,7 +48,7 @@ function require_root_user() {
 }
 
 function download_artifact() {
-    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_GOAL MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
 
     GROUP_ID=$1
     ARTIFACT_ID=$2
@@ -59,7 +59,6 @@ function download_artifact() {
 
     RETRY_INTERVAL=30s
 
-    MVN_GOAL="org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get"
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
     MVN_CACHE_DIR="$(mktemp -d)"
@@ -72,11 +71,20 @@ function download_artifact() {
     while [ "$RETRIES" -ge 0 ]; do
         echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
 
-        if ! "$(dirname "$0")/maven/bin/mvn" -Dmaven.repo.local="$MVN_CACHE_DIR" $MVN_GOAL -Dtransitive=false \
-            -Dartifact="$MVN_ARTIFACT" -Dpackaging="$PACKAGING" -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
+        if ! "$(dirname "$0")/maven/bin/mvn" --batch-mode \
+            -Dmaven.repo.local="$MVN_CACHE_DIR" \
+            org.apache.maven.plugins:maven-dependency-plugin:3.1.2:get \
+            -Dtransitive=false \
+            -Dartifact="$MVN_ARTIFACT" \
+            -Dpackaging="$PACKAGING" \
+            -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
-            cat "$MVN_LOG"
-            echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]"
+            echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]:"
+            grep '[ERROR]' "$MVN_LOG" || (
+                echo "====== Start of Maven full log ======"
+                cat "$MVN_LOG"
+                echo "====== End of Maven full log ======"
+            )
         else
             local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
 
