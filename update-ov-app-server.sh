@@ -36,13 +36,13 @@ for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
     ARTIFACT="$(get_artifact_name "$SERVICE_NAME")"
     ARTIFACT_JAR="${ARTIFACT}.jar"
 
-    if [ ! -f "$SERVICE_DIR/$ARTIFACT_JAR" ]; then
+    # shellcheck disable=SC2153
+    SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
+
+    if [ ! -f "$SERVICE_PATH/$ARTIFACT_JAR" ]; then
         # Python services are not supported
         continue
     fi
-
-    # shellcheck disable=SC2153
-    SERVICE_PATH="$SERVICES_PATH/$SERVICE_NAME"
 
     if ! is_snapshot_version "$NEW_VERSION" && [ "$FORCE_UPDATE_ARG" != "--force" ]; then
         ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
