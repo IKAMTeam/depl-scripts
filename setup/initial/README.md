@@ -63,8 +63,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="0"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
+TOMCAT_PATH="/usr/share/tomcat9"
+TOMCAT_SERVICE="tomcat9"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
@@ -134,8 +134,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
+TOMCAT_PATH="/usr/share/tomcat9"
+TOMCAT_SERVICE="tomcat9"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
