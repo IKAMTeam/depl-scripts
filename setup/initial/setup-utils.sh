@@ -181,7 +181,7 @@ function update_motd() {
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
 function update_route53() {
     local ZONE_ID
-    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq -r ".HostedZones[0].Id // empty" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
 
     if [ -z "$ZONE_ID" ]; then
         echo "No Zone ID received for domain [$AWS_DOMAIN]!"
