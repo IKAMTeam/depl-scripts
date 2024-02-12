@@ -49,6 +49,7 @@ for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
 
         if [ "$ARTIFACT_VERSION" == "$NEW_VERSION" ]; then
             # Skip service
+            echo
             echo "[$ARTIFACT $NEW_VERSION] is already installed for website [$WEBSITE]!"
             continue
         fi
