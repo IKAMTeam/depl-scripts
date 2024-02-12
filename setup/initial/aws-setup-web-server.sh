@@ -48,8 +48,7 @@ service iptables save
 yum install -y python3-dnf-plugin-post-transaction-actions
 
 # Create yum post-action to restore permissions after Tomcat package install/update
-# NOT WORK - TODO
-#(< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/yum/post-actions/tomcat.action") >/dev/null
+(< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/dnf/plugins/post-transaction-actions.d/tomcat.action") >/dev/null
 
 # Run setup-web-server.sh
 "$(dirname "$0")/setup-web-server.sh" "-" <<< "$CONFIG_DATA"
