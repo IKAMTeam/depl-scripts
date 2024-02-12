@@ -58,11 +58,13 @@ for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
 done
 
 if [ "${#SERVICE_NAMES_TO_UPDATE[@]}" -eq 0 ]; then
-    echo "No any services for website [$MATCH_WEBSITE] to update"
+    echo "No services found for website [$MATCH_WEBSITE]"
     exit 0
 fi
 
 for SERVICE_NAME in "${SERVICE_NAMES_TO_UPDATE[@]}"; do
     ARTIFACT="$(get_artifact_name "$SERVICE_NAME")"
+
+    echo
     "$(dirname "$0")/update-ov.sh" "$MATCH_WEBSITE" "$ARTIFACT" "$NEW_VERSION" "$FORCE_UPDATE_ARG" || exit 1
 done
