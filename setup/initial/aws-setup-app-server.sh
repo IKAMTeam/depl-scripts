@@ -36,35 +36,11 @@ install_java_17
 # Sometimes these libraries are missing from default install
 yum install -y python3-pip
 
+# python3-devel, Development Tools packages are needed to build wheels including C/C++ code
+yum install -y python3-devel
+yum group install -y "Development Tools"
+
+python3 -m pip install wheel || true
+
 # Run setup-app-server.sh
 "$(dirname "$0")/setup-app-server.sh" "-" <<< "$CONFIG_DATA"
-
-function install_python_dependency() {
-    local USER_NAME MODULE_NAME
-    USER_NAME="$1"
-    MODULE_NAME="$2"
-
-    sudo -u "$USER_NAME" python3 -m pip install "$MODULE_NAME" || true
-}
-
-ARCH=$(uname -m)
-echo "Detected processor architecture: $ARCH"
-
-if [[ "$ARCH" == arm* ]] || [[ "$ARCH" == aarch* ]]; then
-    # python3-devel, Development Tools packages are needed to build wheels including C/C++ code
-    yum install -y python3-devel
-    yum group install -y "Development Tools"
-
-    install_python_dependency "integration-scheduler" wheel
-fi
-
-install_python_dependency "integration-scheduler" argparse
-install_python_dependency "integration-scheduler" oauth
-install_python_dependency "integration-scheduler" PrettyTable
-install_python_dependency "integration-scheduler" pyserial
-install_python_dependency "integration-scheduler" requests
-install_python_dependency "integration-scheduler" onevizion
-install_python_dependency "integration-scheduler" pysftp
-install_python_dependency "integration-scheduler" datetime
-install_python_dependency "integration-scheduler" pandas
-install_python_dependency "integration-scheduler" boto3
