@@ -34,10 +34,17 @@ init_ec2_instance
 install_java_17
 
 # Sometimes these libraries are missing from default install
-yum install -y python3 python3-pip
+yum install -y python3-pip
+
+# Run setup-app-server.sh
+"$(dirname "$0")/setup-app-server.sh" "-" <<< "$CONFIG_DATA"
 
 function install_python_dependency() {
-    python3 -m pip install "$1" || true
+    local USER_NAME MODULE_NAME
+    USER_NAME="$1"
+    MODULE_NAME="$2"
+
+    sudo -u "$USER_NAME" python3 -m pip install "$MODULE_NAME" || true
 }
 
 ARCH=$(uname -m)
@@ -48,19 +55,16 @@ if [[ "$ARCH" == arm* ]] || [[ "$ARCH" == aarch* ]]; then
     yum install -y python3-devel
     yum group install -y "Development Tools"
 
-    install_python_dependency wheel
+    install_python_dependency "integration-scheduler" wheel
 fi
 
-install_python_dependency argparse
-install_python_dependency oauth
-install_python_dependency PrettyTable
-install_python_dependency pyserial
-install_python_dependency requests
-install_python_dependency onevizion
-install_python_dependency pysftp
-install_python_dependency datetime
-install_python_dependency pandas
-install_python_dependency boto3
-
-# Run setup-app-server.sh
-"$(dirname "$0")/setup-app-server.sh" "-" <<< "$CONFIG_DATA"
+install_python_dependency "integration-scheduler" argparse
+install_python_dependency "integration-scheduler" oauth
+install_python_dependency "integration-scheduler" PrettyTable
+install_python_dependency "integration-scheduler" pyserial
+install_python_dependency "integration-scheduler" requests
+install_python_dependency "integration-scheduler" onevizion
+install_python_dependency "integration-scheduler" pysftp
+install_python_dependency "integration-scheduler" datetime
+install_python_dependency "integration-scheduler" pandas
+install_python_dependency "integration-scheduler" boto3
