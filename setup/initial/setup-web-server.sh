@@ -2,7 +2,7 @@
 
 function usage() {
     echo "### This script will automatically set up the services needed to run on the web server ###"
-    echo "Before run this script you need to install Python 2.7, Java 11, Tomcat 9 on server"
+    echo "Before run this script you need to install Python 2.7, Java 17, Tomcat 9 on server"
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "
