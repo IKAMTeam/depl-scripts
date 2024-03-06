@@ -188,3 +188,10 @@ This IAM Role should contains next permissions:
 
 ## Upgrade Tomcat on non-AWS environment
 1. After tomcat upgrade on non-AWS environment run `./config-tomcat-security.sh` for restore Tomcat files and directories correct permissions.
+ 
+## Upgrade monitoring-refresh-config.py
+
+To deploy the new version of `monitoring-refresh-config.py` run the following command:
+```bash
+install-cron-service.sh monitoring-refresh-config "*/5 * * * *"
+```
