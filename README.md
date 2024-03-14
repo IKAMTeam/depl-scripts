@@ -6,8 +6,9 @@
 - Management (add/upgrade/remove) of the OneVizion installs
 - Management (add/upgrade/remove) of the additional service instances (report-schedulers, rule-services, etc)
 - OneVizion installs collocation
+- Amazon Linux 2023 is supported (Amazon Linux 2 is not)
 
-Most scripts are implemented in Bash with some Python 2.7 usage. Latest version of Tomcat 9 is installed by default. OneVizion services (reports,mail, etc) are installed as [systemd](https://www.freedesktop.org/wiki/Software/systemd/) daemons.
+Most scripts are implemented in Bash with some Python 3 usage. Latest version of Tomcat 9 is installed by default. OneVizion services (reports,mail, etc) are installed as [systemd](https://www.freedesktop.org/wiki/Software/systemd/) daemons.
 
 For documentation on initial configuration of the web and app servers check [setup/initial](setup/initial/README.md) folder.
 

@@ -12,7 +12,7 @@ OneVizion web and app instances configuration scripts
 
 1. Prepare instance
 - Install Git
-- Install Python 2.7
+- Install Python 3
 - Install Java 17 (Oracle, OpenJDK, Amazon Corretto)
 - Install Tomcat 9 (if you want to configure server as web instance)
 
@@ -63,8 +63,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="0"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
+TOMCAT_PATH="/usr/share/tomcat9"
+TOMCAT_SERVICE="tomcat9"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
@@ -77,7 +77,7 @@ PLATFORM_EDITION="ENTERPRISE"
 Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
 
 **Requirements:**
-- Amazon Linux 2 Latest AMI
+- Amazon Linux 2023 Latest AMI (one of arm64/x64)
 
 **Example snippet for Web Server setup**:
 
@@ -134,8 +134,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
+TOMCAT_PATH="/usr/share/tomcat9"
+TOMCAT_SERVICE="tomcat9"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 

@@ -73,6 +73,7 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
+    install_crond
     install_cloudwatch_agent
     update_motd
 
@@ -110,8 +111,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    amazon-linux-extras install -y collectd
-    yum install -y amazon-cloudwatch-agent
+    yum install -y collectd amazon-cloudwatch-agent
 
     tee "$CONF_FILE" <<'EOF'
 {
@@ -158,6 +158,13 @@ EOF
     systemctl start amazon-cloudwatch-agent
 }
 
+function install_crond() {
+    yum install -y cronie
+
+    systemctl enable crond
+    systemctl start crond
+}
+
 function install_java_17() {
     # Install Java 17 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key
@@ -174,7 +181,7 @@ function update_motd() {
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
 function update_route53() {
     local ZONE_ID
-    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq -r ".HostedZones[0].Id // empty" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
 
     if [ -z "$ZONE_ID" ]; then
         echo "No Zone ID received for domain [$AWS_DOMAIN]!"
