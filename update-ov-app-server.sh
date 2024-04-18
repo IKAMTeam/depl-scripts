@@ -78,8 +78,6 @@ if [ "${#ARTIFACTS_TO_UPDATE[@]}" -eq 0 ]; then
     exit 0
 fi
 
-mapfile -t ARTIFACTS_TO_UPDATE < <(echo "${ARTIFACTS_TO_UPDATE[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-
 for ARTIFACT in "${ARTIFACTS_TO_UPDATE[@]}"; do
     echo
     "$(dirname "$0")/update-ov.sh" "$MATCH_WEBSITE" "$ARTIFACT" "$NEW_VERSION" "$FORCE_UPDATE_ARG" || exit 1
