@@ -26,7 +26,7 @@ fi
 mapfile -t ALL_SERVICE_NAMES < <("$(dirname "$0")/list-services.sh" --short-format)
 export ARTIFACTS_TO_UPDATE=()
 
-function contains_artifact() {
+function contains_artifact_to_update() {
     local ARTIFACT
     ARTIFACT="$1"
 
@@ -68,7 +68,7 @@ for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
         fi
     fi
 
-    if ! contains_artifact "$ARTIFACT"; then
+    if ! contains_artifact_to_update "$ARTIFACT"; then
         ARTIFACTS_TO_UPDATE+=("$ARTIFACT")
     fi
 done
