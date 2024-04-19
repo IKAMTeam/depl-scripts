@@ -24,7 +24,20 @@ if [ -n "$3" ] && { [ "$3" == "-f" ] || [ "$3" == "--force" ]; }; then
 fi
 
 mapfile -t ALL_SERVICE_NAMES < <("$(dirname "$0")/list-services.sh" --short-format)
-SERVICE_NAMES_TO_UPDATE=()
+export ARTIFACTS_TO_UPDATE=()
+
+function contains_artifact_to_update() {
+    local ARTIFACT
+    ARTIFACT="$1"
+
+    for UPDATE_ARTIFACT in "${ARTIFACTS_TO_UPDATE[@]}"; do
+        if [[ "$UPDATE_ARTIFACT" == "$ARTIFACT" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
 
 for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
     WEBSITE="$(get_website_name "$SERVICE_NAME")"
@@ -55,17 +68,17 @@ for SERVICE_NAME in "${ALL_SERVICE_NAMES[@]}"; do
         fi
     fi
 
-    SERVICE_NAMES_TO_UPDATE+=("$SERVICE_NAME")
+    if ! contains_artifact_to_update "$ARTIFACT"; then
+        ARTIFACTS_TO_UPDATE+=("$ARTIFACT")
+    fi
 done
 
-if [ "${#SERVICE_NAMES_TO_UPDATE[@]}" -eq 0 ]; then
+if [ "${#ARTIFACTS_TO_UPDATE[@]}" -eq 0 ]; then
     echo "No services found for website [$MATCH_WEBSITE]"
     exit 0
 fi
 
-for SERVICE_NAME in "${SERVICE_NAMES_TO_UPDATE[@]}"; do
-    ARTIFACT="$(get_artifact_name "$SERVICE_NAME")"
-
+for ARTIFACT in "${ARTIFACTS_TO_UPDATE[@]}"; do
     echo
     "$(dirname "$0")/update-ov.sh" "$MATCH_WEBSITE" "$ARTIFACT" "$NEW_VERSION" "$FORCE_UPDATE_ARG" || exit 1
 done
