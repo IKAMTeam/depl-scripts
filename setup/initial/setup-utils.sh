@@ -179,9 +179,18 @@ function install_tomcat_10() {
     mkdir -p "$TOMCAT_PATH"
     curl -s -L -o "$DOWNLOAD_PATH" "$DOWNLOAD_URL"
 
-    echo "Adding group [$TOMCAT_GROUP] and user [$TOMCAT_UN]"
-    groupadd -r "$TOMCAT_GROUP"
-    useradd -c "$TOMCAT_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
+    if getent group "$TOMCAT_GROUP" >/dev/null; then
+        echo "[$TOMCAT_GROUP] group is already exists"
+    else
+        groupadd -r "$TOMCAT_GROUP"
+        echo "[$TOMCAT_GROUP] group added"
+    fi
+    if getent passwd "$TOMCAT_UN" >/dev/null; then
+        echo "[$TOMCAT_UN] user is already exists"
+    else
+        useradd -c "$TOMCAT_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
+        echo "[$TOMCAT_UN] user added"
+    fi
 
     tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
     mv -f "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
