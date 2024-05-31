@@ -193,7 +193,7 @@ function install_tomcat_10() {
     fi
 
     tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
-    mv -f "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
+    cp -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
     rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
     rm -f "$DOWNLOAD_PATH"
 
