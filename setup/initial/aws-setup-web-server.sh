@@ -34,7 +34,7 @@ init_ec2_instance
 install_java_21
 
 # Install Tomcat 10
-yum install -y tomcat9
+install_tomcat_10
 
 # Temporary workaround to support legacy AWS ELB Health Check configuration
 yum install -y iptables-services

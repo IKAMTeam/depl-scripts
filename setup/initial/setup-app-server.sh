@@ -2,7 +2,7 @@
 
 function usage() {
     echo "### This script will automatically set up the services needed to run on the app server ###"
-    echo "Before run this script you need to install Java 17 on server"
+    echo "Before run this script you need to install Java 21 on server"
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "

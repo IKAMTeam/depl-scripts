@@ -13,8 +13,8 @@ OneVizion web and app instances configuration scripts
 1. Prepare instance
 - Install Git
 - Install Python 3
-- Install Java 17 (Oracle, OpenJDK, Amazon Corretto)
-- Install Tomcat 9 (if you want to configure server as web instance)
+- Install Java 21 (Amazon Corretto)
+- Install Tomcat 10 (if you want to configure server as web instance)
 
 2. Clone deployment scripts: `git clone -b stable https://github.com/IKAMTeam/depl-scripts.git`
 3. Create and fill configuration file (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
@@ -63,8 +63,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="0"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat9"
-TOMCAT_SERVICE="tomcat9"
+TOMCAT_PATH="/usr/share/tomcat"
+TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
@@ -134,8 +134,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat9"
-TOMCAT_SERVICE="tomcat9"
+TOMCAT_PATH="/usr/share/tomcat"
+TOMCAT_SERVICE="tomcat"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 

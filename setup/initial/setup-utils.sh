@@ -165,6 +165,39 @@ function install_crond() {
     systemctl start crond
 }
 
+function install_tomcat_10() {
+    # Install Tomcat 10.1.x (manual)
+    local LATEST_VERSION DOWNLOAD_URL DOWNLOAD_PATH
+    LATEST_VERSION="$(curl -s 'https://api.github.com/repos/apache/tomcat/tags' | jq -r '.[] | .name' | grep -E '10\.1\.[0-9]{1,2}$' | sort -r | head -n 1)"
+
+    echo "Found latest version: $LATEST_VERSION"
+    DOWNLOAD_URL="https://dlcdn.apache.org/tomcat/tomcat-10/v${LATEST_VERSION}/bin/apache-tomcat-${LATEST_VERSION}.tar.gz"
+    DOWNLOAD_PATH="$TOMCAT_PATH/tomcat-${LATEST_VERSION}"
+    echo "Download URL: $DOWNLOAD_URL"
+    echo "Download path: $DOWNLOAD_PATH"
+
+    mkdir -p "$TOMCAT_PATH"
+    curl -s -L -o "$DOWNLOAD_PATH" "$DOWNLOAD_URL"
+
+    echo "Adding group [$TOMCAT_GROUP] and user [$TOMCAT_UN]"
+    groupadd -r "$TOMCAT_GROUP"
+    useradd -c "$TOMCAT_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
+
+    tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
+    mv -f "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
+    rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
+    rm -f "$DOWNLOAD_PATH"
+
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"
+
+    (< "$SCRIPTS_PATH/setup/templates/tomcat-service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
+
+    echo "Enabling service [$TOMCAT_SERVICE]..."
+    systemctl enable "$TOMCAT_SERVICE"
+
+    echo "You can start Tomcat with [systemctl start $TOMCAT_SERVICE] command"
+}
+
 function install_java_21() {
     # Install Java 21 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key

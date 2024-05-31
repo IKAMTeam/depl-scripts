@@ -2,7 +2,7 @@
 
 function usage() {
     echo "### This script will automatically set up the services needed to run on the web server ###"
-    echo "Before run this script you need to install Python 3, Java 17, Tomcat 9 on server"
+    echo "Before run this script you need to install Python 3, Java 21, Tomcat 10 on server"
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "
@@ -72,8 +72,8 @@ $TOMCAT_PATH/logs/catalina.log {
     rotate 52
     compress
     missingok
-    su tomcat tomcat
-    create 0660 tomcat tomcat
+    su $TOMCAT_UN $TOMCAT_GROUP
+    create 0660 $TOMCAT_UN $TOMCAT_GROUP
 }
 EOF
 
