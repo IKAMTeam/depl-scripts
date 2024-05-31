@@ -197,6 +197,7 @@ function install_tomcat_10() {
     rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
     rm -f "$DOWNLOAD_PATH"
 
+    export DOLLAR_SYMBOL='$'
     (< "$SCRIPTS_PATH/setup/templates/tomcat10/setenv.sh.template" envsubst | tee "$TOMCAT_PATH/bin/setenv.sh") >/dev/null
     chmod +x "$TOMCAT_PATH/bin/setenv.sh"
 
