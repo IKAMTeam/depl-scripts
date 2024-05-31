@@ -1,0 +1,13 @@
+[Unit]
+Description=Apache Tomcat 10 Web Application Container
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=${TOMCAT_PATH}/conf/tomcat.conf
+ExecStart=${TOMCAT_PATH}/bin/startup.sh
+ExecStop=${TOMCAT_PATH}/bin/shutdown.sh
+User=${TOMCAT_UN}
+
+[Install]
+WantedBy=multi-user.target

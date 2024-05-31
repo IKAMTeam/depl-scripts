@@ -188,9 +188,13 @@ function install_tomcat_10() {
     rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
     rm -f "$DOWNLOAD_PATH"
 
-    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/setenv.sh.template" envsubst | tee "$TOMCAT_PATH/bin/setenv.sh") >/dev/null
+    chmod +x "$TOMCAT_PATH/bin/setenv.sh"
 
-    (< "$SCRIPTS_PATH/setup/templates/tomcat-service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/tomcat.conf.template" envsubst | tee "$TOMCAT_PATH/conf/tomcat.conf") >/dev/null
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
+
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"
 
     echo "Enabling service [$TOMCAT_SERVICE]..."
     systemctl enable "$TOMCAT_SERVICE"
