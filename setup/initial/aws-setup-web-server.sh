@@ -30,10 +30,10 @@ set -o pipefail
 
 init_ec2_instance
 
-# Install Java 17 (Correto)
-install_java_17
+# Install Java 21 (Correto)
+install_java_21
 
-# Install Tomcat 9
+# Install Tomcat 10
 yum install -y tomcat9
 
 # Temporary workaround to support legacy AWS ELB Health Check configuration

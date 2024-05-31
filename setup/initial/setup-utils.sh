@@ -165,12 +165,12 @@ function install_crond() {
     systemctl start crond
 }
 
-function install_java_17() {
-    # Install Java 17 (Correto)
+function install_java_21() {
+    # Install Java 21 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key
     curl -s -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
 
-    yum install -y java-17-amazon-corretto-devel
+    yum install -y java-21-amazon-corretto-devel
 }
 
 # Uses SCRIPTS_PATH variables

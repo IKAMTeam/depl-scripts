@@ -30,8 +30,8 @@ set -o pipefail
 
 init_ec2_instance
 
-# Install Java 17 (Correto)
-install_java_17
+# Install Java 21 (Correto)
+install_java_21
 
 # Sometimes these libraries are missing from default install
 yum install -y python3-pip
