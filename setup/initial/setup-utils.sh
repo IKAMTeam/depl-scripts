@@ -188,7 +188,7 @@ function install_tomcat_10() {
     if getent passwd "$TOMCAT_UN" >/dev/null; then
         echo "[$TOMCAT_UN] user is already exists"
     else
-        useradd -c "$TOMCAT_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
+        useradd -c "$TOMCAT_UN" -g "$TOMCAT_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
         echo "[$TOMCAT_UN] user added"
     fi
 
