@@ -176,7 +176,7 @@ function install_tomcat_10() {
     echo "Download URL: $DOWNLOAD_URL"
     echo "Download path: $DOWNLOAD_PATH"
 
-    mkdir -p "$TOMCAT_PATH"
+    mkdir -p "$TOMCAT_PATH" "$TOMCAT_PATH/conf/Catalina/localhost"
     curl -s -L -o "$DOWNLOAD_PATH" "$DOWNLOAD_URL"
 
     if getent group "$TOMCAT_GROUP" >/dev/null; then
