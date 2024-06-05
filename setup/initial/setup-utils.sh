@@ -73,6 +73,7 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
+    install_crond
     install_cloudwatch_agent
     update_motd
 
@@ -110,8 +111,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    amazon-linux-extras install -y collectd
-    yum install -y amazon-cloudwatch-agent
+    yum install -y collectd amazon-cloudwatch-agent
 
     tee "$CONF_FILE" <<'EOF'
 {
@@ -158,12 +158,66 @@ EOF
     systemctl start amazon-cloudwatch-agent
 }
 
-function install_java_17() {
-    # Install Java 17 (Correto)
+function install_crond() {
+    yum install -y cronie
+
+    systemctl enable crond
+    systemctl start crond
+}
+
+function install_tomcat_10() {
+    # Install Tomcat 10.1.x (manual)
+    local LATEST_VERSION DOWNLOAD_URL DOWNLOAD_PATH
+    LATEST_VERSION="$(curl -s 'https://api.github.com/repos/apache/tomcat/tags' | jq -r '.[] | .name' | grep -E '10\.1\.[0-9]{1,2}$' | sort -r | head -n 1)"
+
+    echo "Found latest version: $LATEST_VERSION"
+    DOWNLOAD_URL="https://dlcdn.apache.org/tomcat/tomcat-10/v${LATEST_VERSION}/bin/apache-tomcat-${LATEST_VERSION}.tar.gz"
+    DOWNLOAD_PATH="$TOMCAT_PATH/tomcat-${LATEST_VERSION}"
+    echo "Download URL: $DOWNLOAD_URL"
+    echo "Download path: $DOWNLOAD_PATH"
+
+    mkdir -p "$TOMCAT_PATH" "$TOMCAT_PATH/conf/Catalina/localhost"
+    curl -s -L -o "$DOWNLOAD_PATH" "$DOWNLOAD_URL"
+
+    if getent group "$TOMCAT_GROUP" >/dev/null; then
+        echo "[$TOMCAT_GROUP] group is already exists"
+    else
+        groupadd -r "$TOMCAT_GROUP"
+        echo "[$TOMCAT_GROUP] group added"
+    fi
+    if getent passwd "$TOMCAT_UN" >/dev/null; then
+        echo "[$TOMCAT_UN] user is already exists"
+    else
+        useradd -c "$TOMCAT_UN" -g "$TOMCAT_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
+        echo "[$TOMCAT_UN] user added"
+    fi
+
+    tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
+    cp -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
+    rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
+    rm -f "$DOWNLOAD_PATH"
+
+    export DOLLAR_SYMBOL='$'
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/setenv.sh.template" envsubst | tee "$TOMCAT_PATH/bin/setenv.sh") >/dev/null
+    chmod +x "$TOMCAT_PATH/bin/setenv.sh"
+
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/tomcat.conf.template" envsubst | tee "$TOMCAT_PATH/conf/tomcat.conf") >/dev/null
+    (< "$SCRIPTS_PATH/setup/templates/tomcat10/service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
+
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"
+
+    echo "Enabling service [$TOMCAT_SERVICE]..."
+    systemctl enable "$TOMCAT_SERVICE"
+
+    echo "You can start Tomcat with [systemctl start $TOMCAT_SERVICE] command"
+}
+
+function install_java_21() {
+    # Install Java 21 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key
     curl -s -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
 
-    yum install -y java-17-amazon-corretto-devel
+    yum install -y java-21-amazon-corretto-devel
 }
 
 # Uses SCRIPTS_PATH variables
@@ -174,7 +228,7 @@ function update_motd() {
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
 function update_route53() {
     local ZONE_ID
-    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq -r ".HostedZones[0].Id // empty" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
 
     if [ -z "$ZONE_ID" ]; then
         echo "No Zone ID received for domain [$AWS_DOMAIN]!"

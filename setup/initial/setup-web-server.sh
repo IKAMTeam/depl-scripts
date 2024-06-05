@@ -2,7 +2,7 @@
 
 function usage() {
     echo "### This script will automatically set up the services needed to run on the web server ###"
-    echo "Before run this script you need to install Python 2.7, Java 11, Tomcat 9 on server"
+    echo "Before run this script you need to install Python 3, Java 21, Tomcat 10 on server"
     echo " "
     echo "Usage: $(basename "$0") <config file>"
     echo " "
@@ -42,8 +42,8 @@ if [ -f "$TOMCAT_PATH/conf/tomcat.conf" ]; then
 fi
 
 # Configure Auto-Restart for Tomcat if it will be crashed
-grep 'Restart=' /usr/lib/systemd/system/tomcat.service &>/dev/null ||
-    sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/tomcat.service
+grep 'Restart=' /usr/lib/systemd/system/"$TOMCAT_SERVICE".service &>/dev/null ||
+    sed -i 's/\[Service\]/[Service]\nRestart=on-failure\nRestartSec=5s/g' /usr/lib/systemd/system/"$TOMCAT_SERVICE".service
 systemctl daemon-reload
 
 # Enable Tomcat service to start at boot time
@@ -72,8 +72,8 @@ $TOMCAT_PATH/logs/catalina.log {
     rotate 52
     compress
     missingok
-    su tomcat tomcat
-    create 0660 tomcat tomcat
+    su $TOMCAT_UN $TOMCAT_GROUP
+    create 0660 $TOMCAT_UN $TOMCAT_GROUP
 }
 EOF
 
