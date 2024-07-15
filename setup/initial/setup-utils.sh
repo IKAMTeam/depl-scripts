@@ -168,7 +168,7 @@ function install_crond() {
 function install_tomcat_10() {
     # Install Tomcat 10.1.x (manual)
     local LATEST_VERSION DOWNLOAD_URL DOWNLOAD_PATH
-    LATEST_VERSION="$(curl -s 'https://api.github.com/repos/apache/tomcat/tags' | jq -r '.[] | .name' | grep -E '10\.1\.[0-9]{1,2}$' | sort -r | head -n 1)"
+    LATEST_VERSION="10.1.26"
 
     echo "Found latest version: $LATEST_VERSION"
     DOWNLOAD_URL="https://dlcdn.apache.org/tomcat/tomcat-10/v${LATEST_VERSION}/bin/apache-tomcat-${LATEST_VERSION}.tar.gz"
