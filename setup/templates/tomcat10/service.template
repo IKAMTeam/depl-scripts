@@ -4,9 +4,9 @@ After=syslog.target network.target
 
 [Service]
 Type=forking
-EnvironmentFile=${TOMCAT_PATH}/conf/tomcat.conf
 ExecStart=${TOMCAT_PATH}/bin/startup.sh
 ExecStop=${TOMCAT_PATH}/bin/shutdown.sh
+Environment="CATALINA_HOME=${TOMCAT_PATH}"
 Environment="CATALINA_PID=${TOMCAT_PATH}/logs/tomcat.pid"
 User=${TOMCAT_UN}
 

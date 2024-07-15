@@ -201,7 +201,6 @@ function install_tomcat_10() {
     (< "$SCRIPTS_PATH/setup/templates/tomcat10/setenv.sh.template" envsubst | tee "$TOMCAT_PATH/bin/setenv.sh") >/dev/null
     chmod +x "$TOMCAT_PATH/bin/setenv.sh"
 
-    (< "$SCRIPTS_PATH/setup/templates/tomcat10/tomcat.conf.template" envsubst | tee "$TOMCAT_PATH/conf/tomcat.conf") >/dev/null
     (< "$SCRIPTS_PATH/setup/templates/tomcat10/service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
 
     chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"

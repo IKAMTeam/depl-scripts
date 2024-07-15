@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. "${TOMCAT_PATH}/conf/tomcat.conf"
-
 if [ -d "${TOMCAT_PATH}/conf/conf.d" ]; then
     for file in "${TOMCAT_PATH}/conf/conf.d"/*.conf ; do
         if [ -f "${DOLLAR_SYMBOL}file" ] ; then
