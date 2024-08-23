@@ -168,7 +168,7 @@ function install_crond() {
 function install_tomcat_10() {
     # Install Tomcat 10.1.x (manual)
     local TOMCAT_VERSION DOWNLOAD_URL DOWNLOAD_PATH
-    TOMCAT_VERSION="10.1.26"
+    TOMCAT_VERSION="10.1.28"
 
     echo "Using version: $TOMCAT_VERSION"
     DOWNLOAD_URL="https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz"
