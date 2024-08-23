@@ -167,12 +167,12 @@ function install_crond() {
 
 function install_tomcat_10() {
     # Install Tomcat 10.1.x (manual)
-    local LATEST_VERSION DOWNLOAD_URL DOWNLOAD_PATH
-    LATEST_VERSION="10.1.26"
+    local TOMCAT_VERSION DOWNLOAD_URL DOWNLOAD_PATH
+    TOMCAT_VERSION="10.1.26"
 
-    echo "Found latest version: $LATEST_VERSION"
-    DOWNLOAD_URL="https://dlcdn.apache.org/tomcat/tomcat-10/v${LATEST_VERSION}/bin/apache-tomcat-${LATEST_VERSION}.tar.gz"
-    DOWNLOAD_PATH="$TOMCAT_PATH/tomcat-${LATEST_VERSION}"
+    echo "Using version: $TOMCAT_VERSION"
+    DOWNLOAD_URL="https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz"
+    DOWNLOAD_PATH="$TOMCAT_PATH/tomcat-${TOMCAT_VERSION}"
     echo "Download URL: $DOWNLOAD_URL"
     echo "Download path: $DOWNLOAD_PATH"
 
@@ -193,8 +193,8 @@ function install_tomcat_10() {
     fi
 
     tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
-    cp -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"/* "$TOMCAT_PATH"
-    rm -rf "$TOMCAT_PATH/apache-tomcat-${LATEST_VERSION}"
+    cp -rf "$TOMCAT_PATH/apache-tomcat-${TOMCAT_VERSION}"/* "$TOMCAT_PATH"
+    rm -rf "$TOMCAT_PATH/apache-tomcat-${TOMCAT_VERSION}"
     rm -f "$DOWNLOAD_PATH"
 
     export DOLLAR_SYMBOL='$'
