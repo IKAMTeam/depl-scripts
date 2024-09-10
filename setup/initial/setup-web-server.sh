@@ -79,7 +79,7 @@ EOF
 
 # Install web
 "$SCRIPTS_PATH/install-web.sh" "$WEBSITE" "$VERSION" "$DB_OWNER_USER" "$DB_OWNER_PASSWORD" "$DB_USER_PASSWORD" \
-    "$DB_PKG_PASSWORD" "$DB_URL" "$PLATFORM_EDITION" "$AES_PASSWORD"
+    "$DB_PKG_PASSWORD" "$DB_RPT_PASSWORD" "$DB_URL" "$PLATFORM_EDITION" "$AES_PASSWORD"
 
 # Finished
 echo "Web server setup complete."
