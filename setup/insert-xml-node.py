@@ -4,12 +4,13 @@ import sys
 import xml.etree.ElementTree as ElementTree
 
 if len(sys.argv) < 3:
-    print('Usage: insert-xml-node.py <in-out-file> <node-in-file> <xpath of node where append child>')
+    print('Usage: insert-xml-node.py <in-out-file> <node-in-file> <xpath of node where append child> [xpath of nodes what append]')
     exit(1)
 
 inFile = sys.argv[1]
 childInFile = sys.argv[2]
 xpath = sys.argv[3]
+xpath_nodes_to_append = sys.argv[4] if len(sys.argv) > 4 else ''
 
 
 class CommentedTreeBuilder(ElementTree.TreeBuilder):
@@ -44,9 +45,11 @@ root = tree.getroot()
 childRoot = treeChild.getroot()
 
 nodes = [root] if len(xpath) == 0 else root.findall(xpath)
+nodes_to_append = [childRoot] if len(xpath_nodes_to_append) == 0 else childRoot.findall(xpath_nodes_to_append)
 
 for node in nodes:
-    node.append(childRoot)
+    for node_to_append in nodes_to_append:
+        node.append(node_to_append)
 
 indent(root)
 
