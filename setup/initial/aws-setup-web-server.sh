@@ -30,11 +30,11 @@ set -o pipefail
 
 init_ec2_instance
 
+# Install Tomcat 10 (will install Java 17)
+yum install -y tomcat10
+
 # Install Java 21 (Correto)
 install_java_21
-
-# Install Tomcat 10
-install_tomcat_10
 
 # Temporary workaround to support legacy AWS ELB Health Check configuration
 yum install -y iptables-services
@@ -47,8 +47,7 @@ service iptables save
 yum install -y python3-dnf-plugin-post-transaction-actions
 
 # Create yum post-action to restore permissions after Tomcat package install/update
-# TODO: Uncomment after Tomcat 10 will be available in yum
-# (< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/dnf/plugins/post-transaction-actions.d/tomcat.action") >/dev/null
+(< "$SCRIPTS_PATH/setup/templates/yum/post-actions/tomcat.action" envsubst | tee "/etc/dnf/plugins/post-transaction-actions.d/tomcat.action") >/dev/null
 
 # Run setup-web-server.sh
 "$(dirname "$0")/setup-web-server.sh" "-" <<< "$CONFIG_DATA"

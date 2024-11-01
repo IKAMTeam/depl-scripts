@@ -165,52 +165,6 @@ function install_crond() {
     systemctl start crond
 }
 
-function install_tomcat_10() {
-    # Install Tomcat 10.1.x (manual)
-    local TOMCAT_VERSION DOWNLOAD_URL DOWNLOAD_PATH
-    TOMCAT_VERSION="10.1.30"
-
-    echo "Using version: $TOMCAT_VERSION"
-    DOWNLOAD_URL="https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz"
-    DOWNLOAD_PATH="$TOMCAT_PATH/tomcat-${TOMCAT_VERSION}"
-    echo "Download URL: $DOWNLOAD_URL"
-    echo "Download path: $DOWNLOAD_PATH"
-
-    mkdir -p "$TOMCAT_PATH" "$TOMCAT_PATH/conf/Catalina/localhost"
-    curl -s -L -o "$DOWNLOAD_PATH" "$DOWNLOAD_URL"
-
-    if getent group "$TOMCAT_GROUP" >/dev/null; then
-        echo "[$TOMCAT_GROUP] group is already exists"
-    else
-        groupadd -r "$TOMCAT_GROUP"
-        echo "[$TOMCAT_GROUP] group added"
-    fi
-    if getent passwd "$TOMCAT_UN" >/dev/null; then
-        echo "[$TOMCAT_UN] user is already exists"
-    else
-        useradd -c "$TOMCAT_UN" -g "$TOMCAT_GROUP" -s /sbin/nologin -r -d "$TOMCAT_PATH" "$TOMCAT_UN"
-        echo "[$TOMCAT_UN] user added"
-    fi
-
-    tar xvfC "$DOWNLOAD_PATH" "$TOMCAT_PATH"
-    cp -rf "$TOMCAT_PATH/apache-tomcat-${TOMCAT_VERSION}"/* "$TOMCAT_PATH"
-    rm -rf "$TOMCAT_PATH/apache-tomcat-${TOMCAT_VERSION}"
-    rm -f "$DOWNLOAD_PATH"
-
-    export DOLLAR_SYMBOL='$'
-    (< "$SCRIPTS_PATH/setup/templates/tomcat10/setenv.sh.template" envsubst | tee "$TOMCAT_PATH/bin/setenv.sh") >/dev/null
-    chmod +x "$TOMCAT_PATH/bin/setenv.sh"
-
-    (< "$SCRIPTS_PATH/setup/templates/tomcat10/service.template" envsubst | tee "/usr/lib/systemd/system/${TOMCAT_SERVICE}.service") >/dev/null
-
-    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH"
-
-    echo "Enabling service [$TOMCAT_SERVICE]..."
-    systemctl enable "$TOMCAT_SERVICE"
-
-    echo "You can start Tomcat with [systemctl start $TOMCAT_SERVICE] command"
-}
-
 function install_java_21() {
     # Install Java 21 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key
