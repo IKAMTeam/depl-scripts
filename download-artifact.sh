@@ -18,11 +18,9 @@ fi
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
-require_root_user
-
 MVN_ARTIFACT="$1" # report-scheduler:1.0-SNAPSHOT:jar:shaded
 TARGET_PATH="$2"
-ARTIFACT_ID_WITH_VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1 ':' $2}')" # report-scheduler:1.0-SNAPSHOT
+ARTIFACT_ID_WITH_VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1 ":" $2}')" # report-scheduler:1.0-SNAPSHOT
 PACKAGING="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $3}')" # jar
 ARTIFACT_CLASSIFIER="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $4}')" # shaded
 
