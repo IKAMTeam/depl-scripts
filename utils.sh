@@ -57,9 +57,18 @@ function download_artifact() {
     ARTIFACT_CLASSIFIER=$5
     DOWNLOAD_PATH=$6
 
-    RETRY_INTERVAL=30s
+    download_artifact_joined "$GROUP_ID:$ARTIFACT_ID:$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"
+}
 
-    MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
+function download_artifact_joined() {
+    local PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
+
+    MVN_ARTIFACT=$1
+    PACKAGING=$2
+    ARTIFACT_CLASSIFIER=$3
+    DOWNLOAD_PATH=$4
+
+    RETRY_INTERVAL=30s
 
     MVN_CACHE_DIR="$(mktemp -d)"
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
