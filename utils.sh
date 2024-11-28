@@ -95,7 +95,10 @@ function download_artifact_joined() {
                 echo "====== End of Maven full log ======"
             )
         else
-            local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
+            local GROUP_ID_DIR_NAME GROUP_ID ARTIFACT_ID VERSION ARTIFACT_PATH DOWNLOAD_SUFFIX
+            GROUP_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1}')"
+            ARTIFACT_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $2}')"
+            VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $3}')"
 
             grep -F 'Downloading from' "$MVN_LOG" | tail -n1
 
