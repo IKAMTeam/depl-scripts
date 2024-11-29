@@ -57,18 +57,9 @@ function download_artifact() {
     ARTIFACT_CLASSIFIER=$5
     DOWNLOAD_PATH=$6
 
-    download_artifact_joined "$GROUP_ID:$ARTIFACT_ID:$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH"
-}
-
-function download_artifact_joined() {
-    local PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
-
-    MVN_ARTIFACT=$1
-    PACKAGING=$2
-    ARTIFACT_CLASSIFIER=$3
-    DOWNLOAD_PATH=$4
-
     RETRY_INTERVAL=30s
+
+    MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
     MVN_CACHE_DIR="$(mktemp -d)"
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
@@ -95,10 +86,7 @@ function download_artifact_joined() {
                 echo "====== End of Maven full log ======"
             )
         else
-            local GROUP_ID_DIR_NAME GROUP_ID ARTIFACT_ID VERSION ARTIFACT_PATH DOWNLOAD_SUFFIX
-            GROUP_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1}')"
-            ARTIFACT_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $2}')"
-            VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $3}')"
+            local GROUP_ID_DIR_NAME ARTIFACT_PATH DOWNLOAD_SUFFIX
 
             grep -F 'Downloading from' "$MVN_LOG" | tail -n1
 

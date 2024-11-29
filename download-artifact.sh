@@ -20,7 +20,9 @@ fi
 
 MVN_ARTIFACT="$1" # report-scheduler:1.0-SNAPSHOT:jar:shaded
 TARGET_PATH="$2"
-ARTIFACT_ID_WITH_VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1 ":" $2}')" # report-scheduler:1.0-SNAPSHOT
+
+ARTIFACT_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1}')" # report-scheduler
+VERSION="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $2}')" # 1.0-SNAPSHOT
 PACKAGING="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $3}')" # jar
 ARTIFACT_CLASSIFIER="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $4}')" # shaded
 
@@ -28,8 +30,7 @@ if [ -z "$PACKAGING" ]; then
   PACKAGING="jar"
 fi
 if [ -z "$TARGET_PATH" ]; then
-  ARTIFACT_ID="$(echo "$MVN_ARTIFACT" | awk -F ':' '{print $1}')"
   TARGET_PATH="${ARTIFACT_ID}.${PACKAGING}"
 fi
 
-download_artifact_joined "com.onevizion:$ARTIFACT_ID_WITH_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$TARGET_PATH" || exit 1
+download_artifact "com.onevizion" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$TARGET_PATH" || exit 1
