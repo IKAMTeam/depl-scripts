@@ -14,9 +14,7 @@ SuccessExitStatus=143
 Restart=on-failure
 RestartSec=60
 
-# StartLimitIntervalSec introduced in new systemd version, but Amazon Linux 2 using old version with StartLimitInterval property
-# StartLimitIntervalSec=400
-StartLimitInterval=400
+StartLimitIntervalSec=400
 StartLimitBurst=5
 
 [Install]
