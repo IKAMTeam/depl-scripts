@@ -15,7 +15,4 @@
     <Parameter name="web.enterpriseEdition" value="true"/>
     <Parameter name="web.whiteLabeled" value="false"/>
     <Parameter name="app.serverUrl" value="https://sitename.onevizion.com"/>
-
-    <!-- Required to prevent NoClassDefFoundError when Tomcat try to start context -->
-    <Loader jakartaConverter="TOMCAT" />
 </Context>
