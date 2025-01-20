@@ -40,6 +40,10 @@ SNAPSHOT_REPO_URL="https://..."
 REPOSITORY_UN="username"
 REPOSITORY_PWD='password'
 
+MONITORING_REPO_URL="https://..."
+MONITORING_REPO_UN="username"
+MONITORING_REPO_PWD='password'
+
 WEBSITE="test01.onevizion.com"
 VERSION="20.5.0"
 
@@ -110,6 +114,10 @@ RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."
 REPOSITORY_UN="username"
 REPOSITORY_PWD='password'
+
+MONITORING_REPO_URL="https://..."
+MONITORING_REPO_UN="username"
+MONITORING_REPO_PWD='password'
 
 WEBSITE="test01.onevizion.com"
 VERSION="20.5.0"
