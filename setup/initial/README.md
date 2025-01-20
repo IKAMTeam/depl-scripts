@@ -96,7 +96,7 @@ SCRIPTS_OWNER="ec2-user:ec2-user"
 
 yum install -y git
 git clone -b stable https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
-chown "$SCRIPTS_OWNER" "$SCRIPTS_PATH"
+chown -R "$SCRIPTS_OWNER" "$SCRIPTS_PATH"
 
 "$SCRIPTS_PATH/setup/initial/aws-setup-web-server.sh" - <<'EOF'
 # Leave empty to skip private DNS entry creation
