@@ -80,7 +80,7 @@ function init_ec2_instance() {
     # To bypass CVE-2022-24765 fix because we are using multi-user configuration (run "git clone" as ec2-user,
     # run "git pull" as root)
     # https://github.blog/2022-04-12-git-security-vulnerability-announced/#cve-2022-24765
-    git config --global --add safe.directory "$SCRIPTS_PATH" || true
+    git config --system --add safe.directory "$SCRIPTS_PATH" || true
 
     if [ -z "$AWS_DOMAIN" ]; then
         echo "Update hostname and route 53 is cancelled"
