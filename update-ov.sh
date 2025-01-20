@@ -34,6 +34,11 @@ if [ "$2" == "tomcat" ]; then
     PACKAGING=war
     ARTIFACT_CLASSIFIER=""
 
+    if is_tomcat_10; then
+        ARTIFACT_CLASSIFIER="tomcat10"
+        echo "Tomcat 10 detected, setting classifier to '$ARTIFACT_CLASSIFIER'"
+    fi
+
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
     CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
     CONTEXT_XML_FILE="$CONTEXT_PATH/ROOT.xml"

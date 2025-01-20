@@ -667,6 +667,10 @@ function cleanup_tomcat() {
     rm -rf "$TOMCAT_PATH"/logs/catalina.log "$TOMCAT_PATH"/logs/catalina.out
 }
 
+function is_tomcat_10() {
+    java -cp "$TOMCAT_PATH/lib/catalina.jar" "org.apache.catalina.util.ServerInfo" | grep 'Apache Tomcat/10'
+}
+
 # Uses CLEANUP_TMP_FILES variable
 function delete_on_exit() {
     export CLEANUP_TMP_FILES="$CLEANUP_TMP_FILES $1"
