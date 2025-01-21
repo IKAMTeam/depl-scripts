@@ -673,7 +673,8 @@ function cleanup_tomcat() {
 }
 
 function is_tomcat_support_jakarta() {
-    java -cp "$TOMCAT_PATH/lib/catalina.jar" "org.apache.catalina.util.ServerInfo" | grep 'Apache Tomcat/10'
+    TOMCAT_MAJOR_VERSION="$(java -cp "$TOMCAT_PATH/lib/catalina.jar" "org.apache.catalina.util.ServerInfo" | grep 'Apache Tomcat/' | cut -d'/' -f2 | cut -d'.' -f1)"
+    [ "$TOMCAT_MAJOR_VERSION" -ge 10 ]
 }
 
 # Uses CLEANUP_TMP_FILES variable
