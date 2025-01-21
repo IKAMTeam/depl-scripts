@@ -48,7 +48,7 @@ function require_root_user() {
 }
 
 function download_artifact() {
-    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
+    local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES ARTIFACT_HUMAN_READABLE
 
     GROUP_ID=$1
     ARTIFACT_ID=$2
@@ -61,6 +61,11 @@ function download_artifact() {
 
     MVN_ARTIFACT="$GROUP_ID:$ARTIFACT_ID:$VERSION"
 
+    ARTIFACT_HUMAN_READABLE="$MVN_ARTIFACT:$PACKAGING"
+    if [ -n "$ARTIFACT_CLASSIFIER" ]; then
+        ARTIFACT_HUMAN_READABLE="$ARTIFACT_HUMAN_READABLE:$ARTIFACT_CLASSIFIER"
+    fi
+
     MVN_CACHE_DIR="$(mktemp -d)"
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
@@ -69,7 +74,7 @@ function download_artifact() {
 
     RETRIES="1"
     while [ "$RETRIES" -ge 0 ]; do
-        echo "Downloading [$MVN_ARTIFACT:$PACKAGING] to [$DOWNLOAD_PATH]..."
+        echo "Downloading [$ARTIFACT_HUMAN_READABLE] to [$DOWNLOAD_PATH]..."
 
         if ! "$(dirname "$0")/maven/bin/mvn" --batch-mode \
             -Dmaven.repo.local="$MVN_CACHE_DIR" \
@@ -79,7 +84,7 @@ function download_artifact() {
             -Dpackaging="$PACKAGING" \
             -Dclassifier="$ARTIFACT_CLASSIFIER" &> "$MVN_LOG"; then
 
-            echo "Can't download artifact [$MVN_ARTIFACT:$PACKAGING]:"
+            echo "Can't download artifact [$ARTIFACT_HUMAN_READABLE]:"
             grep -F '[ERROR]' "$MVN_LOG" || (
                 echo "====== Start of Maven full log ======"
                 cat "$MVN_LOG"
@@ -100,7 +105,7 @@ function download_artifact() {
             ARTIFACT_PATH="$MVN_CACHE_DIR/$GROUP_ID_DIR_NAME/$ARTIFACT_ID/$VERSION/${ARTIFACT_ID}-${VERSION}${DOWNLOAD_SUFFIX}"
 
             if cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
-                echo "[$MVN_ARTIFACT:$PACKAGING] downloaded successfully"
+                echo "[$ARTIFACT_HUMAN_READABLE] downloaded successfully"
                 return 0
             else
                 echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
