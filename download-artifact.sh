@@ -8,6 +8,7 @@ function usage() {
     echo "$(basename "$0") report-scheduler:1.0:jar:shaded"
     echo "$(basename "$0") web:1.0:war"
     echo "$(basename "$0") web:1.0:war web.war"
+    echo "$(basename "$0") web:1.0:war:tomcat10 web.war"
 }
 
 if [ "$#" -lt 1 ]; then

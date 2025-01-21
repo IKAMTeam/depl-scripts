@@ -21,6 +21,11 @@ ARTIFACT_ID=web
 PACKAGING=war
 ARTIFACT_CLASSIFIER=""
 
+if is_tomcat_10; then
+    ARTIFACT_CLASSIFIER="tomcat10"
+    echo "Tomcat 10 detected, setting classifier to '$ARTIFACT_CLASSIFIER'"
+fi
+
 VERSION=$1
 WEBAPP_DIRNAME=$2
 
