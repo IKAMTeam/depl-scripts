@@ -21,7 +21,6 @@
 @REM Environment Variable Prerequisites
 @REM
 @REM   JAVA_HOME          Must point at your Java Development Kit installation.
-@REM   MAVEN_ARGS        (Optional) Arguments passed to Maven before CLI arguments.
 @REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
 @REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
 @REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
@@ -36,8 +35,8 @@
 @REM Execute a user defined script before this one
 if not "%MAVEN_SKIP_RC%"=="" goto skipRcPre
 @REM check for pre script, once with legacy .bat ending and once with .cmd ending
-if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
-if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
+if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat"
+if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd"
 :skipRcPre
 
 @setlocal
@@ -55,15 +54,20 @@ set "JAVACMD=%JAVA_HOME%\bin\java.exe"
 :checkJCmd
 if exist "%JAVACMD%" goto chkMHome
 
-echo The JAVA_HOME environment variable is not defined correctly, >&2
-echo this environment variable is needed to run this program. >&2
+echo The JAVA_HOME environment variable is not defined correctly >&2
+echo This environment variable is needed to run this program >&2
+echo NB: JAVA_HOME should point to a JDK not a JRE >&2
 goto error
 
 :chkMHome
-set "MAVEN_HOME=%~dp0"
-set "MAVEN_HOME=%MAVEN_HOME:~0,-5%"
-if not "%MAVEN_HOME%"=="" goto checkMCmd
+set "MAVEN_HOME=%~dp0.."
+if not "%MAVEN_HOME%"=="" goto stripMHome
 goto error
+
+:stripMHome
+if not "_%MAVEN_HOME:~-1%"=="_\" goto checkMCmd
+set "MAVEN_HOME=%MAVEN_HOME:~0,-1%"
+goto stripMHome
 
 :checkMCmd
 if exist "%MAVEN_HOME%\bin\mvn.cmd" goto init
@@ -74,7 +78,7 @@ goto error
 
 set MAVEN_CMD_LINE_ARGS=%*
 
-@REM Find the project basedir, i.e., the directory that contains the directory ".mvn".
+@REM Find the project basedir, i.e., the directory that contains the folder ".mvn".
 @REM Fallback to current working directory if not found.
 
 set "MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%"
@@ -137,9 +141,8 @@ exit /b
 
 :findBaseDir
 cd /d "%WDIR%"
-set "WDIR=%CD%"
 :findBaseDirLoop
-if exist ".mvn" goto baseDirFound
+if exist "%WDIR%\.mvn" goto baseDirFound
 cd ..
 IF "%WDIR%"=="%CD%" goto baseDirNotFound
 set "WDIR=%CD%"
@@ -153,7 +156,7 @@ goto endDetectBaseDir
 :baseDirNotFound
 if "_%EXEC_DIR:~-1%"=="_\" set "EXEC_DIR=%EXEC_DIR:~0,-1%"
 set "MAVEN_PROJECTBASEDIR=%EXEC_DIR%"
-cd /d "%EXEC_DIR%"
+cd "%EXEC_DIR%"
 
 :endDetectBaseDir
 
@@ -178,7 +181,7 @@ set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  %CLASSWORLDS_LAUNCHER% %MAVEN_ARGS% %MAVEN_CMD_LINE_ARGS%
+  %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
@@ -199,4 +202,4 @@ if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 if "%MAVEN_TERMINATE_CMD%"=="on" exit %ERROR_CODE%
 
-exit /b %ERROR_CODE%
+cmd /C exit /B %ERROR_CODE%

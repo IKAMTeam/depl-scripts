@@ -23,16 +23,11 @@
 # Environment Variable Prerequisites
 #
 #   JAVA_HOME       Must point at your Java Development Kit installation.
-#   MAVEN_ARGS      (Optional) Arguments passed to Maven before CLI arguments.
 #   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
 #   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
 # -----------------------------------------------------------------------------
 
 if [ -z "$MAVEN_SKIP_RC" ] ; then
-
-  if [ -f /usr/local/etc/mavenrc ] ; then
-    . /usr/local/etc/mavenrc
-  fi
 
   if [ -f /etc/mavenrc ] ; then
     . /etc/mavenrc
@@ -95,14 +90,15 @@ if $mingw ; then
 fi
 
 if [ -z "$JAVA_HOME" ] ; then
-  JAVACMD="`\\unset -f command; \\command -v java`"
+  JAVACMD=`which java`
 else
   JAVACMD="$JAVA_HOME/bin/java"
 fi
 
 if [ ! -x "$JAVACMD" ] ; then
-  echo "The JAVA_HOME environment variable is not defined correctly," >&2
-  echo "this environment variable is needed to run this program." >&2
+  echo "The JAVA_HOME environment variable is not defined correctly" >&2
+  echo "This environment variable is needed to run this program" >&2
+  echo "NB: JAVA_HOME should point to a JDK not a JRE" >&2
   exit 1
 fi
 
@@ -127,13 +123,9 @@ find_maven_basedir() {
 (
   basedir=`find_file_argument_basedir "$@"`
   wdir="${basedir}"
-  while :
-  do
+  while [ "$wdir" != '/' ] ; do
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
-      break
-    fi
-    if [ "$wdir" = '/' ] ; then
       break
     fi
     wdir=`cd "$wdir/.."; pwd`
@@ -204,4 +196,4 @@ exec "$JAVACMD" \
   "-Dmaven.home=${MAVEN_HOME}" \
   "-Dlibrary.jansi.path=${MAVEN_HOME}/lib/jansi-native" \
   "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
-  ${CLASSWORLDS_LAUNCHER} ${MAVEN_ARGS} "$@"
+  ${CLASSWORLDS_LAUNCHER} "$@"
