@@ -34,9 +34,9 @@ if [ "$2" == "tomcat" ]; then
     PACKAGING=war
     ARTIFACT_CLASSIFIER=""
 
-    if is_tomcat_10; then
+    if is_tomcat_support_jakarta; then
         ARTIFACT_CLASSIFIER="jakarta"
-        echo "Tomcat 10 detected, setting classifier to '$ARTIFACT_CLASSIFIER'"
+        echo "Jakarta support has been detected in Tomcat, setting classifier to '$ARTIFACT_CLASSIFIER'"
     fi
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"

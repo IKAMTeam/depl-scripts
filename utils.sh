@@ -672,7 +672,7 @@ function cleanup_tomcat() {
     rm -rf "$TOMCAT_PATH"/logs/catalina.log "$TOMCAT_PATH"/logs/catalina.out
 }
 
-function is_tomcat_10() {
+function is_tomcat_support_jakarta() {
     java -cp "$TOMCAT_PATH/lib/catalina.jar" "org.apache.catalina.util.ServerInfo" | grep 'Apache Tomcat/10'
 }
 
