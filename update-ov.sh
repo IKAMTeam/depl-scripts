@@ -35,7 +35,7 @@ if [ "$2" == "tomcat" ]; then
     ARTIFACT_CLASSIFIER=""
 
     if is_tomcat_10; then
-        ARTIFACT_CLASSIFIER="tomcat10"
+        ARTIFACT_CLASSIFIER="jakarta"
         echo "Tomcat 10 detected, setting classifier to '$ARTIFACT_CLASSIFIER'"
     fi
 
