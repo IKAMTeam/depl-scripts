@@ -11,9 +11,23 @@ from xml.etree import ElementTree
 from random import SystemRandom
 from time import sleep
 
+def fetch_ec2_instance_data():
+    return json.loads(urllib.request.urlopen('http://169.254.169.254/latest/dynamic/instance-identity/document').read().decode())
+
+def fetch_ec2_instance_id():
+    return fetch_ec2_instance_data()['instanceId']
+
+def fetch_ssm_region():
+    # Gov Cloud is in a different account, so we need to change region for SSM only
+    if 'us-gov' in fetch_ec2_instance_data()['region']:
+        ssm_region = 'us-gov-east-1'
+    else:
+        ssm_region = 'us-east-1'
+    return ssm_region
+
 class Settings:
     SPREAD_LOAD_MAX_SLEEP_MINUTES = 4
-    AWS_SSM_REGION = 'us-east-1'
+    AWS_SSM_REGION = fetch_ssm_region()
     AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
     MONITOR_CONFIG_FILE = os.getenv('MONITOR_CONFIG_FILE')
     TRACKOR_HOSTNAME = 'trackor.onevizion.com'
@@ -354,12 +368,6 @@ def fetch_config_attributes(config_key):
         return config
 
 
-def fetch_ec2_instance_id():
-    return urllib.request.urlopen('http://169.254.169.254/latest/meta-data/instance-id').read().decode()
-
-def fetch_ec2_region():
-    return json.loads(urllib.request.urlopen('http://169.254.169.254/latest/dynamic/instance-identity/document').read().decode())['region']
-
 
 # endregion
 
@@ -397,10 +405,6 @@ def check_monitoring_config_exists_and_writeable_or_quit():
 
 
 def main():
-    # Gov Cloud is in a different account, so we need to change region for SSM only
-    if 'us-gov' in fetch_ec2_region():
-        Settings.AWS_SSM_REGION = 'us-gov-east-1'
-
     if Settings.MONITOR_CONFIG_FILE is None or len(Settings.MONITOR_CONFIG_FILE) == 0:
         Message('MONITOR_CONFIG_FILE environment variable is empty')
         quit(1)
