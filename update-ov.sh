@@ -34,6 +34,11 @@ if [ "$2" == "tomcat" ]; then
     PACKAGING=war
     ARTIFACT_CLASSIFIER=""
 
+    if is_tomcat_support_jakarta; then
+        ARTIFACT_CLASSIFIER="jakarta"
+        echo "Jakarta support has been detected in Tomcat, setting classifier to '$ARTIFACT_CLASSIFIER'"
+    fi
+
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
     CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
     CONTEXT_XML_FILE="$CONTEXT_PATH/ROOT.xml"
