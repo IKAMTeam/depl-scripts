@@ -47,7 +47,8 @@ chmod 440 /etc/sudoers.d/integration-scheduler
     --aes-password "$AES_PASSWORD" \
     "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL" \
     "${DB_OWNER_USER}_user/${DB_USER_PASSWORD}@$DB_URL" \
-    "${DB_OWNER_USER}_pkg/${DB_PKG_PASSWORD}@$DB_URL"
+    "${DB_OWNER_USER}_pkg/${DB_PKG_PASSWORD}@$DB_URL" \
+    "${DB_OWNER_USER}_rpt/${DB_RPT_PASSWORD}@$DB_URL"
 "$SCRIPTS_PATH/install-cron-service.sh" "$WEBSITE" syncs3 "$VERSION" --aes-password "$AES_PASSWORD" "0 3 * * *" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL"
 
 if [ -n "$MONITOR_VERSION" ]; then
