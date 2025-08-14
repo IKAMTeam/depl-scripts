@@ -49,13 +49,14 @@ function require_root_user() {
 }
 
 function find_artifact_latest_version() {
-    local REPO_URL REPO_UN REPO_PWD GROUP_ID_URL ARTIFACT
+    local REPO_URL REPO_UN REPO_PWD GROUP_ID_URL ARTIFACT URL
     REPO_URL="$1"
     REPO_UN="$2"
     REPO_PWD="$3"
     GROUP_ID_URL="$4"
     ARTIFACT="$5"
 
+    URL="$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
     MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
     delete_on_exit "$MAVEN_METADATA_XML_PATH"
 
@@ -64,11 +65,13 @@ function find_artifact_latest_version() {
             --fail-with-body \
             --show-error \
             --user "$REPO_UN:$REPO_PWD" \
-            "$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"; then
+            "$URL"; then
 
-        echo "Unable to find latest version" 1>&2
+        echo "Unable to find latest version (URL: $URL)" 1>&2
+        echo "====== Start of response body ======"
         cat "$MAVEN_METADATA_XML_PATH" 1>&2
         echo 1>&2
+        echo "====== End of response body ======"
 
         return 1
     fi
