@@ -1,22 +1,34 @@
 #!/bin/bash
 
-function usage() {
-    echo "### Script to install monitoring service as daemon ###"
-    echo "Usage: $(basename "$0") <version>"
-}
+# Script to install monitoring service as daemon
+#
+# Usage: install-monitor-service.sh [version]
+# If version parameter is not specified - latest version will be used automatically
 
-if [ "$#" -lt 1 ]; then
-    usage
-    exit 1
-fi
-
-VERSION=$1
+VERSION="$1"
 ARTIFACT="monitoring"
 
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
 require_root_user
+
+if [ -z "$VERSION" ]; then
+  echo "Finding latest version of the artifact"
+
+  MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
+  delete_on_exit "$MAVEN_METADATA_XML_PATH"
+
+  curl --silent \
+    --output "$MAVEN_METADATA_XML_PATH" \
+    --fail-with-body \
+    --show-error \
+    --user "$MONITORING_REPO_UN:$MONITORING_REPO_PWD" \
+    "$MONITORING_REPO_URL/$MONITOR_GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
+
+  VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest")"
+  echo "Latest version: $VERSION"
+fi
 
 config_service_env "" "$ARTIFACT"
 if ! is_daemon_installed "$SERVICE_NAME"; then

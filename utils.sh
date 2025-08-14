@@ -20,6 +20,7 @@ export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
 export MONITOR_REFRESH_CONFIG_ARTIFACT_NAME="monitoring-refresh-config"
 export MONITOR_REFRESH_CONFIG_UN="$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME"
 export MONITOR_GROUP="monitoring"
+export MONITOR_GROUP_ID_URL="com/onevizion"
 
 export PYTHON_SERVICE_NAMES=("$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME")
 
