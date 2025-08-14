@@ -21,9 +21,11 @@ ARTIFACT="monitoring"
 if { [ "$1" == "-f" ] || [ "$1" == "--force" ]; }; then
     # No version
     FORCE_UPDATE="1"
+    echo "Forcing update"
 elif { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
     NEW_VERSION="$1"
     FORCE_UPDATE="1"
+    echo "Forcing update"
 elif [ -n "$1" ]; then
     NEW_VERSION="$1"
 elif ! NEW_VERSION="$(find_artifact_latest_version \
