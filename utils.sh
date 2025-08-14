@@ -68,6 +68,9 @@ function find_artifact_latest_version() {
 
         echo "Unable to find latest version" 1>&2
         cat "$MAVEN_METADATA_XML_PATH" 1>&2
+        echo 1>&2
+
+        return 1
     fi
 
     read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest"
