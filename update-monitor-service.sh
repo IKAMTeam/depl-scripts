@@ -28,12 +28,15 @@ elif { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
     echo "Forcing update"
 elif [ -n "$1" ]; then
     NEW_VERSION="$1"
-elif ! NEW_VERSION="$(find_artifact_latest_version \
-    "$MONITORING_REPO_URL" \
-    "$MONITORING_REPO_UN" \
-    "$MONITORING_REPO_PWD" \
-    "$MONITOR_GROUP_ID_URL" \
-    "$ARTIFACT")"; then
+fi
+
+if [ -z "$NEW_VERSION" ] \
+    && ! NEW_VERSION="$(find_artifact_latest_version \
+       "$MONITORING_REPO_URL" \
+       "$MONITORING_REPO_UN" \
+       "$MONITORING_REPO_PWD" \
+       "$MONITOR_GROUP_ID_URL" \
+       "$ARTIFACT")"; then
 
     exit 1
 fi
