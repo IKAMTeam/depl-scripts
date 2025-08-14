@@ -48,6 +48,27 @@ function require_root_user() {
     fi
 }
 
+function find_artifact_latest_version() {
+    local REPO_URL REPO_UN REPO_PWD GROUP_ID_URL ARTIFACT
+    REPO_URL="$1"
+    REPO_UN="$2"
+    REPO_PWD="$3"
+    GROUP_ID_URL="$4"
+    ARTIFACT="$5"
+
+    MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
+    delete_on_exit "$MAVEN_METADATA_XML_PATH"
+
+    curl --silent \
+        --output "$MAVEN_METADATA_XML_PATH" \
+        --fail-with-body \
+        --show-error \
+        --user "$REPO_UN:$REPO_PWD" \
+        "$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
+
+    read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest"
+}
+
 function download_artifact() {
     local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES
 

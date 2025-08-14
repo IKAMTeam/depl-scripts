@@ -1,17 +1,32 @@
 #!/bin/bash
-if [ "$#" -lt 1 ]; then
-    echo "### Script for update monitor service artifacts ###"
-    echo "Usage: $(basename "$0") <new version> [-f/--force]"
-    exit 1
-fi
 
-NEW_VERSION=$1
+function usage() {
+    echo "### Script to update monitor service artifacts ###"
+    echo "Usage: $(basename "$0") [new version] [-f/--force]"
+    echo "If new version is not specified - latest will be used"
+}
 
-if [ -n "$2" ] && { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
-    FORCE_UPDATE="1"
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    usage
+    exit
 fi
 
 ARTIFACT="monitoring"
+
+if { [ "$1" == "-f" ] || [ "$1" == "--force" ]; }; then
+    # No version
+    FORCE_UPDATE="1"
+elif { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
+    NEW_VERSION="$1"
+    FORCE_UPDATE="1"
+elif [ -n "$1" ]; then
+    NEW_VERSION="$1"
+else
+    echo "Finding latest version of the artifact"
+    NEW_VERSION="$(find_artifact_latest_version "$MONITORING_REPO_URL" "$MONITORING_REPO_UN" "$MONITORING_REPO_PWD" "$MONITOR_GROUP_ID_URL" "$ARTIFACT")"
+
+    echo "Latest version: $NEW_VERSION"
+fi
 
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"

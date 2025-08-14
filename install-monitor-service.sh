@@ -20,20 +20,10 @@ ARTIFACT="monitoring"
 require_root_user
 
 if [ -z "$VERSION" ]; then
-  echo "Finding latest version of the artifact"
+    echo "Finding latest version of the artifact"
+    VERSION="$(find_artifact_latest_version "$MONITORING_REPO_URL" "$MONITORING_REPO_UN" "$MONITORING_REPO_PWD" "$MONITOR_GROUP_ID_URL" "$ARTIFACT")"
 
-  MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
-  delete_on_exit "$MAVEN_METADATA_XML_PATH"
-
-  curl --silent \
-    --output "$MAVEN_METADATA_XML_PATH" \
-    --fail-with-body \
-    --show-error \
-    --user "$MONITORING_REPO_UN:$MONITORING_REPO_PWD" \
-    "$MONITORING_REPO_URL/$MONITOR_GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
-
-  VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest")"
-  echo "Latest version: $VERSION"
+    echo "Latest version: $VERSION"
 fi
 
 config_service_env "" "$ARTIFACT"
