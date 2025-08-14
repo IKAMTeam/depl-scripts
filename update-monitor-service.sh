@@ -26,19 +26,14 @@ elif { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
     FORCE_UPDATE="1"
 elif [ -n "$1" ]; then
     NEW_VERSION="$1"
-else
-    echo "Finding latest version of the artifact"
-    if ! NEW_VERSION="$(find_artifact_latest_version \
-        "$MONITORING_REPO_URL" \
-        "$MONITORING_REPO_UN" \
-        "$MONITORING_REPO_PWD" \
-        "$MONITOR_GROUP_ID_URL" \
-        "$ARTIFACT")"; then
+elif ! NEW_VERSION="$(find_artifact_latest_version \
+    "$MONITORING_REPO_URL" \
+    "$MONITORING_REPO_UN" \
+    "$MONITORING_REPO_PWD" \
+    "$MONITOR_GROUP_ID_URL" \
+    "$ARTIFACT")"; then
 
-        exit 1
-    fi
-
-    echo "Latest version: $NEW_VERSION"
+    exit 1
 fi
 
 config_service_env "" "$ARTIFACT"
