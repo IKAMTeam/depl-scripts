@@ -80,6 +80,17 @@ function find_artifact_latest_version() {
     LATEST_VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest")"
     echoerr "Latest version: $LATEST_VERSION"
     echo "$LATEST_VERSION"
+
+    if [ -z "$LATEST_VERSION" ]; then
+        echoerr "Unable to find latest version in XML"
+        echoerr "====== Start of response body ======"
+        >&2 cat "$MAVEN_METADATA_XML_PATH"
+        echoerr
+        echoerr "====== End of response body ======"
+
+        return 1
+    fi
+
 }
 
 function echoerr() {
