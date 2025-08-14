@@ -59,15 +59,18 @@ function find_artifact_latest_version() {
     MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
     delete_on_exit "$MAVEN_METADATA_XML_PATH"
 
-    curl --silent \
-        --output "$MAVEN_METADATA_XML_PATH" \
-        --fail-with-body \
-        --show-error \
-        --user "$REPO_UN:$REPO_PWD" \
-        "$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
+    if ! curl --silent \
+            --output "$MAVEN_METADATA_XML_PATH" \
+            --fail-with-body \
+            --show-error \
+            --user "$REPO_UN:$REPO_PWD" \
+            "$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"; then
+
+        echo "Unable to find latest version" 1>&2
+        cat "$MAVEN_METADATA_XML_PATH" 1>&2
+    fi
 
     read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest"
-    trap 'cat "$MAVEN_METADATA_XML_PATH"' ERR
 }
 
 function download_artifact() {
