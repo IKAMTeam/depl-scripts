@@ -21,7 +21,15 @@ require_root_user
 
 if [ -z "$VERSION" ]; then
     echo "Finding latest version of the artifact"
-    VERSION="$(find_artifact_latest_version "$MONITORING_REPO_URL" "$MONITORING_REPO_UN" "$MONITORING_REPO_PWD" "$MONITOR_GROUP_ID_URL" "$ARTIFACT")"
+    if ! VERSION="$(find_artifact_latest_version \
+        "$MONITORING_REPO_URL" \
+        "$MONITORING_REPO_UN" \
+        "$MONITORING_REPO_PWD" \
+        "$MONITOR_GROUP_ID_URL" \
+        "$ARTIFACT")"; then
+
+        exit 1
+    fi
 
     echo "Latest version: $VERSION"
 fi
