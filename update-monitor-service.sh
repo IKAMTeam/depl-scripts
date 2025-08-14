@@ -11,6 +11,11 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     exit
 fi
 
+# shellcheck source=utils.sh
+. "$(dirname "$0")/utils.sh"
+
+require_root_user
+
 ARTIFACT="monitoring"
 
 if { [ "$1" == "-f" ] || [ "$1" == "--force" ]; }; then
@@ -35,11 +40,6 @@ else
 
     echo "Latest version: $NEW_VERSION"
 fi
-
-# shellcheck source=utils.sh
-. "$(dirname "$0")/utils.sh"
-
-require_root_user
 
 config_service_env "" "$ARTIFACT"
 
