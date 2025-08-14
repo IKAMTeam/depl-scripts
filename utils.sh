@@ -68,10 +68,10 @@ function find_artifact_latest_version() {
             "$URL"; then
 
         echo "Unable to find latest version (URL: $URL)" 1>&2
-        echo "====== Start of response body ======"
+        echo "====== Start of response body ======" 1>&2
         cat "$MAVEN_METADATA_XML_PATH" 1>&2
         echo 1>&2
-        echo "====== End of response body ======"
+        echo "====== End of response body ======" 1>&2
 
         return 1
     fi
