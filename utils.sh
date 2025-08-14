@@ -77,7 +77,7 @@ function find_artifact_latest_version() {
         return 1
     fi
 
-    LATEST_VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest")"
+    LATEST_VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "versioning/latest")"
     echoerr "Latest version: $LATEST_VERSION"
     echo "$LATEST_VERSION"
 
