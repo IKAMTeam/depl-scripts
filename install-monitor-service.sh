@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# Script to install monitoring service as daemon
-#
-# Usage: install-monitor-service.sh [version]
-# If version parameter is not specified - latest version will be used automatically
+function usage() {
+    echo "### Script to install monitoring service as daemon ###"
+    echo "Usage: $(basename "$0") [version]"
+    echo "If version is not specified - latest will be used"
+}
 
-VERSION="$1"
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    usage
+    exit
+fi
+
+VERSION=$1
 ARTIFACT="monitoring"
 
 # shellcheck source=utils.sh
