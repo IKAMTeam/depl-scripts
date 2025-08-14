@@ -67,6 +67,7 @@ function find_artifact_latest_version() {
         "$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
 
     read_xml_value "$MAVEN_METADATA_XML_PATH" "metadata/versioning/latest"
+    trap 'cat "$MAVEN_METADATA_XML_PATH"' ERR
 }
 
 function download_artifact() {
