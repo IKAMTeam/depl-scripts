@@ -12,7 +12,10 @@ from random import SystemRandom
 from time import sleep
 
 def fetch_ec2_instance_data():
-    return json.loads(urllib.request.urlopen('http://169.254.169.254/latest/dynamic/instance-identity/document').read().decode())
+    TokenRequest = urllib.request.Request('http://169.254.169.254/latest/api/token', method='PUT', headers={'X-aws-ec2-metadata-token-ttl-seconds': '21600'})
+    TOKEN = urllib.request.urlopen(TokenRequest).read().decode()
+    MetadataRequest = urllib.request.Request('http://169.254.169.254/latest/dynamic/instance-identity/document', headers={'X-aws-ec2-metadata-token': TOKEN})
+    return json.loads(urllib.request.urlopen(MetadataRequest).read().decode())
 
 def fetch_ec2_instance_id():
     return fetch_ec2_instance_data()['instanceId']
