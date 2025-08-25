@@ -26,6 +26,28 @@ function init_credentials() {
     chmod 600 "$SCRIPTS_PATH/credentials.conf"
 }
 
+function retry() {
+    local RETRIES COUNT
+    RETRIES=2
+    COUNT=0
+
+    until "$@"; do
+        EXIT=$?
+        WAIT=$((2 ** COUNT))
+        COUNT=$((COUNT + 1))
+
+        if [ "$COUNT" -lt "$RETRIES" ]; then
+            echo "Retry $COUNT/$RETRIES exited $EXIT, retrying in $WAIT seconds..."
+            sleep $WAIT
+        else
+            echo "Retry $COUNT/$RETRIES exited $EXIT, no more retries left."
+            return $EXIT
+        fi
+    done
+
+    return 0
+}
+
 function generate_service_name() {
     local WEBSITE ARTIFACT SERVICE_NAME
 
@@ -88,7 +110,7 @@ function init_ec2_instance() {
     fi
 
     # Install jq
-    yum install -y jq
+    retry yum install -y jq
 
     config_ec2_env
 
@@ -111,7 +133,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    yum install -y collectd amazon-cloudwatch-agent
+    retry yum install -y collectd amazon-cloudwatch-agent
 
     tee "$CONF_FILE" <<'EOF'
 {
@@ -159,7 +181,7 @@ EOF
 }
 
 function install_crond() {
-    yum install -y cronie
+    retry yum install -y cronie
 
     systemctl enable crond
     systemctl start crond
@@ -170,7 +192,7 @@ function install_java_21() {
     rpm --import https://yum.corretto.aws/corretto.key
     curl -s -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
 
-    yum install -y java-21-amazon-corretto-devel
+    retry yum install -y java-21-amazon-corretto-devel
 }
 
 # Uses SCRIPTS_PATH variables

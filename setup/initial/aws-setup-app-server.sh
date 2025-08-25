@@ -34,11 +34,11 @@ init_ec2_instance
 install_java_21
 
 # Sometimes these libraries are missing from default install
-yum install -y python3-pip
+retry yum install -y python3-pip
 
 # python3-devel, Development Tools packages are needed to build wheels including C/C++ code
-yum install -y python3-devel
-yum group install -y "Development Tools"
+retry yum install -y python3-devel
+retry yum group install -y "Development Tools"
 
 python3 -m pip install wheel || true
 
