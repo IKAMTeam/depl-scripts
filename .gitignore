@@ -1,6 +1,7 @@
 *.ipr
 *.iws
 *.iml
+*.pyc
 .idea
 credentials.conf
 maven/cache
