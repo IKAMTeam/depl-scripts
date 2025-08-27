@@ -92,7 +92,7 @@ function install_java_service() {
 
 function install_python_and_dependencies() {
     echo "Installing Python..."
-    yum install -y python3 || return 1
+    retry yum install -y python3 || return 1
 
     PYTHON_REQUIREMENTS_FILE="$(get_python_service_requirements_file)"
     if [ -f "$PYTHON_REQUIREMENTS_FILE" ]; then
