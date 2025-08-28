@@ -20,6 +20,7 @@ export MONITOR_XML_TEMPLATE_NAME="setup/templates/monitor-db-schemas.template"
 export MONITOR_REFRESH_CONFIG_ARTIFACT_NAME="monitoring-refresh-config"
 export MONITOR_REFRESH_CONFIG_UN="$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME"
 export MONITOR_GROUP="monitoring"
+export MONITOR_GROUP_ID_URL="com/onevizion"
 
 export PYTHON_SERVICE_NAMES=("$MONITOR_REFRESH_CONFIG_ARTIFACT_NAME")
 
@@ -45,6 +46,55 @@ function require_root_user() {
         echo "This script must be run as root user"
         exit 1
     fi
+}
+
+function find_artifact_latest_version() {
+    local REPO_URL REPO_UN REPO_PWD GROUP_ID_URL ARTIFACT URL
+    REPO_URL="$1"
+    REPO_UN="$2"
+    REPO_PWD="$3"
+    GROUP_ID_URL="$4"
+    ARTIFACT="$5"
+
+    URL="$REPO_URL/$GROUP_ID_URL/$ARTIFACT/maven-metadata.xml"
+    MAVEN_METADATA_XML_PATH="$(mktemp --suffix="_maven_metadata_xml")"
+    delete_on_exit "$MAVEN_METADATA_XML_PATH"
+
+    echoerr "Finding latest version of the artifact ($URL)"
+    if ! curl --silent \
+            --output "$MAVEN_METADATA_XML_PATH" \
+            --fail-with-body \
+            --show-error \
+            --user "$REPO_UN:$REPO_PWD" \
+            "$URL"; then
+
+        echoerr "Unable to find latest version"
+        echoerr "====== Start of response body ======"
+        >&2 cat "$MAVEN_METADATA_XML_PATH"
+        echoerr
+        echoerr "====== End of response body ======"
+
+        return 1
+    fi
+
+    LATEST_VERSION="$(read_xml_value "$MAVEN_METADATA_XML_PATH" "versioning/latest")"
+    echoerr "Latest version: $LATEST_VERSION"
+    echo "$LATEST_VERSION"
+
+    if [ -z "$LATEST_VERSION" ]; then
+        echoerr "Unable to find latest version in XML"
+        echoerr "====== Start of response body ======"
+        >&2 cat "$MAVEN_METADATA_XML_PATH"
+        echoerr
+        echoerr "====== End of response body ======"
+
+        return 1
+    fi
+
+}
+
+function echoerr() {
+    >&2 echo "$@"
 }
 
 function download_artifact() {
