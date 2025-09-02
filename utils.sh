@@ -47,6 +47,28 @@ function require_root_user() {
     fi
 }
 
+function retry() {
+    local RETRIES COUNT
+    RETRIES=2
+    COUNT=0
+
+    until "$@"; do
+        EXIT=$?
+        WAIT=$((2 ** COUNT))
+        COUNT=$((COUNT + 1))
+
+        if [ "$COUNT" -lt "$RETRIES" ]; then
+            echo "Retry $COUNT/$RETRIES exited $EXIT, retrying in $WAIT seconds..."
+            sleep $WAIT
+        else
+            echo "Retry $COUNT/$RETRIES exited $EXIT, no more retries left."
+            return $EXIT
+        fi
+    done
+
+    return 0
+}
+
 function download_artifact() {
     local GROUP_ID ARTIFACT_ID VERSION PACKAGING ARTIFACT_CLASSIFIER DOWNLOAD_PATH MVN_ARTIFACT MVN_CACHE_DIR RETRY_INTERVAL RETRIES ARTIFACT_HUMAN_READABLE
 
