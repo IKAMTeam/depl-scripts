@@ -94,7 +94,13 @@ Use `aws-setup-app-server.sh` on the line `10` to setup application server.
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"
 
-yum install -y git
+# Required to prevent 'No such file or directory' error when using from EC2 Userdata
+git_install_attempt=3
+while [ $git_install_attempt -gt 0 ]; do
+    yum install -y git && break
+    (( git_install_attempt-- ))
+done
+
 git clone -b stable https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
 chown -R "$SCRIPTS_OWNER" "$SCRIPTS_PATH"
 
