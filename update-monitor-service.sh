@@ -1,22 +1,45 @@
 #!/bin/bash
-if [ "$#" -lt 1 ]; then
-    echo "### Script for update monitor service artifacts ###"
-    echo "Usage: $(basename "$0") <new version> [-f/--force]"
-    exit 1
+
+function usage() {
+    echo "### Script to update monitor service artifacts ###"
+    echo "Usage: $(basename "$0") [new version] [-f/--force]"
+    echo "If new version is not specified - latest will be used"
+}
+
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    usage
+    exit
 fi
-
-NEW_VERSION=$1
-
-if [ -n "$2" ] && { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
-    FORCE_UPDATE="1"
-fi
-
-ARTIFACT="monitoring"
 
 # shellcheck source=utils.sh
 . "$(dirname "$0")/utils.sh"
 
 require_root_user
+
+ARTIFACT="monitoring"
+
+if { [ "$1" == "-f" ] || [ "$1" == "--force" ]; }; then
+    # No version
+    FORCE_UPDATE="1"
+    echo "Forcing update"
+elif { [ "$2" == "-f" ] || [ "$2" == "--force" ]; }; then
+    NEW_VERSION="$1"
+    FORCE_UPDATE="1"
+    echo "Forcing update"
+elif [ -n "$1" ]; then
+    NEW_VERSION="$1"
+fi
+
+if [ -z "$NEW_VERSION" ] \
+    && ! NEW_VERSION="$(find_artifact_latest_version \
+       "$MONITORING_REPO_URL" \
+       "$MONITORING_REPO_UN" \
+       "$MONITORING_REPO_PWD" \
+       "$MONITOR_GROUP_ID_URL" \
+       "$ARTIFACT")"; then
+
+    exit 1
+fi
 
 config_service_env "" "$ARTIFACT"
 
