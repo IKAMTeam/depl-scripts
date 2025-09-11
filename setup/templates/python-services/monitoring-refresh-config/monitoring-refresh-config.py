@@ -11,8 +11,13 @@ from xml.etree import ElementTree
 from random import SystemRandom
 from time import sleep
 
+INSTANCE_METADATA_ADDRESS = 'http://169.254.169.254'
+
 def fetch_ec2_instance_data():
-    return json.loads(urllib.request.urlopen('http://169.254.169.254/latest/dynamic/instance-identity/document').read().decode())
+    token_request = urllib.request.Request(f'{INSTANCE_METADATA_ADDRESS}/latest/api/token', method='PUT', headers={'X-aws-ec2-metadata-token-ttl-seconds': '21600'})
+    token = urllib.request.urlopen(token_request).read().decode()
+    metadata_request = urllib.request.Request(f'{INSTANCE_METADATA_ADDRESS}/latest/dynamic/instance-identity/document', headers={'X-aws-ec2-metadata-token': token})
+    return json.loads(urllib.request.urlopen(metadata_request).read().decode())
 
 def fetch_ec2_instance_id():
     return fetch_ec2_instance_data()['instanceId']
