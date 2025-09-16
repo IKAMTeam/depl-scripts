@@ -2,12 +2,13 @@
 
 function usage() {
     echo "### Script to install monitoring service as daemon ###"
-    echo "Usage: $(basename "$0") <version>"
+    echo "Usage: $(basename "$0") [version]"
+    echo "If version is not specified - latest will be used"
 }
 
-if [ "$#" -lt 1 ]; then
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     usage
-    exit 1
+    exit
 fi
 
 VERSION=$1
@@ -17,6 +18,17 @@ ARTIFACT="monitoring"
 . "$(dirname "$0")/utils.sh"
 
 require_root_user
+
+if [ -z "$VERSION" ] \
+    && ! VERSION="$(find_artifact_latest_version \
+        "$MONITORING_REPO_URL" \
+        "$MONITORING_REPO_UN" \
+        "$MONITORING_REPO_PWD" \
+        "$MONITOR_GROUP_ID_URL" \
+        "$ARTIFACT")"; then
+
+    exit 1
+fi
 
 config_service_env "" "$ARTIFACT"
 if ! is_daemon_installed "$SERVICE_NAME"; then
