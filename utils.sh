@@ -214,7 +214,7 @@ function read_artifact_version() {
     fi
     IMPLEMENTATION_VERSION="${IMPLEMENTATION_VERSION//[^[:alnum:][:punct:]]/}"
 
-    if [[ "$IMPLEMENTATION_VERSION" == *"-SNAPSHOT" ]] && [ -n "$GIT_COMMIT_ID" ]; then
+    if is_snapshot_version "$IMPLEMENTATION_VERSION" && [ -n "$GIT_COMMIT_ID" ]; then
        GIT_COMMIT_ID="${GIT_COMMIT_ID//[^[:alnum:][:punct:]]/}"
        IMPLEMENTATION_VERSION="$IMPLEMENTATION_VERSION (Git: ${GIT_COMMIT_ID})"
     fi

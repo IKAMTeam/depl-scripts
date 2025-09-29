@@ -31,8 +31,12 @@ if [ -z "$VERSION" ] \
 fi
 
 config_service_env "" "$ARTIFACT"
-if ! is_daemon_installed "$SERVICE_NAME"; then
-    config_service "" "$ARTIFACT" || exit 1
+if is_daemon_installed "$SERVICE_NAME"; then
+    ARTIFACT_JAR="$(get_artifact_name "$SERVICE_NAME").jar"
+    ARTIFACT_VERSION="$(extract_and_read_artifact_version "$SERVICE_PATH/$ARTIFACT_JAR")"
+
+    echo "Daemon [$SERVICE_NAME] of version [$ARTIFACT_VERSION] is already installed, nothing to do"
+else
     download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1
 
     copy_service_artifacts "$ARTIFACT" || exit 1
