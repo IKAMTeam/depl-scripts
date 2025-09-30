@@ -37,6 +37,7 @@ if is_daemon_installed "$SERVICE_NAME"; then
 
     echo "Daemon [$SERVICE_NAME] of version [$ARTIFACT_VERSION] is already installed, nothing to do"
 else
+    config_service "" "$ARTIFACT" || exit 1
     download_service_artifacts "$ARTIFACT" "$VERSION" || exit 1
 
     copy_service_artifacts "$ARTIFACT" || exit 1
