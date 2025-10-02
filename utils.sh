@@ -202,7 +202,24 @@ function read_artifact_version() {
     local MANIFEST_PATH
     MANIFEST_PATH="$1"
 
-    grep 'Implementation-Version' "$MANIFEST_PATH" | cut -d ' ' -f2 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+    local IMPLEMENTATION_VERSION VERSION_NUMBER GIT_COMMIT_ID
+    IMPLEMENTATION_VERSION="$(grep -e 'Implementation-Version' "$MANIFEST_PATH" | gawk -F': ' '{ print $2 }')"
+
+    # monitoring project
+    VERSION_NUMBER="$(grep -e 'Version-Number' "$MANIFEST_PATH" | gawk -F': ' '{ gensub(/^[ \t]*|[ \t]*$/,"","g",$2); print $2 }')"
+    GIT_COMMIT_ID="$(grep -e 'Git-Commit-Id' "$MANIFEST_PATH" | gawk -F': ' '{ gensub(/^[ \t]*|[ \t]*$/,"","g",$2); print $2 }')"
+
+    if [ -z "$IMPLEMENTATION_VERSION" ] && [ -n "$VERSION_NUMBER" ]; then
+        IMPLEMENTATION_VERSION="$VERSION_NUMBER"
+    fi
+    IMPLEMENTATION_VERSION="${IMPLEMENTATION_VERSION//[^[:alnum:][:punct:]]/}"
+
+    if is_snapshot_version "$IMPLEMENTATION_VERSION" && [ -n "$GIT_COMMIT_ID" ]; then
+       GIT_COMMIT_ID="${GIT_COMMIT_ID//[^[:alnum:][:punct:]]/}"
+       IMPLEMENTATION_VERSION="$IMPLEMENTATION_VERSION (Git: ${GIT_COMMIT_ID})"
+    fi
+
+    echo "$IMPLEMENTATION_VERSION"
 }
 
 function is_snapshot_version() {
