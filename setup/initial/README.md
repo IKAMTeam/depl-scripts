@@ -12,9 +12,9 @@ OneVizion web and app instances configuration scripts
 
 1. Prepare instance
 - Install Git
-- Install Python 2.7
-- Install Java 17 (Oracle, OpenJDK, Amazon Corretto)
-- Install Tomcat 9 (if you want to configure server as web instance)
+- Install Python 3
+- Install Java 21 (Amazon Corretto)
+- Install Tomcat 10 (if you want to configure server as web instance)
 
 2. Clone deployment scripts: `git clone -b stable https://github.com/IKAMTeam/depl-scripts.git`
 3. Create and fill configuration file (check [setup-server.conf.template](setup-server.conf.template) for get info about configuration)
@@ -39,6 +39,10 @@ RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."
 REPOSITORY_UN="username"
 REPOSITORY_PWD='password'
+
+MONITORING_REPO_URL="https://..."
+MONITORING_REPO_UN="username"
+MONITORING_REPO_PWD='password'
 
 WEBSITE="test01.onevizion.com"
 VERSION="20.5.0"
@@ -77,7 +81,7 @@ PLATFORM_EDITION="ENTERPRISE"
 Using [EC2 UserData](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
 
 **Requirements:**
-- Amazon Linux 2 Latest AMI
+- Amazon Linux 2023 Latest AMI (one of arm64/x64)
 
 **Example snippet for Web Server setup**:
 
@@ -90,9 +94,15 @@ Use `aws-setup-app-server.sh` on the line `10` to setup application server.
 SCRIPTS_PATH="/home/ec2-user/depl-scripts"
 SCRIPTS_OWNER="ec2-user:ec2-user"
 
-yum install -y git
+# Required to prevent 'No such file or directory' error when using from EC2 Userdata
+git_install_attempt=3
+while [ $git_install_attempt -gt 0 ]; do
+    yum install -y git && break
+    (( git_install_attempt-- ))
+done
+
 git clone -b stable https://github.com/IKAMTeam/depl-scripts.git "$SCRIPTS_PATH"
-chown "$SCRIPTS_OWNER" "$SCRIPTS_DIR"
+chown -R "$SCRIPTS_OWNER" "$SCRIPTS_PATH"
 
 "$SCRIPTS_PATH/setup/initial/aws-setup-web-server.sh" - <<'EOF'
 # Leave empty to skip private DNS entry creation
@@ -110,6 +120,10 @@ RELEASES_REPO_URL="https://..."
 SNAPSHOT_REPO_URL="https://..."
 REPOSITORY_UN="username"
 REPOSITORY_PWD='password'
+
+MONITORING_REPO_URL="https://..."
+MONITORING_REPO_UN="username"
+MONITORING_REPO_PWD='password'
 
 WEBSITE="test01.onevizion.com"
 VERSION="20.5.0"
@@ -134,8 +148,8 @@ MONITOR_VERSION="1.0-SNAPSHOT"
 MONITOR_INSTALL_CONFIG_REFRESH_SCRIPT="1"
 
 # Web specific
-TOMCAT_PATH="/usr/share/tomcat"
-TOMCAT_SERVICE="tomcat"
+TOMCAT_PATH="/usr/share/tomcat10"
+TOMCAT_SERVICE="tomcat10"
 TOMCAT_UN="tomcat"
 TOMCAT_GROUP="tomcat"
 
