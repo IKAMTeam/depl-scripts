@@ -11,8 +11,13 @@ from xml.etree import ElementTree
 from random import SystemRandom
 from time import sleep
 
+INSTANCE_METADATA_ADDRESS = 'http://169.254.169.254'
+
 def fetch_ec2_instance_data():
-    return json.loads(urllib.request.urlopen('http://169.254.169.254/latest/dynamic/instance-identity/document').read().decode())
+    token_request = urllib.request.Request(f'{INSTANCE_METADATA_ADDRESS}/latest/api/token', method='PUT', headers={'X-aws-ec2-metadata-token-ttl-seconds': '21600'})
+    token = urllib.request.urlopen(token_request).read().decode()
+    metadata_request = urllib.request.Request(f'{INSTANCE_METADATA_ADDRESS}/latest/dynamic/instance-identity/document', headers={'X-aws-ec2-metadata-token': token})
+    return json.loads(urllib.request.urlopen(metadata_request).read().decode())
 
 def fetch_ec2_instance_id():
     return fetch_ec2_instance_data()['instanceId']
@@ -31,6 +36,8 @@ class Settings:
     AWS_SSM_PARAMETER_NAME = 'MonitoringOneTeam'
     MONITOR_CONFIG_FILE = os.getenv('MONITOR_CONFIG_FILE')
     TRACKOR_HOSTNAME = 'trackor.onevizion.com'
+    TRACKOR_ACCESS_KEY = ''
+    TRACKOR_SECRET_KEY = ''
     TRACKOR_TYPE_WEBSITE = 'Website'
     TRACKOR_TYPE_CONFIG_ATTRIB = 'ConfigAttrib'
     TRACKOR_TO_XML_TRANSLATION_DICT = {
@@ -320,7 +327,10 @@ def fetch_required_configs():
 def fetch_websites_for_current_instance():
     websites = onevizion.Trackor(
         trackorType=Settings.TRACKOR_TYPE_WEBSITE,
-        paramToken=Settings.TRACKOR_HOSTNAME
+		URL = Settings.TRACKOR_HOSTNAME,
+		userName = Settings.TRACKOR_ACCESS_KEY,
+		password = Settings.TRACKOR_SECRET_KEY,
+        isTokenAuth = True
     )
     websites.read(
         filters={
@@ -344,7 +354,10 @@ def fetch_websites_for_current_instance():
 def fetch_config_attributes(config_key):
     config_attrib = onevizion.Trackor(
         trackorType=Settings.TRACKOR_TYPE_CONFIG_ATTRIB,
-        paramToken=Settings.TRACKOR_HOSTNAME
+		URL = Settings.TRACKOR_HOSTNAME,
+		userName = Settings.TRACKOR_ACCESS_KEY,
+		password = Settings.TRACKOR_SECRET_KEY,
+        isTokenAuth = True
     )
     config_attrib.read(
         filters={
@@ -415,6 +428,9 @@ def main():
     check_monitoring_config_exists_and_writeable_or_quit()
 
     onevizion.Config['ParameterData'] = fetch_onevizion_configuration_from_ssm()
+    Settings.TRACKOR_ACCESS_KEY = onevizion.Config['ParameterData'][Settings.TRACKOR_HOSTNAME]['AccessKey']
+    Settings.TRACKOR_SECRET_KEY = onevizion.Config['ParameterData'][Settings.TRACKOR_HOSTNAME]['SecretKey']
+
 
     sleep_to_spread_load()
 
