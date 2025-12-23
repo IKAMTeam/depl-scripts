@@ -26,6 +26,28 @@ function init_credentials() {
     chmod 600 "$SCRIPTS_PATH/credentials.conf"
 }
 
+function retry() {
+    local RETRIES COUNT
+    RETRIES=2
+    COUNT=0
+
+    until "$@"; do
+        EXIT=$?
+        WAIT=$((2 ** COUNT))
+        COUNT=$((COUNT + 1))
+
+        if [ "$COUNT" -lt "$RETRIES" ]; then
+            echo "Retry $COUNT/$RETRIES exited $EXIT, retrying in $WAIT seconds..."
+            sleep $WAIT
+        else
+            echo "Retry $COUNT/$RETRIES exited $EXIT, no more retries left."
+            return $EXIT
+        fi
+    done
+
+    return 0
+}
+
 function generate_service_name() {
     local WEBSITE ARTIFACT SERVICE_NAME
 
@@ -73,13 +95,14 @@ function config_ec2_env() {
 
 # Uses EC2_URL_INTERNAL, EC2_IPV4, SCRIPTS_PATH variables
 function init_ec2_instance() {
+    install_crond
     install_cloudwatch_agent
     update_motd
 
     # To bypass CVE-2022-24765 fix because we are using multi-user configuration (run "git clone" as ec2-user,
     # run "git pull" as root)
     # https://github.blog/2022-04-12-git-security-vulnerability-announced/#cve-2022-24765
-    git config --global --add safe.directory "$SCRIPTS_PATH" || true
+    git config --system --add safe.directory "$SCRIPTS_PATH" || true
 
     if [ -z "$AWS_DOMAIN" ]; then
         echo "Update hostname and route 53 is cancelled"
@@ -87,7 +110,7 @@ function init_ec2_instance() {
     fi
 
     # Install jq
-    yum install -y jq
+    retry yum install -y jq
 
     config_ec2_env
 
@@ -110,8 +133,7 @@ function install_cloudwatch_agent() {
     local CONF_FILE
     CONF_FILE="/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 
-    amazon-linux-extras install -y collectd
-    yum install -y amazon-cloudwatch-agent
+    retry yum install -y collectd amazon-cloudwatch-agent
 
     tee "$CONF_FILE" <<'EOF'
 {
@@ -158,12 +180,19 @@ EOF
     systemctl start amazon-cloudwatch-agent
 }
 
-function install_java_17() {
-    # Install Java 17 (Correto)
+function install_crond() {
+    retry yum install -y cronie
+
+    systemctl enable crond
+    systemctl start crond
+}
+
+function install_java_21() {
+    # Install Java 21 (Correto)
     rpm --import https://yum.corretto.aws/corretto.key
     curl -s -L -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
 
-    yum install -y java-17-amazon-corretto-devel
+    retry yum install -y java-21-amazon-corretto-devel
 }
 
 # Uses SCRIPTS_PATH variables
@@ -174,7 +203,7 @@ function update_motd() {
 # Uses EC2_URL_INTERNAL, EC2_IPV4, AWS_DOMAIN variable
 function update_route53() {
     local ZONE_ID
-    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq ".HostedZones[0].Id" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
+    ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$AWS_DOMAIN" --max-items 1 | jq -r ".HostedZones[0].Id // empty" | sed 's/^"\/hostedzone\///g' | sed 's/"//g')
 
     if [ -z "$ZONE_ID" ]; then
         echo "No Zone ID received for domain [$AWS_DOMAIN]!"

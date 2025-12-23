@@ -21,6 +21,11 @@ ARTIFACT_ID=web
 PACKAGING=war
 ARTIFACT_CLASSIFIER=""
 
+if is_tomcat_support_jakarta; then
+    ARTIFACT_CLASSIFIER="jakarta"
+    echo "Jakarta support has been detected in Tomcat, setting classifier to '$ARTIFACT_CLASSIFIER'"
+fi
+
 VERSION=$1
 WEBAPP_DIRNAME=$2
 
