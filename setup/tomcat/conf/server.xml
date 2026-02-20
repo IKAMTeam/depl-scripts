@@ -7,7 +7,7 @@
 
     <Service name="Catalina">
         <!-- CWE ID 526 fix: change server name to another and disable X-Powered-By header -->
-        <!-- Err-266307 fix (maxPartCount): too much parts in Multipart request -->
+        <!-- Err-266307 temporarily fix (maxPartCount): too much parts in Multipart request -->
         <Connector port="8080" protocol="HTTP/1.1"
                    connectionTimeout="20000"
                    xpoweredBy="false"
