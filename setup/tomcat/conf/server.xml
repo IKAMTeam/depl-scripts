@@ -11,7 +11,7 @@
         <Connector port="8080" protocol="HTTP/1.1"
                    connectionTimeout="20000"
                    xpoweredBy="false"
-                   maxPartCount="100"
+                   maxPartCount="1000"
                    server="ov" />
 
         <Engine name="Catalina" defaultHost="localhost">
