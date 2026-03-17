@@ -502,7 +502,7 @@
 
     <!-- Partial CWE ID 693 fix
          This filter will set response headers:
-            Strict-Transport-Security: max-age=2592000
+            Strict-Transport-Security: max-age=31536000
             X-Frame-Options: SAMEORIGIN
             X-Content-Type-Options: nosniff
             X-XSS-Protection: 1; mode=block
@@ -517,8 +517,12 @@
         </init-param>
         <init-param>
             <param-name>hstsMaxAgeSeconds</param-name>
-            <!-- 30 days -->
-            <param-value>2592000</param-value>
+            <!-- 365 days -->
+            <param-value>31536000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>hstsIncludeSubDomains</param-name>
+            <param-value>true</param-value>
         </init-param>
     </filter>
 
