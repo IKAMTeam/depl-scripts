@@ -502,7 +502,7 @@
 
     <!-- Partial CWE ID 693 fix
          This filter will set response headers:
-            Strict-Transport-Security: max-age=31536000
+            Strict-Transport-Security: max-age=31536000;includeSubDomains
             X-Frame-Options: SAMEORIGIN
             X-Content-Type-Options: nosniff
             X-XSS-Protection: 1; mode=block
