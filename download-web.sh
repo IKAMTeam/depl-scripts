@@ -19,12 +19,6 @@ require_root_user
 GROUP_ID=com.onevizion
 ARTIFACT_ID=web
 PACKAGING=war
-ARTIFACT_CLASSIFIER=""
-
-if is_tomcat_support_jakarta; then
-    ARTIFACT_CLASSIFIER="jakarta"
-    echo "Jakarta support has been detected in Tomcat, setting classifier to '$ARTIFACT_CLASSIFIER'"
-fi
 
 VERSION=$1
 WEBAPP_DIRNAME=$2
@@ -33,7 +27,7 @@ WEBAPP_PATH="$TOMCAT_PATH/$WEBAPP_DIRNAME"
 DOWNLOAD_PATH="$(mktemp --suffix="_web")"
 
 delete_on_exit "$DOWNLOAD_PATH"
-download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "" "$DOWNLOAD_PATH" || exit 1
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
 extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1

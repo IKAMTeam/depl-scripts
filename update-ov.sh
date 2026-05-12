@@ -32,12 +32,6 @@ if [ "$2" == "tomcat" ]; then
     GROUP_ID=com.onevizion
     ARTIFACT_ID=web
     PACKAGING=war
-    ARTIFACT_CLASSIFIER=""
-
-    if is_tomcat_support_jakarta; then
-        ARTIFACT_CLASSIFIER="jakarta"
-        echo "Jakarta support has been detected in Tomcat, setting classifier to '$ARTIFACT_CLASSIFIER'"
-    fi
 
     SERVER_XML_FILE="$TOMCAT_PATH/conf/server.xml"
     CONTEXT_PATH="$TOMCAT_PATH/conf/Catalina/$WEBSITE"
@@ -73,7 +67,7 @@ if [ "$2" == "tomcat" ]; then
     echo "Deploying [$ARTIFACT_ID $NEW_VERSION] at [$WEBAPP_PATH]..."
 
     delete_on_exit "$DOWNLOAD_PATH"
-    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "$ARTIFACT_CLASSIFIER" "$DOWNLOAD_PATH" || exit 1
+    download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$NEW_VERSION" "$PACKAGING" "" "$DOWNLOAD_PATH" || exit 1
 
     # Prevent script fail if Tomcat is not running
     echo "Stopping Tomcat..."
