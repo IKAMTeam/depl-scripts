@@ -715,8 +715,8 @@ function extract_war_contents() {
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 
     mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
-    chown "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH/.config/jgit" || return 1
-    chmod g+w "$TOMCAT_PATH/.config/jgit" || return 1
+    chown "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
+    chmod g+rwx "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
 }
 
 # Uses TOMCAT_PATH variable
