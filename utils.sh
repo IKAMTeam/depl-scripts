@@ -694,7 +694,7 @@ function wait_log() {
     fi
 }
 
-# Uses TOMCAT_UN, TOMCAT_GROUP variables
+# Uses TOMCAT_UN, TOMCAT_GROUP, TOMCAT_PATH variables
 function extract_war_contents() {
     local WEBAPP_PATH DOWNLOAD_PATH
 
@@ -715,7 +715,7 @@ function extract_war_contents() {
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 
     mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
-    chown "$(whoami):$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
+    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
     chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
 }
 
