@@ -31,3 +31,4 @@ download_artifact "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" "$PACKAGING" "" "$DOWNLO
 
 echo "Unpacking WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
 extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
+grant_jgit_access || exit 1

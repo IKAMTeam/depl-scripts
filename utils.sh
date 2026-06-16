@@ -694,7 +694,7 @@ function wait_log() {
     fi
 }
 
-# Uses TOMCAT_UN, TOMCAT_GROUP, TOMCAT_PATH variables
+# Uses TOMCAT_UN, TOMCAT_GROUP variables
 function extract_war_contents() {
     local WEBAPP_PATH DOWNLOAD_PATH
 
@@ -713,10 +713,6 @@ function extract_war_contents() {
     find "$WEBAPP_PATH" -type d -exec chmod g-w,g+x,o-r,o-w,o-x {} + || return 1
     find "$WEBAPP_PATH" -type f -exec chmod g-w,o-r,o-w,o-x {} + || return 1
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
-
-    mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
-    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
-    chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
 }
 
 # Uses TOMCAT_PATH variable
@@ -743,6 +739,13 @@ function recalculate_tomcat_metaspace_size() {
 
     sed -i "/^METASPACE_SIZE_MB=.*$/ c METASPACE_SIZE_MB=\"$METASPACE_SIZE_MB\"" "$MEM_CONF_FILE" || return 1
     sed -i "/^METASPACE_MAX_SIZE_MB=.*$/ c METASPACE_MAX_SIZE_MB=\"$METASPACE_MAX_SIZE_MB\"" "$MEM_CONF_FILE" || return 1
+}
+
+# Uses TOMCAT_UN, TOMCAT_GROUP, TOMCAT_PATH variables
+function grant_jgit_access() {
+    mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
+    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
+    chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
 }
 
 function read_xml_value() {
