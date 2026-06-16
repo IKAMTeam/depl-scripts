@@ -744,8 +744,11 @@ function recalculate_tomcat_metaspace_size() {
 # Uses TOMCAT_UN, TOMCAT_GROUP, TOMCAT_PATH variables
 function grant_jgit_access() {
     mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
-    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
-    chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" "$TOMCAT_PATH/.config/jgit" || return 1
+    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" || return 1
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config/jgit" || return 1
+    chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" || return 1
+    chmod -R g+rwX,o-rwx "$TOMCAT_PATH/.config/jgit" || return 1
+    find "$TOMCAT_PATH/.config/jgit" -type d -exec chmod g+s {} + || return 1
 }
 
 function read_xml_value() {
