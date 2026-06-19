@@ -62,6 +62,7 @@ EOF
 chmod 440 /etc/sudoers.d/integration-scheduler /etc/sudoers.d/rule-service /etc/sudoers.d/services
 
 # Validate generated sudoers files
+visudo -c -f /etc/sudoers.d/integration-scheduler || { echo "ERROR: Invalid sudoers file for integration-scheduler"; exit 1; }
 visudo -c -f /etc/sudoers.d/rule-service || { echo "ERROR: Invalid sudoers file for rule-service"; exit 1; }
 visudo -c -f /etc/sudoers.d/services || { echo "ERROR: Invalid sudoers file for services"; exit 1; }
 
