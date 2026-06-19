@@ -38,8 +38,37 @@ fi
 
 # Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
-echo 'rule-service ALL=(rule_*) NOPASSWD: ALL' > /etc/sudoers.d/rule-service
-echo 'services ALL=(rule_*) NOPASSWD: ALL' > /etc/sudoers.d/services
+cat > /etc/sudoers.d/rule-service <<'EOF'
+rule-service ALL=(rule_*) NOPASSWD: /opt/*_rule-service*/python-rules-data/rule-*/.venv/bin/python3
+rule-service ALL=(rule_*) NOPASSWD: /opt/*_rule-service*/python-rules-data/rule-*/.venv/bin/pip3
+
+rule-service ALL=(rule_*) NOPASSWD: /opt/rule-service*/python-rules-data/rule-*/.venv/bin/python3
+rule-service ALL=(rule_*) NOPASSWD: /opt/rule-service*/python-rules-data/rule-*/.venv/bin/pip3
+
+rule-service ALL=(root) NOPASSWD: /opt/*_rule-service*/python-rules-data/init-python-workspace.sh
+rule-service ALL=(root) NOPASSWD: /opt/*_rule-service*/python-rules-data/deinit-python-workspace.sh
+rule-service ALL=(root) NOPASSWD: /opt/*_rule-service*/python-rules-data/clean-python-workspace.sh
+
+rule-service ALL=(root) NOPASSWD: /opt/rule-service*/python-rules-data/init-python-workspace.sh
+rule-service ALL=(root) NOPASSWD: /opt/rule-service*/python-rules-data/deinit-python-workspace.sh
+rule-service ALL=(root) NOPASSWD: /opt/rule-service*/python-rules-data/clean-python-workspace.sh
+EOF
+
+cat > /etc/sudoers.d/services <<'EOF'
+services ALL=(rule_*) NOPASSWD: /opt/*_services*/python-rules-data/rule-*/.venv/bin/python3
+services ALL=(rule_*) NOPASSWD: /opt/*_services*/python-rules-data/rule-*/.venv/bin/pip3
+
+services ALL=(rule_*) NOPASSWD: /opt/services*/python-rules-data/rule-*/.venv/bin/python3
+services ALL=(rule_*) NOPASSWD: /opt/services*/python-rules-data/rule-*/.venv/bin/pip3
+
+services ALL=(root) NOPASSWD: /opt/*_services*/python-rules-data/init-python-workspace.sh
+services ALL=(root) NOPASSWD: /opt/*_services*/python-rules-data/deinit-python-workspace.sh
+services ALL=(root) NOPASSWD: /opt/*_services*/python-rules-data/clean-python-workspace.sh
+
+services ALL=(root) NOPASSWD: /opt/services*/python-rules-data/init-python-workspace.sh
+services ALL=(root) NOPASSWD: /opt/services*/python-rules-data/deinit-python-workspace.sh
+services ALL=(root) NOPASSWD: /opt/services*/python-rules-data/clean-python-workspace.sh
+EOF
 chmod 440 /etc/sudoers.d/integration-scheduler /etc/sudoers.d/rule-service /etc/sudoers.d/services
 
 # Install services for this instance
