@@ -2,7 +2,8 @@
 
 function usage() {
     echo "### Script to install new service to run on schedule ###"
-    echo "Usage for syncs3: $(basename "$0") <website> <artifact> [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
+    echo "Usage for syncs3: $(basename "$0") <website> syncs3 [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> [for_last_N_days]"
+    echo "Usage for extract-files-content: $(basename "$0") <website> extract-files-content [--suffix <suffix>] <version> [--aes-password <aes_password>] <schedule> <owner_schema_username>/<owner_schema_password>@<owner_schema_connect_identifier> <user_schema_username>/<user_schema_password>@<user_schema_connect_identifier>"
     echo "Usage for monitoring-refresh-config: $(basename "$0") monitoring-refresh-config <schedule>"
     echo " "
     echo "Where *_schema_connect_identifier is Oracle host:port:sid or host:port/service_name"
