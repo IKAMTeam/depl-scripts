@@ -52,8 +52,8 @@ EOF
 cat > /etc/sudoers.d/services << EOF
 root ALL=(ALL : ALL) NOPASSWD: /usr/bin/python3 -m venv ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv
 
-services ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/python3 *
-services ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/pip3 *
+services ALL=(ALL : services) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/python3 *
+services ALL=(ALL : services) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/pip3 *
 
 services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/init-python-workspace.sh *
 services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/deinit-python-workspace.sh *
