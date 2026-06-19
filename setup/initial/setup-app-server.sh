@@ -37,7 +37,6 @@ if [ -n "$SET_TIMEZONE" ]; then
 fi
 
 # Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
-# integration-scheduler needs full sudo access for systemctl and service management
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
 echo 'rule-service ALL=(rule_*) NOPASSWD: ALL' > /etc/sudoers.d/rule-service
 echo 'services ALL=(rule_*) NOPASSWD: ALL' > /etc/sudoers.d/services
