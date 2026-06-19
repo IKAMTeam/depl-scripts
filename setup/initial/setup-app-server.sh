@@ -39,7 +39,7 @@ fi
 # Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
 cat > /etc/sudoers.d/rule-service << EOF
-root ALL=(ALL : rule-service) NOPASSWD: /usr/bin/python3 -m venv ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv
+root ALL=(ALL : ALL) NOPASSWD: /usr/bin/python3 -m venv ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv
 
 rule-service ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv/bin/python3 *
 rule-service ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv/bin/pip3 *
@@ -50,7 +50,7 @@ rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-d
 EOF
 
 cat > /etc/sudoers.d/services << EOF
-root ALL=(ALL : rule-service) NOPASSWD: /usr/bin/python3 -m venv ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv
+root ALL=(ALL : ALL) NOPASSWD: /usr/bin/python3 -m venv ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv
 
 services ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/python3 *
 services ALL=(ALL : rule-service) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/pip3 *
