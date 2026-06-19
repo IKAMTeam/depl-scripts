@@ -36,6 +36,11 @@ if [ -n "$SET_TIMEZONE" ]; then
     ln -sf "/usr/share/zoneinfo/$SET_TIMEZONE" /etc/localtime
 fi
 
+if [ -z "$SERVICES_PATH" ]; then
+    echo "ERROR: SERVICES_PATH is not set in the configuration file."
+    exit 1
+fi
+
 # Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
 cat > /etc/sudoers.d/rule-service << EOF
