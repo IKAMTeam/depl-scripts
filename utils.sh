@@ -141,6 +141,10 @@ function download_artifact() {
     MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
     mkdir -p "$MVN_CACHE_DIR"
 
+    setfacl -d -m o::rwx "$MVN_CACHE_DIR" || return 1
+    setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
+    chown -R "$(stat -c '%U:%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
+
     echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
 
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
