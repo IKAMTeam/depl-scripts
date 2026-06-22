@@ -138,10 +138,12 @@ function download_artifact() {
         ARTIFACT_HUMAN_READABLE="$ARTIFACT_HUMAN_READABLE:$ARTIFACT_CLASSIFIER"
     fi
 
-    MVN_CACHE_DIR="$(mktemp -d)"
+    MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
+    mkdir -p "$MVN_CACHE_DIR"
+
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
-    delete_on_exit "$MVN_CACHE_DIR"
+    delete_on_exit "$MVN_CACHE_DIR/com/onevizion"
     delete_on_exit "$MVN_LOG"
 
     RETRIES="1"
