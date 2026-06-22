@@ -141,6 +141,8 @@ function download_artifact() {
     MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
     mkdir -p "$MVN_CACHE_DIR"
 
+    echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
     delete_on_exit "$MVN_CACHE_DIR/com/onevizion"
@@ -180,6 +182,10 @@ function download_artifact() {
 
             if cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
                 echo "[$ARTIFACT_HUMAN_READABLE] downloaded successfully"
+
+                rm -rf "$MVN_CACHE_DIR/com/onevizion"
+                echo "Maven cache size after download (without OneVizion artifacts): $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
                 return 0
             else
                 echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
