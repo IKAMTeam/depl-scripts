@@ -36,9 +36,40 @@ if [ -n "$SET_TIMEZONE" ]; then
     ln -sf "/usr/share/zoneinfo/$SET_TIMEZONE" /etc/localtime
 fi
 
-# Add rules for sudo into /etc/sudoers for integration-scheduler:
+if [ -z "$SERVICES_PATH" ]; then
+    echo "ERROR: SERVICES_PATH is not set in the configuration file."
+    exit 1
+fi
+
+# Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
-chmod 440 /etc/sudoers.d/integration-scheduler
+cat > /etc/sudoers.d/rule-service << EOF
+root ALL=(ALL : ALL) NOPASSWD:SETENV: /usr/bin/python3 -m venv ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv
+
+rule-service ALL=(ALL : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv/bin/python3 *
+rule-service ALL=(ALL : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/rule-*/.venv/bin/pip3 *
+
+rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/init-python-workspace.sh *
+rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/deinit-python-workspace.sh *
+rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/clean-python-workspace.sh *
+EOF
+
+cat > /etc/sudoers.d/services << EOF
+root ALL=(ALL : ALL) NOPASSWD:SETENV: /usr/bin/python3 -m venv ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv
+
+services ALL=(ALL : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/python3 *
+services ALL=(ALL : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/rule-*/.venv/bin/pip3 *
+
+services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/init-python-workspace.sh *
+services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/deinit-python-workspace.sh *
+services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/clean-python-workspace.sh *
+EOF
+chmod 440 /etc/sudoers.d/integration-scheduler /etc/sudoers.d/rule-service /etc/sudoers.d/services
+
+# Validate generated sudoers files
+visudo -c -f /etc/sudoers.d/integration-scheduler || { echo "ERROR: Invalid sudoers file for integration-scheduler"; exit 1; }
+visudo -c -f /etc/sudoers.d/rule-service || { echo "ERROR: Invalid sudoers file for rule-service"; exit 1; }
+visudo -c -f /etc/sudoers.d/services || { echo "ERROR: Invalid sudoers file for services"; exit 1; }
 
 # Install services for this instance
 "$SCRIPTS_PATH/install-daemon-service.sh" "$WEBSITE" services "$VERSION" --aes-password "$AES_PASSWORD" "${DB_OWNER_USER}/${DB_OWNER_PASSWORD}@$DB_URL" \
