@@ -214,6 +214,9 @@ function download_artifact() {
                 rm -rf "$MVN_CACHE_DIR/com/onevizion"
                 echo "Maven cache size after download (without OneVizion artifacts): $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
 
+                # Close lock descriptor
+                exec {LOCK_FD}>&-
+
                 return 0
             else
                 echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
