@@ -168,7 +168,8 @@ function download_artifact() {
     echo "Maven cache lock acquired (PID: $$, fd: $LOCK_FD)"
 
     # Ensure lock is released on function exit (success or failure)
-    trap 'flock --unlock ${LOCK_FD}; exec {LOCK_FD}>&-; echo "Maven cache lock released (PID: $$)"' RETURN
+    # shellcheck disable=SC2064
+    trap "flock --unlock $LOCK_FD; exec $LOCK_FD>&-; trap - RETURN; echo 'Maven cache lock released (PID: $$)'" RETURN
 
     echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
 
