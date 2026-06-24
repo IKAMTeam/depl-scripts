@@ -145,6 +145,7 @@ function download_artifact() {
         mkdir -p "$MVN_CACHE_DIR" || return 1
         chmod g+s "$MVN_CACHE_DIR" || return 1
         setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
+        chgrp -R "$(stat -c '%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
     fi
 
     local MVN_LOCK_FILE="$MVN_CACHE_DIR/.maven-cache.lock"
