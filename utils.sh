@@ -143,7 +143,7 @@ function download_artifact() {
         echo "Creating Maven cache directory [$MVN_CACHE_DIR]..."
 
         mkdir -p "$MVN_CACHE_DIR" || return 1
-        chmod g+s "$MVN_CACHE_DIR" || return 1
+        chmod g+s,g+w "$MVN_CACHE_DIR" || return 1
         setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
         chgrp -R "$(stat -c '%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
     fi
@@ -153,7 +153,7 @@ function download_artifact() {
 
     echo "Acquiring Maven cache lock (timeout: ${MVN_LOCK_TIMEOUT}s)..."
     local LOCK_FD
-    exec {LOCK_FD}>"$MVN_LOCK_FILE"
+    exec {LOCK_FD}>"$MVN_LOCK_FILE" || { echo "ERROR: Unable to open Maven cache lock file: $MVN_LOCK_FILE"; return 1; }
 
     if ! flock --timeout "$MVN_LOCK_TIMEOUT" "$LOCK_FD"; then
         echo "ERROR: Unable to acquire Maven cache lock after ${MVN_LOCK_TIMEOUT}s."
