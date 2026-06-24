@@ -139,12 +139,35 @@ function download_artifact() {
     fi
 
     MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
-    mkdir -p "$MVN_CACHE_DIR" || return 1
+    if [ ! -d "$MVN_CACHE_DIR" ]; then
+        echo "Creating Maven cache directory [$MVN_CACHE_DIR]..."
 
-    setfacl -d -m o::rwx "$MVN_CACHE_DIR" || return 1
-    setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
-    chmod -R g+s "$MVN_CACHE_DIR" || return 1
-    chown -R "$(stat -c '%U:%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
+        mkdir -p "$MVN_CACHE_DIR" || return 1
+        chmod g+s "$MVN_CACHE_DIR" || return 1
+        setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
+    fi
+
+    local MVN_LOCK_FILE="$MVN_CACHE_DIR/.maven-cache.lock"
+    local MVN_LOCK_TIMEOUT=600
+
+    echo "Acquiring Maven cache lock (timeout: ${MVN_LOCK_TIMEOUT}s)..."
+    local LOCK_FD
+    exec {LOCK_FD}>"$MVN_LOCK_FILE"
+
+    if ! flock --timeout "$MVN_LOCK_TIMEOUT" "$LOCK_FD"; then
+        echo "ERROR: Unable to acquire Maven cache lock after ${MVN_LOCK_TIMEOUT}s."
+        echo "Another download process may be stuck. Lock file: $MVN_LOCK_FILE"
+
+        # Close lock descriptor
+        exec {LOCK_FD}>&-
+
+        return 1
+    fi
+
+    echo "Maven cache lock acquired (PID: $$, fd: $LOCK_FD)"
+
+    # Ensure lock is released on function exit (success or failure)
+    trap 'flock --unlock ${LOCK_FD}; exec {LOCK_FD}>&-; echo "Maven cache lock released (PID: $$)"' RETURN
 
     echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
 
