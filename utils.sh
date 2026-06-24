@@ -175,7 +175,6 @@ function download_artifact() {
 
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
-    delete_on_exit "$MVN_CACHE_DIR/com/onevizion"
     delete_on_exit "$MVN_LOG"
 
     RETRIES="1"
