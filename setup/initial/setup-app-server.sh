@@ -91,6 +91,8 @@ if [ -n "$MONITOR_VERSION" ]; then
     fi
 fi
 
+install_uv_for_all_users || exit 1
+
 # Start up services
 systemctl start "${WEBSITE}_services"
 systemctl start "${WEBSITE}_integration-scheduler"
