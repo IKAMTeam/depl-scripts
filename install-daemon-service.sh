@@ -91,3 +91,7 @@ echo "Enabling service [$SERVICE_NAME]..."
 systemctl enable "$SERVICE_NAME" || exit 1
 
 echo "You can start daemon with [systemctl start $SERVICE_NAME] command"
+
+if [[ "$SERVICE_NAME" == "rule-service" || "$SERVICE_NAME" == "services" ]]; then
+    update_uv_for_all_users
+fi

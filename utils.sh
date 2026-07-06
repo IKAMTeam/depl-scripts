@@ -751,6 +751,24 @@ function read_xml_value() {
     "$(dirname "$0")/setup/read-xml-value.py" "$IN_FILE" "$XPATH" "$ATTR_NAME" || return 1
 }
 
+function update_uv_for_all_users() {
+    update_uv "rule-service" || return 1
+    update_uv "services" || return 1
+}
+
+function update_uv() {
+    local USER
+    USER="$1"
+
+    echo "Updating uv for user [$USER]"
+
+    sudo -u "$USER" uv self update || return 1
+    sudo -u "$USER" uv self version || return 1
+
+    echo "uv cache directory: $(sudo -u "$USER" uv cache dir)"
+    echo "uv cache size: $(sudo -u "$USER" uv cache size -H)"
+}
+
 function cleanup_tomcat() {
     local TOMCAT_PATH
 

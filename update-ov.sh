@@ -184,5 +184,9 @@ else
         elif is_cron_installed "$SERVICE_NAME"; then
             extract_cron_launcher_script "$ARTIFACT" || exit 1
         fi
+
+        if [[ "$SERVICE_NAME" == "rule-service" || "$SERVICE_NAME" == "services" ]]; then
+            update_uv_for_all_users
+        fi
     done
 fi
