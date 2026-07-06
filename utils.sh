@@ -789,8 +789,12 @@ function read_xml_value() {
 }
 
 function update_uv_for_all_users() {
-    update_uv "rule-service" || return 1
-    update_uv "services" || return 1
+    if getent passwd "rule-service" >/dev/null; then
+        update_uv "rule-service" || return 1
+    fi
+    if getent passwd "services" >/dev/null; then
+        update_uv "services" || return 1
+    fi
 }
 
 function update_uv() {
