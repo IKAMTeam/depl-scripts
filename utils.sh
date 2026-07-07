@@ -565,7 +565,7 @@ function config_service() {
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICE_PATH" "$SERVICE_UN"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICES_PATH/${SERVICE_NAME}_home" "$SERVICE_UN"
         echo "[$SERVICE_UN] user added"
     fi
 
