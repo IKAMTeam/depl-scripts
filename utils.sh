@@ -791,7 +791,7 @@ function install_uv() {
     trap 'rm -rf /tmp/uv' EXIT ERR
     cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
 
-    sudo -u "$USER" --preserve-env=UV_INSTALL_DIR "/tmp/uv/uv-installer.sh"
+    sudo -u "$USER" "/tmp/uv/uv-installer.sh"
 }
 
 function cleanup_tomcat() {
