@@ -88,8 +88,8 @@ if [ -n "$AES_PASSWORD" ]; then
 fi
 
 if [[ "$SERVICE_UN" == "rule-service" || "$SERVICE_UN" == "services" ]]; then
-    install_uv "$SERVICE_UN" || return 1
-    update_uv "$SERVICE_UN" || return 1
+    install_uv "$SERVICE_UN" || exit 1
+    update_uv "$SERVICE_UN" || exit 1
 fi
 
 echo "Enabling service [$SERVICE_NAME]..."
