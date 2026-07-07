@@ -781,7 +781,7 @@ function install_uv() {
     cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
 
     sudo -u "$USER" "/tmp/uv/uv-installer.sh"
-    sudo -u "$USER" configure_uv_from_user
+    sudo -u "$USER" bash -c "$(declare -f configure_uv_from_user); configure_uv_from_user"
 }
 
 function configure_uv_from_user() {
@@ -790,8 +790,6 @@ function configure_uv_from_user() {
     # shellcheck disable=SC2016
     echo 'PATH=$HOME/.local/bin:$PATH' > ~/.config/environment.d/uv.conf
 }
-
-export -f configure_uv_from_user
 
 function cleanup_tomcat() {
     local TOMCAT_PATH
