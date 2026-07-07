@@ -2068,7 +2068,7 @@ ignore() {
 # This wraps curl or wget. Try curl first, if not installed,
 # use wget instead.
 function downloader() {
-    BASENAME="$(basename "$1")"
+    BASENAME="$(dirname "$0")/$(basename "$1")"
 
     echo "Copying $BASENAME to $2"
     cp -f "$BASENAME" "$2" || return 1
