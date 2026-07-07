@@ -773,6 +773,27 @@ function update_uv() {
     echo "uv cache size: $(sudo -u "$USER" uv cache size -H)"
 }
 
+function install_uv_for_all_users() {
+    if getent passwd "rule-service" >/dev/null; then
+        install_uv "rule-service" || return 1
+    fi
+    if getent passwd "services" >/dev/null; then
+        install_uv "services" || return 1
+    fi
+}
+
+function install_uv() {
+    local USER
+    USER="$1"
+
+    echo "Installing uv for user [$USER]"
+
+    trap 'rm -rf /tmp/uv' EXIT ERR
+    cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
+
+    sudo -u "$USER" --preserve-env=UV_INSTALL_DIR "/tmp/uv/uv-installer.sh"
+}
+
 function cleanup_tomcat() {
     local TOMCAT_PATH
 

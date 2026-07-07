@@ -256,5 +256,5 @@ function install_uv() {
     trap 'rm -rf /tmp/uv' EXIT ERR
     cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
 
-    UV_INSTALL_DIR="$SERVICES_PATH/.local/bin" sudo -u "services" --preserve-env=UV_INSTALL_DIR "/tmp/uv/uv-installer.sh"
+    sudo -u "$USER" --preserve-env=UV_INSTALL_DIR "/tmp/uv/uv-installer.sh"
 }
