@@ -99,9 +99,8 @@ if [ -n "$MONITOR_VERSION" ]; then
     systemctl start "monitoring"
 fi
 
-mkdir -p /tmp/uv
 trap 'rm -rf /tmp/uv' EXIT ERR
-cp -rf "$SCRIPTS_PATH/setup/uv" /tmp/uv
+cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
 sudo -u "services" "/tmp/uv/uv-installer.sh"
 
 # Finished
