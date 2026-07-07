@@ -99,5 +99,7 @@ if [ -n "$MONITOR_VERSION" ]; then
     systemctl start "monitoring"
 fi
 
+sudo -u "services" "$SCRIPTS_PATH/setup/uv/uv-installer.sh"
+
 # Finished
 echo "Application server setup complete."
