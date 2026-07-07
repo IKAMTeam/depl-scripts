@@ -101,9 +101,5 @@ if [ -n "$MONITOR_VERSION" ]; then
     systemctl start "monitoring"
 fi
 
-trap 'rm -rf /tmp/uv' EXIT ERR
-cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
-sudo -u "services" "/tmp/uv/uv-installer.sh"
-
 # Finished
 echo "Application server setup complete."

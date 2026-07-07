@@ -252,4 +252,9 @@ function install_uv() {
     USER="$1"
 
     echo "Installing uv for user [$USER]"
+
+    trap 'rm -rf /tmp/uv' EXIT ERR
+    cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
+
+    UV_INSTALL_DIR="$SERVICES_PATH/.local/bin" sudo -u "services" --preserve-env=UV_INSTALL_DIR "/tmp/uv/uv-installer.sh"
 }
