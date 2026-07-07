@@ -87,12 +87,12 @@ if [ -n "$AES_PASSWORD" ]; then
     echo "aesPassword=$AES_PASSWORD" > "$SERVICE_PATH/ov.properties"
 fi
 
+if [[ "$SERVICE_UN" == "rule-service" || "$SERVICE_UN" == "services" ]]; then
+    install_uv "$SERVICE_UN" || return 1
+    update_uv "$SERVICE_UN" || return 1
+fi
+
 echo "Enabling service [$SERVICE_NAME]..."
 systemctl enable "$SERVICE_NAME" || exit 1
 
 echo "You can start daemon with [systemctl start $SERVICE_NAME] command"
-
-if [[ "$SERVICE_NAME" == "rule-service" || "$SERVICE_NAME" == "services" ]]; then
-    install_uv_for_all_users
-    update_uv_for_all_users
-fi

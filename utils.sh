@@ -751,15 +751,6 @@ function read_xml_value() {
     "$(dirname "$0")/setup/read-xml-value.py" "$IN_FILE" "$XPATH" "$ATTR_NAME" || return 1
 }
 
-function update_uv_for_all_users() {
-    if getent passwd "rule-service" >/dev/null; then
-        update_uv "rule-service" || return 1
-    fi
-    if getent passwd "services" >/dev/null; then
-        update_uv "services" || return 1
-    fi
-}
-
 function update_uv() {
     local USER
     USER="$1"
@@ -771,15 +762,6 @@ function update_uv() {
 
     echo "uv cache directory: $(sudo -u "$USER" uv cache dir)"
     echo "uv cache size: $(sudo -u "$USER" uv cache size -H)"
-}
-
-function install_uv_for_all_users() {
-    if getent passwd "rule-service" >/dev/null; then
-        install_uv "rule-service" || return 1
-    fi
-    if getent passwd "services" >/dev/null; then
-        install_uv "services" || return 1
-    fi
 }
 
 function install_uv() {
