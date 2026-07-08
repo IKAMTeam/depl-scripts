@@ -16,6 +16,7 @@
 if [ -d "$HOME/.config/environment.d" ]; then
     set -o allexport
     for _env_file in "$HOME/.config/environment.d"/*.conf; do
+        # shellcheck disable=SC1090
         [ -f "$_env_file" ] && . "$_env_file"
     done
     set +o allexport
