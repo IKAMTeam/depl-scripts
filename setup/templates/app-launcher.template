@@ -12,6 +12,15 @@
 # JAR_OPTS - JAR options
 ########################################
 
+# Source environment.d configs (not auto-loaded for system-level systemd services)
+if [ -d "$HOME/.config/environment.d" ]; then
+    set -o allexport
+    for _env_file in "$HOME/.config/environment.d"/*.conf; do
+        [ -f "$_env_file" ] && . "$_env_file"
+    done
+    set +o allexport
+fi
+
 if [ -z "$SERVICE_PID" ]; then
     echo "SERVICE_PID is not set"
     exit 1
