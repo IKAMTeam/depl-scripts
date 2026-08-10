@@ -138,10 +138,43 @@ function download_artifact() {
         ARTIFACT_HUMAN_READABLE="$ARTIFACT_HUMAN_READABLE:$ARTIFACT_CLASSIFIER"
     fi
 
-    MVN_CACHE_DIR="$(mktemp -d)"
+    MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
+    if [ ! -d "$MVN_CACHE_DIR" ]; then
+        echo "Creating Maven cache directory [$MVN_CACHE_DIR]..."
+
+        mkdir -p "$MVN_CACHE_DIR" || return 1
+        chmod g+s,g+w "$MVN_CACHE_DIR" || return 1
+        setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
+        chgrp -R "$(stat -c '%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
+    fi
+
+    local MVN_LOCK_FILE="$MVN_CACHE_DIR/.maven-cache.lock"
+    local MVN_LOCK_TIMEOUT=600
+
+    echo "Acquiring Maven cache lock (timeout: ${MVN_LOCK_TIMEOUT}s)..."
+    local LOCK_FD
+    exec {LOCK_FD}>"$MVN_LOCK_FILE" || { echo "ERROR: Unable to open Maven cache lock file: $MVN_LOCK_FILE"; return 1; }
+
+    if ! flock --timeout "$MVN_LOCK_TIMEOUT" "$LOCK_FD"; then
+        echo "ERROR: Unable to acquire Maven cache lock after ${MVN_LOCK_TIMEOUT}s."
+        echo "Another download process may be stuck. Lock file: $MVN_LOCK_FILE"
+
+        # Close lock descriptor
+        exec {LOCK_FD}>&-
+
+        return 1
+    fi
+
+    echo "Maven cache lock acquired (PID: $$, fd: $LOCK_FD)"
+
+    # Ensure lock is released on function exit (success or failure)
+    # shellcheck disable=SC2064
+    trap "flock --unlock $LOCK_FD; exec $LOCK_FD>&-; trap - RETURN; echo 'Maven cache lock released (PID: $$)'" RETURN
+
+    echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
-    delete_on_exit "$MVN_CACHE_DIR"
     delete_on_exit "$MVN_LOG"
 
     RETRIES="1"
@@ -178,6 +211,10 @@ function download_artifact() {
 
             if cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
                 echo "[$ARTIFACT_HUMAN_READABLE] downloaded successfully"
+
+                rm -rf "$MVN_CACHE_DIR/com/onevizion"
+                echo "Maven cache size after download (without OneVizion artifacts): $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
                 return 0
             else
                 echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
