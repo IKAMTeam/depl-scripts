@@ -568,10 +568,8 @@ function config_service() {
         HOME_PATH="$SERVICES_PATH/${SERVICE_UN}_home"
         useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$HOME_PATH" "$SERVICE_UN"
 
-        if [[ "$SERVICE_UN" == "rule-service" || "$SERVICE_UN" == "services" ]]; then
-            mkdir -p "$HOME_PATH" || return 1
-            chown "$SERVICE_UN:$SERVICE_GROUP" "$HOME_PATH" || return 1
-        fi
+        mkdir -p "$HOME_PATH" || return 1
+        chown "$SERVICE_UN:$SERVICE_GROUP" "$HOME_PATH" || return 1
 
         echo "[$SERVICE_UN] user added"
     fi
