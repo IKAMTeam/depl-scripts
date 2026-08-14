@@ -817,7 +817,7 @@ function install_uv() {
 
     cp -rf "$SCRIPTS_PATH/setup/uv"/* "$TMP_UV_DIR" || return 1
 
-    sudo -u "$USER" "$TMP_UV_DIR/uv-installer.sh"
+    sudo -u "$USER" bash "$TMP_UV_DIR/uv-installer.sh" || return 1
     sudo -u "$USER" bash -c "$(declare -f configure_uv_from_user); configure_uv_from_user"
 }
 
