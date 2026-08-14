@@ -2067,10 +2067,14 @@ ignore() {
 
 # This wraps curl or wget. Try curl first, if not installed,
 # use wget instead.
-function downloader() {
+downloader() {
     BASENAME="$(dirname "$0")/$(basename "$1")"
 
-    echo "Copying $BASENAME to $2"
+    if [ ! -f "$BASENAME" ]; then
+        err "missing bundled artifact: $BASENAME"
+    fi
+
+    say "Copying $BASENAME to $2"
     cp -f "$BASENAME" "$2" || return 1
 }
 
