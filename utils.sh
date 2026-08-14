@@ -800,7 +800,7 @@ function update_uv() {
     echo "Updating uv for user [$USER]"
 
     sudo -H -u "$USER" bash -lc 'cd ~ && uv self update' || return 1
-    sudo -H -u "$USER" bash -lc 'cd ~ && uv self version'
+    sudo -H -u "$USER" bash -lc 'cd ~ && uv self version' || return 1
 
     echo "uv cache directory: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache dir')"
     echo "uv cache size: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache size -H --preview-features cache-size')"
