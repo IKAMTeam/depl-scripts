@@ -816,6 +816,7 @@ function install_uv() {
     delete_on_exit "$TMP_UV_DIR"
 
     cp -rf "$SCRIPTS_PATH/setup/uv"/* "$TMP_UV_DIR" || return 1
+    chmod +rx "$TMP_UV_DIR" || return 1
     chmod -R +r "$TMP_UV_DIR" || return 1
 
     sudo -u "$USER" "$TMP_UV_DIR/uv-installer.sh" || return 1
