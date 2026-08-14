@@ -807,15 +807,17 @@ function update_uv() {
 }
 
 function install_uv() {
-    local USER
+    local USER TMP_UV_DIR
     USER="$1"
 
     echo "Installing uv for user [$USER]"
 
-    trap 'rm -rf /tmp/uv' EXIT ERR
-    cp -rf "$SCRIPTS_PATH/setup/uv" /tmp
+    TMP_UV_DIR="$(mktemp -d /tmp/uv.XXXXXX)" || return 1
+    delete_on_exit "$TMP_UV_DIR"
 
-    sudo -u "$USER" "/tmp/uv/uv-installer.sh"
+    cp -rf "$SCRIPTS_PATH/setup/uv"/* "$TMP_UV_DIR" || return 1
+
+    sudo -u "$USER" "$TMP_UV_DIR/uv-installer.sh"
     sudo -u "$USER" bash -c "$(declare -f configure_uv_from_user); configure_uv_from_user"
 }
 
