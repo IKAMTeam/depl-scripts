@@ -176,6 +176,10 @@ else
         ARTIFACT="$(get_artifact_name "$SERVICE_NAME")"
         copy_service_artifacts "$ARTIFACT" || exit 1
 
+        if [[ "$ARTIFACT" == "rule-service" || "$ARTIFACT" == "services" ]]; then
+            update_uv "$ARTIFACT" || exit 1
+        fi
+
         if is_daemon_installed "$SERVICE_NAME"; then
             extract_launcher_script "$ARTIFACT" || exit 1
 

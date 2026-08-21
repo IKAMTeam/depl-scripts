@@ -602,7 +602,12 @@ function config_service() {
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICE_PATH" "$SERVICE_UN"
+        HOME_PATH="$SERVICES_PATH/${SERVICE_UN}_home"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$HOME_PATH" "$SERVICE_UN"
+
+        mkdir -p "$HOME_PATH" || return 1
+        chown "$SERVICE_UN:$SERVICE_GROUP" "$HOME_PATH" || return 1
+
         echo "[$SERVICE_UN] user added"
     fi
 
@@ -786,6 +791,42 @@ function read_xml_value() {
     ATTR_NAME=$3
 
     "$(dirname "$0")/setup/read-xml-value.py" "$IN_FILE" "$XPATH" "$ATTR_NAME" || return 1
+}
+
+function update_uv() {
+    local USER
+    USER="$1"
+
+    echo "Updating uv for user [$USER]"
+
+    sudo -H -u "$USER" bash -lc 'cd ~ && uv self update' || return 1
+    sudo -H -u "$USER" bash -lc 'cd ~ && uv self version' || return 1
+
+    echo "uv cache directory: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache dir')"
+    echo "uv cache size: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache size -H --preview-features cache-size')"
+}
+
+function install_uv() {
+    local USER TMP_UV_DIR
+    USER="$1"
+
+    echo "Installing uv for user [$USER]"
+
+    TMP_UV_DIR="$(mktemp -d /tmp/uv.XXXXXX)" || return 1
+    delete_on_exit "$TMP_UV_DIR"
+
+    cp -rf "$SCRIPTS_PATH/setup/uv"/* "$TMP_UV_DIR" || return 1
+    chmod -R +rx "$TMP_UV_DIR" || return 1
+
+    sudo -u "$USER" "$TMP_UV_DIR/uv-installer.sh" || return 1
+    sudo -u "$USER" bash -c "$(declare -f configure_uv_from_user); configure_uv_from_user"
+}
+
+function configure_uv_from_user() {
+    mkdir -p ~/.config/environment.d
+
+    # shellcheck disable=SC2016
+    echo 'PATH=$HOME/.local/bin:$PATH' > ~/.config/environment.d/uv.conf
 }
 
 function cleanup_tomcat() {
