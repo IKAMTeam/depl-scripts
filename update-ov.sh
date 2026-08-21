@@ -75,6 +75,7 @@ if [ "$2" == "tomcat" ]; then
 
     echo "Deploying WAR [$DOWNLOAD_PATH] to [$WEBAPP_PATH]..."
     extract_war_contents "$WEBAPP_PATH" "$DOWNLOAD_PATH" || exit 1
+    grant_jgit_access || exit 1
     cleanup_tomcat "$TOMCAT_PATH"
 
     sleep 5s

@@ -783,6 +783,16 @@ function recalculate_tomcat_metaspace_size() {
     sed -i "/^METASPACE_MAX_SIZE_MB=.*$/ c METASPACE_MAX_SIZE_MB=\"$METASPACE_MAX_SIZE_MB\"" "$MEM_CONF_FILE" || return 1
 }
 
+# Uses TOMCAT_UN, TOMCAT_GROUP, TOMCAT_PATH variables
+function grant_jgit_access() {
+    mkdir -p "$TOMCAT_PATH/.config/jgit" || return 1
+    chown "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config" || return 1
+    chown -R "$TOMCAT_UN:$TOMCAT_GROUP" "$TOMCAT_PATH/.config/jgit" || return 1
+    chmod g+rwx,o-rwx "$TOMCAT_PATH/.config" || return 1
+    chmod -R g+rwX,o-rwx "$TOMCAT_PATH/.config/jgit" || return 1
+    find "$TOMCAT_PATH/.config/jgit" -type d -exec chmod g+s {} + || return 1
+}
+
 function read_xml_value() {
     local IN_FILE XPATH ATTR_NAME
 
