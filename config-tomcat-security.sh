@@ -20,4 +20,11 @@ setfacl -LRd -m g::r-x "$TOMCAT_PATH" || exit 1
 setfacl -LRd -m o::--- "$TOMCAT_PATH" || exit 1
 setfacl -LRd -m g::rwx "$TOMCAT_PATH/logs" "$TOMCAT_PATH/temp" "$TOMCAT_PATH/work" || exit 1
 
+if [ -d "$TOMCAT_PATH/conf/Catalina" ]; then
+    for CONTEXT_PATH in "$TOMCAT_PATH"/conf/Catalina/*; do
+        [ -d "$CONTEXT_PATH" ] || continue
+        configure_tomcat_website_properties_permissions "$(basename "$CONTEXT_PATH")" || exit 1
+    done
+fi
+
 echo "Permissions successfully set"
