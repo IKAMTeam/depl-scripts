@@ -138,10 +138,43 @@ function download_artifact() {
         ARTIFACT_HUMAN_READABLE="$ARTIFACT_HUMAN_READABLE:$ARTIFACT_CLASSIFIER"
     fi
 
-    MVN_CACHE_DIR="$(mktemp -d)"
+    MVN_CACHE_DIR="$(dirname "$0")/maven/cache"
+    if [ ! -d "$MVN_CACHE_DIR" ]; then
+        echo "Creating Maven cache directory [$MVN_CACHE_DIR]..."
+
+        mkdir -p "$MVN_CACHE_DIR" || return 1
+        chmod g+s,g+w "$MVN_CACHE_DIR" || return 1
+        setfacl -d -m g::rwx "$MVN_CACHE_DIR" || return 1
+        chgrp -R "$(stat -c '%G' "$MVN_CACHE_DIR/..")" "$MVN_CACHE_DIR" || return 1
+    fi
+
+    local MVN_LOCK_FILE="$MVN_CACHE_DIR/.maven-cache.lock"
+    local MVN_LOCK_TIMEOUT=600
+
+    echo "Acquiring Maven cache lock (timeout: ${MVN_LOCK_TIMEOUT}s)..."
+    local LOCK_FD
+    exec {LOCK_FD}>"$MVN_LOCK_FILE" || { echo "ERROR: Unable to open Maven cache lock file: $MVN_LOCK_FILE"; return 1; }
+
+    if ! flock --timeout "$MVN_LOCK_TIMEOUT" "$LOCK_FD"; then
+        echo "ERROR: Unable to acquire Maven cache lock after ${MVN_LOCK_TIMEOUT}s."
+        echo "Another download process may be stuck. Lock file: $MVN_LOCK_FILE"
+
+        # Close lock descriptor
+        exec {LOCK_FD}>&-
+
+        return 1
+    fi
+
+    echo "Maven cache lock acquired (PID: $$, fd: $LOCK_FD)"
+
+    # Ensure lock is released on function exit (success or failure)
+    # shellcheck disable=SC2064
+    trap "flock --unlock $LOCK_FD; exec $LOCK_FD>&-; trap - RETURN; echo 'Maven cache lock released (PID: $$)'" RETURN
+
+    echo "Maven cache size before download: $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
     MVN_LOG="$(mktemp --suffix="_mvn_log")"
 
-    delete_on_exit "$MVN_CACHE_DIR"
     delete_on_exit "$MVN_LOG"
 
     RETRIES="1"
@@ -178,6 +211,10 @@ function download_artifact() {
 
             if cp -f "$ARTIFACT_PATH" "$DOWNLOAD_PATH"; then
                 echo "[$ARTIFACT_HUMAN_READABLE] downloaded successfully"
+
+                rm -rf "$MVN_CACHE_DIR/com/onevizion"
+                echo "Maven cache size after download (without OneVizion artifacts): $(du -sh "$MVN_CACHE_DIR" 2>/dev/null | cut -f1)"
+
                 return 0
             else
                 echo "Unable to copy [$ARTIFACT_PATH] to [$DOWNLOAD_PATH]"
@@ -565,7 +602,12 @@ function config_service() {
     if getent passwd "$SERVICE_UN" >/dev/null; then
         echo "[$SERVICE_UN] user is already exists"
     else
-        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$SERVICE_PATH" "$SERVICE_UN"
+        HOME_PATH="$SERVICES_PATH/${SERVICE_UN}_home"
+        useradd -c "$SERVICE_UN" -g "$SERVICE_GROUP" -s /sbin/nologin -r -d "$HOME_PATH" "$SERVICE_UN"
+
+        mkdir -p "$HOME_PATH" || return 1
+        chown "$SERVICE_UN:$SERVICE_GROUP" "$HOME_PATH" || return 1
+
         echo "[$SERVICE_UN] user added"
     fi
 
@@ -751,6 +793,42 @@ function read_xml_value() {
     "$(dirname "$0")/setup/read-xml-value.py" "$IN_FILE" "$XPATH" "$ATTR_NAME" || return 1
 }
 
+function update_uv() {
+    local USER
+    USER="$1"
+
+    echo "Updating uv for user [$USER]"
+
+    sudo -H -u "$USER" bash -lc 'cd ~ && uv self update' || return 1
+    sudo -H -u "$USER" bash -lc 'cd ~ && uv self version' || return 1
+
+    echo "uv cache directory: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache dir')"
+    echo "uv cache size: $(sudo -H -u "$USER" bash -lc 'cd ~ && uv cache size -H --preview-features cache-size')"
+}
+
+function install_uv() {
+    local USER TMP_UV_DIR
+    USER="$1"
+
+    echo "Installing uv for user [$USER]"
+
+    TMP_UV_DIR="$(mktemp -d /tmp/uv.XXXXXX)" || return 1
+    delete_on_exit "$TMP_UV_DIR"
+
+    cp -rf "$SCRIPTS_PATH/setup/uv"/* "$TMP_UV_DIR" || return 1
+    chmod -R +rx "$TMP_UV_DIR" || return 1
+
+    sudo -u "$USER" "$TMP_UV_DIR/uv-installer.sh" || return 1
+    sudo -u "$USER" bash -c "$(declare -f configure_uv_from_user); configure_uv_from_user"
+}
+
+function configure_uv_from_user() {
+    mkdir -p ~/.config/environment.d
+
+    # shellcheck disable=SC2016
+    echo 'PATH=$HOME/.local/bin:$PATH' > ~/.config/environment.d/uv.conf
+}
+
 function cleanup_tomcat() {
     local TOMCAT_PATH
 
@@ -759,11 +837,6 @@ function cleanup_tomcat() {
     rm -rf "$TOMCAT_PATH"/work/*
     rm -rf "$TOMCAT_PATH"/logs/ps/*
     rm -rf "$TOMCAT_PATH"/logs/catalina.log "$TOMCAT_PATH"/logs/catalina.out
-}
-
-function is_tomcat_support_jakarta() {
-    TOMCAT_MAJOR_VERSION="$(java -cp "$TOMCAT_PATH/lib/catalina.jar" "org.apache.catalina.util.ServerInfo" | grep 'Apache Tomcat/' | cut -d'/' -f2 | cut -d'.' -f1)"
-    [ "$TOMCAT_MAJOR_VERSION" -ge 10 ]
 }
 
 # Uses CLEANUP_TMP_FILES variable
