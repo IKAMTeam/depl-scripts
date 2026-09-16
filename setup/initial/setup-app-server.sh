@@ -44,18 +44,18 @@ fi
 # Add rules for sudo into /etc/sudoers for integration-scheduler, rule-service and services:
 echo "integration-scheduler ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/integration-scheduler
 cat > /etc/sudoers.d/rule-service << EOF
-rule-service ALL=(rule-service : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-sync.sh *
-rule-service ALL=(rule-service : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-run.sh *
-rule-service ALL=(rule-service : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-tree.sh
+rule-service ALL=(ALL : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-sync.sh *
+rule-service ALL=(ALL : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-run.sh *
+rule-service ALL=(ALL : rule-service) NOPASSWD:SETENV: ${SERVICES_PATH}/*rule-service*/python-rules-data/uv-tree.sh
 rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/init-python-workspace.sh *
 rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/deinit-python-workspace.sh *
 rule-service ALL=(root) NOPASSWD: ${SERVICES_PATH}/*rule-service*/python-rules-data/clean-python-workspace.sh *
 EOF
 
 cat > /etc/sudoers.d/services << EOF
-services ALL=(services : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-sync.sh *
-services ALL=(services : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-run.sh *
-services ALL=(services : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-tree.sh
+services ALL=(ALL : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-sync.sh *
+services ALL=(ALL : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-run.sh *
+services ALL=(ALL : services) NOPASSWD:SETENV: ${SERVICES_PATH}/*services*/python-rules-data/uv-tree.sh
 services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/init-python-workspace.sh *
 services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/deinit-python-workspace.sh *
 services ALL=(root) NOPASSWD: ${SERVICES_PATH}/*services*/python-rules-data/clean-python-workspace.sh *
