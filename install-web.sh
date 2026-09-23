@@ -93,6 +93,7 @@ if [ -n "$AES_PASSWORD" ]; then
     echo "aesPassword=$AES_PASSWORD" > "$TOMCAT_PATH/$WEBSITE/ov.properties" || exit 1
 fi
 
+configure_tomcat_website_properties_permissions "$WEBSITE" || exit 1
 recalculate_tomcat_metaspace_size || exit 1
 
 "$(dirname "$0")/update-ov.sh" "$WEBSITE" "tomcat" "$VERSION" || exit 1
