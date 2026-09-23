@@ -757,6 +757,28 @@ function extract_war_contents() {
     find "$WEBAPP_PATH" -maxdepth 1 -type d \( -name 'css' -or -name 'img' \) -exec chmod -R g+w {} + || exit 1
 }
 
+# Uses TOMCAT_PATH, TOMCAT_GROUP variables
+function configure_tomcat_website_properties_permissions() {
+    local WEBSITE PROPERTIES_PATH
+
+    WEBSITE=$1
+    PROPERTIES_PATH="$TOMCAT_PATH/$WEBSITE"
+
+    if [ ! -d "$PROPERTIES_PATH" ]; then
+        return 0
+    fi
+
+    chown -R "$(whoami):$TOMCAT_GROUP" "$PROPERTIES_PATH" || return 1
+    chmod g+rwx,g+s,o-rwx "$PROPERTIES_PATH" || return 1
+    setfacl -d -m u::rwx "$PROPERTIES_PATH" || return 1
+    setfacl -d -m g::rwx "$PROPERTIES_PATH" || return 1
+    setfacl -d -m o::--- "$PROPERTIES_PATH" || return 1
+
+    if [ -f "$PROPERTIES_PATH/ov.properties" ]; then
+        chmod u+rw,g+r,g-w,o-rwx "$PROPERTIES_PATH/ov.properties" || return 1
+    fi
+}
+
 # Uses TOMCAT_PATH variable
 function recalculate_tomcat_metaspace_size() {
     local MEM_CONF_FILE SERVER_XML_FILE METASPACE_SIZE_MB METASPACE_MAX_SIZE_MB
